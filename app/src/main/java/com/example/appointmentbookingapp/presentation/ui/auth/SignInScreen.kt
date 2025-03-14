@@ -1,4 +1,4 @@
-package com.example.loginapplication.presentation.ui.auth
+package com.example.appointmentbookingapp.presentation.ui.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,11 +23,11 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.loginapplication.R
-import com.example.loginapplication.presentation.ui.auth.components.ActionButton
-import com.example.loginapplication.presentation.ui.auth.components.ImageWithBorder
-import com.example.loginapplication.presentation.ui.auth.components.TextInputField
-import com.example.loginapplication.presentation.ui.auth.components.WelcomeText
+import com.example.appointmentbookingapp.R
+import com.example.appointmentbookingapp.presentation.ui.auth.components.ActionButton
+import com.example.appointmentbookingapp.presentation.ui.auth.components.ImageWithBorder
+import com.example.appointmentbookingapp.presentation.ui.auth.components.TextInputField
+import com.example.appointmentbookingapp.presentation.ui.auth.components.WelcomeText
 
 
 @Preview

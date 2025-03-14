@@ -1,4 +1,4 @@
-package com.example.loginapplication
+package com.example.appointmentbookingapp
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

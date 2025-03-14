@@ -1,4 +1,4 @@
-package com.example.loginapplication.presentation.ui.auth.components
+package com.example.appointmentbookingapp.presentation.ui.auth.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.loginapplication.R
+import com.example.appointmentbookingapp.R
 
 @Composable
 fun ImageWithBorder(image: Int) {

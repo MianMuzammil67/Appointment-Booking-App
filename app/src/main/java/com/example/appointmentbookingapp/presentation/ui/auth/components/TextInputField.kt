@@ -1,4 +1,4 @@
-package com.example.loginapplication.presentation.ui.auth.components
+package com.example.appointmentbookingapp.presentation.ui.auth.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,12 +17,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 
-
 @Composable
 fun TextInputField(
     label: String,
     hint: String,
-    value: String,
+//    value: String,
     onValueChange: (String) -> Unit,
     isPassword: Boolean,
     modifier: Modifier = Modifier

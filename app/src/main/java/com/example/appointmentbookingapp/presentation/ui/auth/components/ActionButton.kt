@@ -1,4 +1,4 @@
-package com.example.loginapplication.presentation.ui.auth.components
+package com.example.appointmentbookingapp.presentation.ui.auth.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import com.example.loginapplication.R
+import com.example.appointmentbookingapp.R
 
 @Composable
 fun ActionButton (

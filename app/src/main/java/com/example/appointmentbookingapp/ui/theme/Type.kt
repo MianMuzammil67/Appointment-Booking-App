@@ -1,4 +1,4 @@
-package com.example.loginapplication.ui.theme
+package com.example.appointmentbookingapp.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

@@ -1,4 +1,4 @@
-package com.example.loginapplication.ui.theme
+package com.example.appointmentbookingapp.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
