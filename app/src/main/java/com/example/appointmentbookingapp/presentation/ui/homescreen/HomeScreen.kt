@@ -28,8 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.appointmentbookingapp.R
-import com.example.appointmentbookingapp.presentation.ui.components.DoctorItem
-import com.example.appointmentbookingapp.presentation.ui.components.*
+import com.example.appointmentbookingapp.presentation.ui.components.DocCard
 import com.example.appointmentbookingapp.presentation.ui.components.SearchDoctorField
 import com.example.appointmentbookingapp.presentation.ui.homescreen.components.CategoryItem
 import com.example.appointmentbookingapp.presentation.ui.homescreen.components.ImageSlider
