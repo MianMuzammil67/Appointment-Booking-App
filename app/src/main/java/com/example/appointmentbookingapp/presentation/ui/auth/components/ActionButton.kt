@@ -20,7 +20,7 @@ fun ActionButton (
     Button(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth()
-            .padding(24.dp),
+            .padding(top = 24.dp, bottom = 24.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = colorResource(id = R.color.colorPrimary)
         ),

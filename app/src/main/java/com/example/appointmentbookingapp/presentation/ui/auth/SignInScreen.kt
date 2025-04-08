@@ -57,7 +57,7 @@ fun SignInScreen() {
             TextInputField(
                 label = "Email",
                 hint = "Enter Your Email",
-                value = email,
+//                value = email,
                 isPassword = false,
                 onValueChange = { email = it }
             )
@@ -67,7 +67,7 @@ fun SignInScreen() {
             TextInputField(
                 label = "Password",
                 hint = "Enter Your Password",
-                value = password,
+//                value = password,
                 isPassword = true,
                 onValueChange = { password = it }
             )
