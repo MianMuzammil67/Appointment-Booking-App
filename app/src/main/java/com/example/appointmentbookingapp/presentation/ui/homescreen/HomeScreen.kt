@@ -37,6 +37,16 @@ import com.example.appointmentbookingapp.presentation.ui.homescreen.components.I
 @Composable
 fun HomeScreen() {
     val userName by remember { mutableStateOf("Mian Muzammil") }
+
+    val categories = listOf(
+        CategoryData(R.drawable.ic_cate_placeholder, "#DC9497", "Dentist"),
+        CategoryData(R.drawable.ic_cate_placeholder, "#93C19E", "Therapist"),
+        CategoryData(R.drawable.ic_cate_placeholder, "#F5AD7E", "Surgeon"),
+        CategoryData(R.drawable.ic_cate_placeholder, "#ACA1CD", "Cardiologist")
+    )
+    val docCards = List(2) { DocCard() }
+
+
     Column(
         modifier = Modifier
             .background(Color.White)
@@ -135,18 +145,14 @@ fun HomeScreen() {
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CategoryItem(
-                R.drawable.ic_cate_placeholder, "#DC9497", "Dentist"
-            )
-            CategoryItem(
-                R.drawable.ic_cate_placeholder, "#93C19E", "Therapist"
-            )
-            CategoryItem(
-                R.drawable.ic_cate_placeholder, "#F5AD7E", "Surgeon"
-            )
-            CategoryItem(
-                R.drawable.ic_cate_placeholder, "#ACA1CD", "Cardiologist"
-            )
+            categories.forEach{category->
+                CategoryItem(
+                    image = category.icon,
+                    backgroundColor = category.color,
+                    categoryName = category.label,
+                )
+
+            }
 
         }
         Spacer(Modifier.height(8.dp))
@@ -168,11 +174,10 @@ fun HomeScreen() {
                 color = colorResource(id = R.color.gray)
             )
         }
-        Spacer(Modifier.height(8.dp))
-        DocCard()
-
-        Spacer(Modifier.height(8.dp))
-        DocCard()
+        docCards.forEach { docCard ->
+            docCard
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
 
 //        DoctorItem()
@@ -182,3 +187,4 @@ fun HomeScreen() {
     }
 
 }
+data class CategoryData(val icon: Int, val color: String, val label: String)
