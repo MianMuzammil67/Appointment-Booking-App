@@ -42,13 +42,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
 
 
-@Preview
 @Composable
-fun DocDetailScreen() {
-
+fun DocDetailScreen(navController: NavHostController) {
     Column(
         modifier = Modifier
             .background(Color.White)
@@ -295,7 +295,6 @@ fun ItemWithIcon(
 
 @Composable
 fun AboutMe() {
-
     Column {
 
         Text(
@@ -357,6 +356,11 @@ fun BottomLayout() {
 
     }
 
+}
+@Preview
+@Composable
+fun DocScreenPreview(modifier: Modifier = Modifier) {
+    DocDetailScreen(navController = rememberNavController())
 }
 
 

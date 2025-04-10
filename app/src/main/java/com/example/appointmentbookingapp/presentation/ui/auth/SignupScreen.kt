@@ -1,6 +1,7 @@
 package com.example.appointmentbookingapp.presentation.ui.auth
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,15 +23,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.presentation.ui.auth.components.ActionButton
 import com.example.appointmentbookingapp.presentation.ui.auth.components.ImageWithBorder
 import com.example.appointmentbookingapp.presentation.ui.auth.components.TextInputField
 import com.example.appointmentbookingapp.presentation.ui.auth.components.WelcomeText
 
-@Preview
+//@Preview
 @Composable
-fun SignupScreen (){
+fun SignupScreen(navController: NavHostController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     Column(
@@ -121,11 +124,20 @@ fun SignupScreen (){
                 Text(
                     text = "Sign In",
                     color = colorResource(id = R.color.colorPrimary),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.clickable{
+                        navController.navigate("SignIn")
+                    }
                 )
 
             }
         }
 
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SignupScreenPreview() {
+    SignupScreen(navController = rememberNavController())
 }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,17 +26,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.presentation.ui.components.DocCard
 import com.example.appointmentbookingapp.presentation.ui.components.SearchDoctorField
 import com.example.appointmentbookingapp.presentation.ui.homescreen.components.CategoryItem
 import com.example.appointmentbookingapp.presentation.ui.homescreen.components.ImageSlider
 
-@Preview
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavHostController) {
     val userName by remember { mutableStateOf("Mian Muzammil") }
 
     val categories = listOf(
@@ -45,80 +48,82 @@ fun HomeScreen() {
         CategoryData(R.drawable.ic_cate_placeholder, "#ACA1CD", "Cardiologist")
     )
     val docCards = List(2) { DocCard() }
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
 
-
-    Column(
-        modifier = Modifier
-            .background(Color.White)
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .background(Color.White)
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
-            Image(
-                painter = painterResource(id = R.drawable.demo_user),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(70.dp)
-                    .clip(CircleShape)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Column(modifier = Modifier.weight(1f)) {
-
-                Text(
-                    "Hi,Welcome Back,", color = colorResource(id = R.color.gray)
+                Image(
+                    painter = painterResource(id = R.drawable.demo_user),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(70.dp)
+                        .clip(CircleShape)
                 )
-                Text(
-                    text = userName,
-                    color = colorResource(id = R.color.black),
-                    style = MaterialTheme.typography.titleMedium
+                Spacer(modifier = Modifier.width(8.dp))
+                Column(modifier = Modifier.weight(1f)) {
+
+                    Text(
+                        "Hi,Welcome Back,", color = colorResource(id = R.color.gray)
+                    )
+                    Text(
+                        text = userName,
+                        color = colorResource(id = R.color.black),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                }
+                Image(
+                    painter = painterResource(id = R.drawable.icon_bell),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
                 )
 
             }
-            Image(
-                painter = painterResource(id = R.drawable.icon_bell),
-                contentDescription = null,
-                modifier = Modifier.size(24.dp)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            SearchDoctorField()
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            val images = listOf(
+                R.drawable.doc1, R.drawable.doc2, R.drawable.doc3
             )
 
-        }
+            ImageSlider(images = images)
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        SearchDoctorField()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        val images = listOf(
-            R.drawable.doc1, R.drawable.doc2, R.drawable.doc3
-        )
-
-        ImageSlider(images = images)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-
-        ) {
-            Text(
-                text = "Categories",
-                style = MaterialTheme.typography.titleLarge,
-                color = colorResource(id = R.color.black)
-            )
-            Text(
-                text = "See All",
-                style = MaterialTheme.typography.titleSmall,
-                color = colorResource(id = R.color.gray)
-            )
-        }
-        Spacer(Modifier.height(8.dp))
+            ) {
+                Text(
+                    text = "Categories",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = colorResource(id = R.color.black),
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "See All",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = colorResource(id = R.color.gray)
+                )
+            }
+            Spacer(Modifier.height(8.dp))
 
 //        Row(
 //            modifier = Modifier.fillMaxWidth(),
@@ -140,51 +145,62 @@ fun HomeScreen() {
 //
 //        }
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            categories.forEach{category->
-                CategoryItem(
-                    image = category.icon,
-                    backgroundColor = category.color,
-                    categoryName = category.label,
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                categories.forEach { category ->
+                    CategoryItem(
+                        image = category.icon,
+                        backgroundColor = category.color,
+                        categoryName = category.label,
+                    )
+
+                }
+
+            }
+            Spacer(Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+
+            ) {
+                Text(
+                    text = "Doctors",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = colorResource(id = R.color.black),
+                    fontWeight = FontWeight.Bold
                 )
+                Text(
+                    text = "See All",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = colorResource(id = R.color.gray)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            docCards.forEach { docCard ->
+//            docCard
+                Spacer(modifier = Modifier.height(8.dp))
+                DocCard()
 
             }
 
-        }
-        Spacer(Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-
-        ) {
-            Text(
-                text = "Doctors",
-                style = MaterialTheme.typography.titleLarge,
-                color = colorResource(id = R.color.black)
-            )
-            Text(
-                text = "See All",
-                style = MaterialTheme.typography.titleSmall,
-                color = colorResource(id = R.color.gray)
-            )
-        }
-        docCards.forEach { docCard ->
-            docCard
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-
 //        DoctorItem()
 
-
+        }
 
     }
-
 }
+
 data class CategoryData(val icon: Int, val color: String, val label: String)
+
+@Preview
+@Composable
+fun HomeScreenPreview() {
+    HomeScreen(navController = rememberNavController())
+}
