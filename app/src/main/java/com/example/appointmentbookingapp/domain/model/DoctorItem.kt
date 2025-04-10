@@ -7,6 +7,6 @@ data class DoctorItem(
     val imageUrl: String = "",
     val rating: String = "",
     val docCategory:String= "",
-    val isFavorite: Boolean = false,
+    var isFavorite: Boolean = false,
 
-)
+    )

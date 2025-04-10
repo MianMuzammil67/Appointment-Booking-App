@@ -82,7 +82,7 @@ fun FavoriteScreen() {
             ) {
             items(favoriteDoctor) { doctor ->
                 Spacer(modifier = Modifier.height(8.dp))
-                DocCard()
+                DocCard(doctor= doctor){}
             }
 
         }

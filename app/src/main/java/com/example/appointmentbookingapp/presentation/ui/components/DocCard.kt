@@ -2,6 +2,7 @@ package com.example.appointmentbookingapp.presentation.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,11 +32,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import com.example.appointmentbookingapp.R
+import com.example.appointmentbookingapp.domain.model.DoctorItem
 
-@Preview
 @Composable
-fun DocCard() {
-    Row(
+    fun DocCard(doctor: DoctorItem, onClick : ()-> Unit ) {
+        Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
 
@@ -43,52 +44,38 @@ fun DocCard() {
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(Color("#D2EBE7".toColorInt()))
-            .padding(8.dp),
-//            .padding(top = 8.dp)
+            .padding(8.dp)
+            .clickable { onClick() },
+
     )
     {
         Box(
             modifier = Modifier
                 .size(100.dp)
                 .clip(RoundedCornerShape(12.dp))
-//                .height(100.dp)
-//                .width(100.dp)
                 .background(colorResource(R.color.muted_rose))
-//                .weight(.8f)
-//                .wrapContentSize()
 
-//                .padding(8.dp)
         ) {
             Image(
                 painter = painterResource(R.drawable.im_doctor),
                 contentDescription = null,
                 Modifier
-//                    .height(100.dp)
-//                    .width(100.dp)
-//                    .size(100.dp)
                     .matchParentSize()
                     .padding(start = 2.dp, end = 2.dp, top = 2.dp)
-
                     .align(Alignment.Center),
-//                contentScale = ContentScale.Fit,
-
-
-            )
+                )
         }
-
         Column(
             Modifier
-//                .weight(1.5f)
-//                .padding(top = 32.dp)
+
                 .padding(start = 8.dp)
-//                .offset(x= 8.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = "Dr. Andrew",
+                    text = doctor.name,
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.Black,
                     fontWeight = FontWeight.Bold
@@ -96,8 +83,12 @@ fun DocCard() {
                 Icon(
                     painter = painterResource(R.drawable.ic_fav),
                     contentDescription = null,
-                    Modifier.size(24.dp),
-                    tint = colorResource(R.color.colorPrimary)
+                    Modifier
+                        .size(24.dp)
+                        .clickable {
+                            doctor.isFavorite = !doctor.isFavorite
+                        },
+                    tint = colorResource(R.color.colorPrimary),
                 )
 
             }
@@ -107,9 +98,8 @@ fun DocCard() {
                 color = Gray
             )
             Text(
-                text = "Dentist",
+                text = doctor.docCategory,
                 style = MaterialTheme.typography.bodyLarge,
-//                color = colorResource(R.color.gray),
             )
 
             Spacer(Modifier.height(8.dp))
@@ -119,19 +109,6 @@ fun DocCard() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-//                Text(
-//                    text = "Fee: 12$ ",
-//                    style = MaterialTheme.typography.titleSmall,
-//                    color = colorResource(R.color.white),
-//                    textAlign = TextAlign.Center,
-//                    modifier = Modifier
-//                        .clip(RoundedCornerShape(12.dp))
-////                        .clip(RoundedCornerShape(24.dp))
-//                        .background(colorResource(R.color.colorPrimary))
-//                        .padding(horizontal = 24.dp, vertical = 4.dp)
-////                        .height(20.dp)
-////                        .width(60.dp)
-//                )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -149,7 +126,7 @@ fun DocCard() {
                         tint = colorResource(R.color.yellow)
                     )
                     Text(
-                        text = "4.3",
+                        text = doctor.rating,
                         style = MaterialTheme.typography.bodySmall,
                     )
                     VerticalDivider(
@@ -164,8 +141,6 @@ fun DocCard() {
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
-
-
                 Text(
                     text = "Book",
                     style = MaterialTheme.typography.titleSmall,
@@ -173,19 +148,21 @@ fun DocCard() {
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-//                        .clip(RoundedCornerShape(24.dp))
                         .background(colorResource(R.color.colorPrimary))
                         .padding(horizontal = 24.dp, vertical = 4.dp)
-//                        .height(20.dp)
-//                        .width(60.dp)
+
                 )
             }
         }
 
 
     }
+}
 
-
+@Preview
+@Composable
+fun DocCardPreview(modifier: Modifier = Modifier) {
+    DocCard(doctor = DoctorItem()) { }
 }
 
 
