@@ -1,6 +1,5 @@
 package com.example.appointmentbookingapp.presentation.ui.appointment
 
-//import androidx.compose.material.Scaffold
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,13 +44,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import java.time.LocalDate
 import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
-fun BookAppointmentScreen() {
+fun BookAppointmentScreen(navController: NavHostController) {
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var selectedTime by remember { mutableStateOf<String?>(null) }
 
@@ -155,7 +155,8 @@ fun AppointmentCalendar(
     Column(
         modifier = Modifier
             .padding(16.dp)
-            .background(Color.White,
+            .background(
+                Color.White,
                 shape = RoundedCornerShape(16.dp)
             )
             .padding(16.dp)
@@ -262,13 +263,8 @@ fun AppointmentCalendar(
     }
 }
 
-//fun BookAppointment() {
-//    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
-//
-//    AppointmentCalendar(
-//        selectedDate = selectedDate,
-//        onDateSelected = { selectedDate = it }
-//    )
-//
-//}
-//
+@Preview
+@Composable
+fun BookAppointmentPreview(modifier: Modifier = Modifier) {
+    BookAppointmentScreen(navController = rememberNavController())
+}

@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.appointmentbookingapp.presentation.ui.appointment.BookAppointmentScreen
 import com.example.appointmentbookingapp.presentation.ui.auth.SignInScreen
 import com.example.appointmentbookingapp.presentation.ui.auth.SignupScreen
 import com.example.appointmentbookingapp.presentation.ui.doctorDetail.DocDetailScreen
@@ -30,6 +31,9 @@ fun MainApp() {
             }
             composable("DoctorDetail"){
                 DocDetailScreen(navController)
+            }
+            composable("BookAppointment"){
+                BookAppointmentScreen(navController)
             }
 
 
