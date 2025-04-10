@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,27 +14,18 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.appointmentbookingapp.R
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun ImageSlider(modifier: Modifier = Modifier, images: List<Int> ) {
@@ -45,12 +35,12 @@ fun ImageSlider(modifier: Modifier = Modifier, images: List<Int> ) {
     )
     LaunchedEffect(Unit) {
         while (true) {
-            delay(2000)
+            delay(3000)
             val nextPage = (pagerState.currentPage + 1) % pagerState.pageCount
             pagerState.scrollToPage(nextPage)
         }
     }
-    val scope = rememberCoroutineScope()
+//    val scope = rememberCoroutineScope()
 
     Column(
         modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
@@ -72,56 +62,56 @@ fun ImageSlider(modifier: Modifier = Modifier, images: List<Int> ) {
                     )
                 }
             }
-            IconButton(
-                onClick = {
-                    val nextPage = pagerState.currentPage + 1
-                    if (nextPage < images.size) {
-                        scope.launch {
-                            pagerState.scrollToPage(nextPage)
-                        }
-                    }
-                },
-                modifier
-                    .padding(30.dp)
-                    .size(48.dp)
-                    .align(Alignment.CenterEnd)
-                    .clip(CircleShape),
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = Color(0x52373737)
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = "",
-                    modifier.fillMaxSize(),
-                    tint = Color.LightGray
-                )
-            }
-            IconButton(
-                onClick = {
-                    val prevPage = pagerState.currentPage - 1
-                    if (prevPage >= 0) {
-                        scope.launch {
-                            pagerState.scrollToPage(prevPage)
-                        }
-                    }
-                },
-                modifier
-                    .padding(30.dp)
-                    .size(48.dp)
-                    .align(Alignment.CenterStart)
-                    .clip(CircleShape),
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = Color(0x52373737)
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                    contentDescription = "",
-                    modifier.fillMaxSize(),
-                    tint = Color.LightGray
-                )
-            }
+//            IconButton(
+//                onClick = {
+//                    val nextPage = pagerState.currentPage + 1
+//                    if (nextPage < images.size) {
+//                        scope.launch {
+//                            pagerState.scrollToPage(nextPage)
+//                        }
+//                    }
+//                },
+//                modifier
+//                    .padding(30.dp)
+//                    .size(48.dp)
+//                    .align(Alignment.CenterEnd)
+//                    .clip(CircleShape),
+//                colors = IconButtonDefaults.iconButtonColors(
+//                    containerColor = Color(0x52373737)
+//                )
+//            ) {
+//                Icon(
+//                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+//                    contentDescription = "",
+//                    modifier.fillMaxSize(),
+//                    tint = Color.LightGray
+//                )
+//            }
+//            IconButton(
+//                onClick = {
+//                    val prevPage = pagerState.currentPage - 1
+//                    if (prevPage >= 0) {
+//                        scope.launch {
+//                            pagerState.scrollToPage(prevPage)
+//                        }
+//                    }
+//                },
+//                modifier
+//                    .padding(30.dp)
+//                    .size(48.dp)
+//                    .align(Alignment.CenterStart)
+//                    .clip(CircleShape),
+//                colors = IconButtonDefaults.iconButtonColors(
+//                    containerColor = Color(0x52373737)
+//                )
+//            ) {
+//                Icon(
+//                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+//                    contentDescription = "",
+//                    modifier.fillMaxSize(),
+//                    tint = Color.LightGray
+//                )
+//            }
         }
 
         PageIndicator(
