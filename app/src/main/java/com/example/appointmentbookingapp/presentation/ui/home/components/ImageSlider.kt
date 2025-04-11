@@ -1,4 +1,4 @@
-package com.example.appointmentbookingapp.presentation.ui.homescreen.components
+package com.example.appointmentbookingapp.presentation.ui.home.components
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
@@ -35,7 +35,7 @@ fun ImageSlider(modifier: Modifier = Modifier, images: List<Int> ) {
     )
     LaunchedEffect(Unit) {
         while (true) {
-            delay(3000)
+            delay(4000)
             val nextPage = (pagerState.currentPage + 1) % pagerState.pageCount
             pagerState.scrollToPage(nextPage)
         }

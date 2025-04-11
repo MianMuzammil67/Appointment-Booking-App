@@ -1,4 +1,4 @@
-package com.example.appointmentbookingapp.presentation.ui.homescreen.components
+package com.example.appointmentbookingapp.presentation.ui.home.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

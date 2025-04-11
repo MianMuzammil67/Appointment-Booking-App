@@ -11,7 +11,7 @@ import com.example.appointmentbookingapp.presentation.ui.appointment.BookAppoint
 import com.example.appointmentbookingapp.presentation.ui.auth.SignInScreen
 import com.example.appointmentbookingapp.presentation.ui.auth.SignupScreen
 import com.example.appointmentbookingapp.presentation.ui.doctorDetail.DocDetailScreen
-import com.example.appointmentbookingapp.presentation.ui.homescreen.HomeScreen
+import com.example.appointmentbookingapp.presentation.ui.home.HomeScreen
 
 @Composable
 fun MainApp() {

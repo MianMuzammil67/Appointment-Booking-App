@@ -1,4 +1,4 @@
-package com.example.appointmentbookingapp.presentation.ui.homescreen
+package com.example.appointmentbookingapp.presentation.ui.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,8 +38,8 @@ import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.presentation.ui.components.DocCard
 import com.example.appointmentbookingapp.presentation.ui.components.SearchDoctorField
-import com.example.appointmentbookingapp.presentation.ui.homescreen.components.CategoryItem
-import com.example.appointmentbookingapp.presentation.ui.homescreen.components.ImageSlider
+import com.example.appointmentbookingapp.presentation.ui.home.components.CategoryItem
+import com.example.appointmentbookingapp.presentation.ui.home.components.ImageSlider
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
@@ -125,7 +125,6 @@ fun HomeScreen(navController: NavHostController) {
                     modifier = Modifier.size(24.dp)
                 )
             }
-
             Spacer(modifier = Modifier.height(16.dp))
 
             SearchDoctorField(
