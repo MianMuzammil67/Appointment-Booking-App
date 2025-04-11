@@ -7,8 +7,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,32 +16,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.appointmentbookingapp.R
 
-@Preview
 @Composable
-fun SearchDoctorField() {
+fun SearchDoctorField(
+    value:String,
+    onValueChange:(String)->Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-//            .padding(16.dp)
     ) {
-        TextField(
-            value = "",  // You can bind this to your state
-            onValueChange = {},
-//            label = { Text("Search a Doctor") },
-            placeholder = { Text("Search a Doctor") },
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text("Search a Doctor") },
             leadingIcon = {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_search),  // Replace with your search icon
+                    painter = painterResource(id = R.drawable.ic_search),
                     contentDescription = "Search Icon"
                 )
             },
             trailingIcon = {
                 IconButton(onClick = { /* Handle voice click */ }) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_voice),  // Replace with your voice icon
+                        painter = painterResource(id = R.drawable.ic_voice),
                         contentDescription = "Voice Icon"
                     )
                 }
@@ -54,6 +53,7 @@ fun SearchDoctorField() {
             ),
             keyboardActions = KeyboardActions(
                 onSearch = {
+
                 }
             ),
             shape = MaterialTheme.shapes.small,

@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +44,9 @@ import com.example.appointmentbookingapp.presentation.ui.homescreen.components.I
 @Composable
 fun HomeScreen(navController: NavHostController) {
     val userName by remember { mutableStateOf("Mian Muzammil") }
+    var search by remember {
+        mutableStateOf("")
+    }
 
     val categories = listOf(
         CategoryData(R.drawable.ic_cate_placeholder, "#DC9497", "Dentist"),
@@ -124,7 +128,10 @@ fun HomeScreen(navController: NavHostController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            SearchDoctorField()
+            SearchDoctorField(
+                value = search,
+                onValueChange = {search = it}
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
