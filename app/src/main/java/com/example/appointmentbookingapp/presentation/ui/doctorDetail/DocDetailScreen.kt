@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -21,12 +21,15 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,81 +51,111 @@ import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DocDetailScreen(navController: NavHostController) {
-    Scaffold(Modifier.fillMaxSize()) { innerPadding ->
+    Scaffold(
+        Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text("Doctor Details", fontWeight = FontWeight.Bold)
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back")
+
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {  }) {
+                        Icon(painter = painterResource(R.drawable.ic_fav), contentDescription = "add to Favorite")
+
+                    }
+                },
+                colors = TopAppBarColors(
+                    containerColor = Color.White,
+                    titleContentColor = Color.Black,
+                    actionIconContentColor = Color.Black,
+                    navigationIconContentColor = Color.Black,
+                    scrolledContainerColor = Color.White,
+                )
+            )
+        },
+        bottomBar = {
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .navigationBarsPadding()
+
+            ) {
+                Box(
+                    Modifier
+                        .clip(CircleShape)
+                        .background(color = colorResource(R.color.colorPrimary))
+                        .padding(16.dp)
+                        .size(32.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.ic_message),
+                        contentDescription = null,
+                        colorFilter = ColorFilter.tint(Color.White),
+                    )
+                }
+                Button(
+                    onClick = { navController.navigate("BookAppointment") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorResource(id = R.color.colorPrimary),
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+
+                    Text(
+                        text = "Book Appointment",
+                        style = TextStyle(fontWeight = FontWeight.Bold)
+                    )
+                }
+
+
+            }
+
+
+        }
+
+
+    ) { innerPadding ->
 
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .background(Color.White)
-//                .fillMaxSize()
                 .padding(16.dp)
+                .fillMaxSize()
         )
         {
-            TitleBar {
-                navController.navigateUp()
-            }
-            Spacer(Modifier.height(16.dp))
             TopCard()
             Spacer(Modifier.height(24.dp))
             TabBar()
             Spacer(Modifier.height(24.dp))
             AboutMe()
-            Spacer(Modifier.height(16.dp))
-
-
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column(modifier = Modifier.fillMaxHeight()) {
-                    Spacer(Modifier.weight(1f))
-                    BottomLayout{
-                        navController.navigate("BookAppointment")
-                    }
-                }
-            }
-
         }
     }
 }
-
-    @Composable
-    fun TitleBar(
-        onBackPressed: () -> Unit,
-    ) {
-        Row(
-            Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBackPressed) {
-                Image(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    Modifier.size(32.dp)
-                )
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = "Doctor Details",
-                style = MaterialTheme.typography.titleLarge
-            )
-            Spacer(modifier = Modifier.weight(1f))
-
-            IconButton(onClick = { /* handle click */ }) {
-                Image(
-                    painter = painterResource(R.drawable.ic_fav),
-                    contentDescription = "Favorite",
-                    Modifier.size(32.dp)
-                )
-            }
-        }
-    }
 
 
 @Composable
 fun TopCard() {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-//        horizontalArrangement = Arrangement.Center,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
 
         modifier = Modifier
@@ -245,7 +278,6 @@ fun ItemWithIcon(
                     tint = colorResource(R.color.colorPrimary) // You can customize the tint here
                 )
             } else if (imageResId != null) {
-                // For PNG/SVG images (drawable resources)
                 Image(
                     painter = painterResource(id = imageResId),
                     contentDescription = null,
@@ -264,8 +296,6 @@ fun ItemWithIcon(
     }
 }
 
-
-
 @Composable
 fun AboutMe() {
     Column {
@@ -280,53 +310,7 @@ fun AboutMe() {
         Text(
             text = "Dr. David Patel, a dedicated cardiologist, brings a wealth of experience to Golden Gate Cardiology Center in Golden Gate, CA.",
             style = MaterialTheme.typography.bodyMedium,
-//            color = colorResource(R.color.black)
         )
-    }
-
-}
-
-@Composable
-fun BottomLayout(onBookAppointment :()-> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-
-        Box(
-            Modifier
-                .clip(CircleShape)
-                .background(color = colorResource(R.color.colorPrimary))
-                .padding(16.dp)
-                .size(32.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Image(
-//                imageVector = Icons.Default.Add,
-                painter = painterResource(R.drawable.ic_message),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(Color.White),
-            )
-        }
-        Button(
-            onClick = {onBookAppointment()},
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = colorResource(id = R.color.colorPrimary),
-                contentColor = Color.White
-            ),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-
-            Text(
-                text = "Book Appointment",
-                style = TextStyle(fontWeight = FontWeight.Bold)
-            )
-        }
-
-
     }
 
 }
