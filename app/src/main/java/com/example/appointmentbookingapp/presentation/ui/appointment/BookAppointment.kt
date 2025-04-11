@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -20,9 +21,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -61,14 +62,13 @@ fun BookAppointmentScreen(navController: NavHostController) {
         "3.00 PM", "3.30 PM", "4.00 PM",
         "4.30 PM", "5.00 PM", "5.30 PM"
     )
-
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Book Appointment", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
-                    IconButton(onClick = { /* Handle back */ }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
             )
@@ -80,7 +80,9 @@ fun BookAppointmentScreen(navController: NavHostController) {
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .navigationBarsPadding()
+                ,
                 shape = RoundedCornerShape(8.dp),
                 enabled = selectedTime != null
             ) {
@@ -181,7 +183,7 @@ fun AppointmentCalendar(
                 },
                 enabled = !currentMonth.atDay(1).isBefore(today.withDayOfMonth(1))
             ) {
-                Icon(Icons.Default.KeyboardArrowLeft, contentDescription = "Previous Month")
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Previous Month")
             }
 
             Text(
@@ -193,10 +195,9 @@ fun AppointmentCalendar(
             IconButton(
                 onClick = { currentMonth = currentMonth.plusMonths(1) }
             ) {
-                Icon(Icons.Default.KeyboardArrowRight, contentDescription = "Next Month")
+                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next Month")
             }
         }
-
         Spacer(modifier = Modifier.height(8.dp))
 
         // Weekday labels

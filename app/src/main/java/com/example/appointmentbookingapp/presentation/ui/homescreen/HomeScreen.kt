@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
+import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.presentation.ui.components.DocCard
 import com.example.appointmentbookingapp.presentation.ui.components.SearchDoctorField
 import com.example.appointmentbookingapp.presentation.ui.homescreen.components.CategoryItem
@@ -47,15 +50,44 @@ fun HomeScreen(navController: NavHostController) {
         CategoryData(R.drawable.ic_cate_placeholder, "#F5AD7E", "Surgeon"),
         CategoryData(R.drawable.ic_cate_placeholder, "#ACA1CD", "Cardiologist")
     )
-    val docCards = List(2) { DocCard() }
+    val doctorList = listOf(
+        DoctorItem(
+            id = "1",
+            name = "Dr. Andrew",
+            description = "Dentist",
+            imageUrl = "",
+            rating = "4.3",
+            docCategory = "Dentist",
+            isFavorite = true
+        ),
+        DoctorItem(
+            id = "2",
+            name = "Dr. Emma",
+            description = "Pediatrician",
+            imageUrl = "",
+            rating = "4.8",
+            docCategory = "Pediatrics",
+            isFavorite = false
+        ),
+        DoctorItem(
+            id = "3",
+            name = "Dr. Michael",
+            description = "Cardiologist",
+            imageUrl = "",
+            rating = "4.1",
+            docCategory = "Cardiology",
+            isFavorite = true
+        )
+    )
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .background(Color.White)
                 .fillMaxSize()
                 .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -88,7 +120,6 @@ fun HomeScreen(navController: NavHostController) {
                     contentDescription = null,
                     modifier = Modifier.size(24.dp)
                 )
-
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -124,26 +155,6 @@ fun HomeScreen(navController: NavHostController) {
                 )
             }
             Spacer(Modifier.height(8.dp))
-
-//        Row(
-//            modifier = Modifier.fillMaxWidth(),
-//            horizontalArrangement = Arrangement.SpaceAround,
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//            CategoryItem(
-//                R.drawable.ic_cate_placeholder, "#DC9497", "Dentist"
-//            )
-//            CategoryItem(
-//                R.drawable.ic_cate_placeholder, "#93C19E", "Dentist"
-//            )
-//            CategoryItem(
-//                R.drawable.ic_cate_placeholder, "#F5AD7E", "Dentist"
-//            )
-//            CategoryItem(
-//                R.drawable.ic_cate_placeholder, "#ACA1CD", "Dentist"
-//            )
-//
-//        }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -182,16 +193,12 @@ fun HomeScreen(navController: NavHostController) {
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-
-            docCards.forEach { docCard ->
-//            docCard
+            doctorList.forEach { docCard ->
                 Spacer(modifier = Modifier.height(8.dp))
-                DocCard()
-
+                DocCard(docCard){
+                    navController.navigate("DoctorDetail")
+                }
             }
-
-//        DoctorItem()
-
         }
 
     }
