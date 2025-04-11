@@ -25,6 +25,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -49,66 +50,73 @@ import com.example.appointmentbookingapp.R
 
 @Composable
 fun DocDetailScreen(navController: NavHostController) {
-    Column(
-        modifier = Modifier
-            .background(Color.White)
-            .fillMaxSize()
-            .padding(16.dp)
-    )
-    {
-        TittleBar {}
-        Spacer(Modifier.height(16.dp))
-        TopCard()
-        Spacer(Modifier.height(24.dp))
-        TabBar()
-        Spacer(Modifier.height(24.dp))
-        AboutMe()
-        Spacer(Modifier.height(16.dp))
+    Scaffold(Modifier.fillMaxSize()) { innerPadding ->
+
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .background(Color.White)
+//                .fillMaxSize()
+                .padding(16.dp)
+        )
+        {
+            TitleBar {
+                navController.navigateUp()
+            }
+            Spacer(Modifier.height(16.dp))
+            TopCard()
+            Spacer(Modifier.height(24.dp))
+            TabBar()
+            Spacer(Modifier.height(24.dp))
+            AboutMe()
+            Spacer(Modifier.height(16.dp))
 
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.fillMaxHeight()) {
-                Spacer(Modifier.weight(1f))
-                BottomLayout()
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(modifier = Modifier.fillMaxHeight()) {
+                    Spacer(Modifier.weight(1f))
+                    BottomLayout{
+                        navController.navigate("BookAppointment")
+                    }
+                }
+            }
+
+        }
+    }
+}
+
+    @Composable
+    fun TitleBar(
+        onBackPressed: () -> Unit,
+    ) {
+        Row(
+            Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onBackPressed) {
+                Image(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    Modifier.size(32.dp)
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = "Doctor Details",
+                style = MaterialTheme.typography.titleLarge
+            )
+            Spacer(modifier = Modifier.weight(1f))
+
+            IconButton(onClick = { /* handle click */ }) {
+                Image(
+                    painter = painterResource(R.drawable.ic_fav),
+                    contentDescription = "Favorite",
+                    Modifier.size(32.dp)
+                )
             }
         }
-
-
     }
-}
 
-
-@Composable
-fun TittleBar(
-    onBackPressed: () -> Unit,
-) {
-    Row(
-        Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(onClick = onBackPressed) {
-            Image(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                Modifier.size(32.dp)
-            )
-        }
-        Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = "Doctor Details",
-            style = MaterialTheme.typography.titleLarge
-        )
-        Spacer(modifier = Modifier.weight(1f))
-
-        IconButton(onClick = { /* handle click */ }) {
-            Image(
-                painter = painterResource(R.drawable.ic_fav),
-                contentDescription = "Favorite",
-                Modifier.size(32.dp)
-            )
-        }
-    }
-}
 
 @Composable
 fun TopCard() {
@@ -140,16 +148,13 @@ fun TopCard() {
             )
         }
 
-        Column(
-//            Modifier
-//                .padding(start = 8.dp)
-        ) {
-                Text(
-                    text = "Dr. Andrew",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = Color.Black,
-                    fontWeight = FontWeight.Bold,
-                )
+        Column {
+            Text(
+                text = "Dr. Andrew",
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.Black,
+                fontWeight = FontWeight.Bold,
+            )
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 4.dp),
                 thickness = 1.dp,
@@ -160,7 +165,7 @@ fun TopCard() {
                 text = "Dentist",
                 style = MaterialTheme.typography.bodyLarge,
 
-            )
+                )
 
             Spacer(Modifier.height(8.dp))
 
@@ -182,11 +187,7 @@ fun TopCard() {
                 )
             }
         }
-
-
     }
-
-
 }
 
 @Composable
@@ -263,35 +264,7 @@ fun ItemWithIcon(
     }
 }
 
-//@Composable
-//fun ItemWithIcon(icon: ImageVector, text: String) {
-//    Column(
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        verticalArrangement = Arrangement.Center
-//    ) {
-//        Box(
-//            Modifier
-//                .clip(CircleShape)
-//                .background(colorResource(R.color.light_gray))
-//                .padding(12.dp)
-//        ) {
-//
-//            Icon(
-//                imageVector = icon,
-//                contentDescription = null,
-//                modifier = Modifier.size(32.dp),
-//                tint = colorResource(R.color.colorPrimary)
-//            )
-//        }
-//        Spacer(modifier = Modifier.height(4.dp))
-//        Text(
-//            text = text,
-//            style = MaterialTheme.typography.bodyLarge,
-//            color = Color.Black,
-//            textAlign = TextAlign.Center,
-//        )
-//    }
-//}
+
 
 @Composable
 fun AboutMe() {
@@ -314,7 +287,7 @@ fun AboutMe() {
 }
 
 @Composable
-fun BottomLayout() {
+fun BottomLayout(onBookAppointment :()-> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -336,7 +309,7 @@ fun BottomLayout() {
             )
         }
         Button(
-            onClick = { /* Handle Book Appointment click */ },
+            onClick = {onBookAppointment()},
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
@@ -357,6 +330,7 @@ fun BottomLayout() {
     }
 
 }
+
 @Preview
 @Composable
 fun DocScreenPreview(modifier: Modifier = Modifier) {
