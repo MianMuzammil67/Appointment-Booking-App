@@ -34,8 +34,11 @@ import com.example.appointmentbookingapp.presentation.ui.auth.components.Welcome
 
 @Composable
 fun SignInScreen(navController: NavHostController) {
-    var email by remember { mutableStateOf("") }
+    var email by remember {
+        mutableStateOf("")
+    }
     var password by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .background(Color.White)
@@ -50,25 +53,22 @@ fun SignInScreen(navController: NavHostController) {
         Spacer(modifier = Modifier.height(50.dp))
 
         Column(
-//            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
 
         ) {
             TextInputField(
-                label = "Email",
-                hint = "Enter Your Email",
-//                value = email,
+                tittle = "Email",
+                label = "Enter Your Email",
+                value = email,
                 isPassword = false,
                 onValueChange = { email = it }
             )
-
             Spacer(modifier = Modifier.height(32.dp))
-
             TextInputField(
-                label = "Password",
-                hint = "Enter Your Password",
-//                value = password,
+                tittle = "Password",
+                label = "Enter Your Password",
+                value = password,
                 isPassword = true,
                 onValueChange = { password = it }
             )
@@ -100,7 +100,6 @@ fun SignInScreen(navController: NavHostController) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-//                    .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
 

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -19,27 +20,27 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun TextInputField(
+    tittle: String,
     label: String,
-    hint: String,
-//    value: String,
+    value: String,
     onValueChange: (String) -> Unit,
     isPassword: Boolean,
     modifier: Modifier = Modifier
 
 ) {
     Column(modifier = modifier) {
-        Text(text = label, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+        Text(text = tittle, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
         Spacer(modifier.height(8.dp))
-        TextField(
-            value = "",
+
+        OutlinedTextField(
+            value = value ,
             onValueChange = onValueChange,
-//            label = { Text(label) },
+            label = { Text(label) },
             visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            placeholder = { Text(hint) },
+//            placeholder = { Text(hint) },
             shape = RoundedCornerShape(10.dp),
-
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,

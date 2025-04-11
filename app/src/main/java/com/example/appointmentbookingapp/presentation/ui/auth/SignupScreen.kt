@@ -31,11 +31,12 @@ import com.example.appointmentbookingapp.presentation.ui.auth.components.ImageWi
 import com.example.appointmentbookingapp.presentation.ui.auth.components.TextInputField
 import com.example.appointmentbookingapp.presentation.ui.auth.components.WelcomeText
 
-//@Preview
 @Composable
 fun SignupScreen(navController: NavHostController) {
+    var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
     Column(
         modifier = Modifier
             .background(Color.White)
@@ -55,37 +56,41 @@ fun SignupScreen(navController: NavHostController) {
 
         ) {
             TextInputField(
-                label = "Name",
-                hint = "Enter Your Name",
+                tittle = "Full Name",
+                label = "Enter Your Name",
                 isPassword = false,
+                value = name,
+                onValueChange = { name = it }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextInputField(
+                tittle = "Email",
+                label = "Enter Your Email",
+                isPassword = false,
+                value = email,
                 onValueChange = { email = it }
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TextInputField(
-                label = "Email",
-                hint = "Enter Your Email",
-                isPassword = false,
-                onValueChange = { password = it }
-            )
             Spacer(modifier = Modifier.height(16.dp))
 
 
             TextInputField(
-                label = "Password",
-                hint = "Enter Your Password",
+                tittle = "Password",
+                label = "Enter Your Password",
                 isPassword = true,
+                value = password,
                 onValueChange = { password = it }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             TextInputField(
-                label = "Phone",
-                hint = "Enter Your Phone NO",
+                tittle = " Phone NO",
+                label = "Enter Your Phone NO",
                 isPassword = false,
-                onValueChange = { password = it }
+                value = phone,
+                onValueChange = { phone = it }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -93,13 +98,11 @@ fun SignupScreen(navController: NavHostController) {
                 onClick = {},
                 buttonText = "Sign Up"
             )
-
             Text(
                 "OR",
                 color = colorResource(id = R.color.gray),
                 style = MaterialTheme.typography.titleMedium,
             )
-
 
             Row(
                 modifier = Modifier
@@ -125,7 +128,7 @@ fun SignupScreen(navController: NavHostController) {
                     text = "Sign In",
                     color = colorResource(id = R.color.colorPrimary),
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.clickable{
+                    modifier = Modifier.clickable {
                         navController.navigate("SignIn")
                     }
                 )
