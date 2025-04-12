@@ -83,7 +83,6 @@ fun DocDetailScreen(navController: NavHostController) {
             )
         },
         bottomBar = {
-
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -91,7 +90,6 @@ fun DocDetailScreen(navController: NavHostController) {
                     .fillMaxWidth()
                     .padding(16.dp)
                     .navigationBarsPadding()
-
             ) {
                 Box(
                     Modifier
@@ -124,14 +122,8 @@ fun DocDetailScreen(navController: NavHostController) {
                         style = TextStyle(fontWeight = FontWeight.Bold)
                     )
                 }
-
-
             }
-
-
         }
-
-
     ) { innerPadding ->
 
         Column(
