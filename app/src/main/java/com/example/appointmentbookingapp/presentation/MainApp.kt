@@ -12,13 +12,16 @@ import com.example.appointmentbookingapp.presentation.ui.auth.SignInScreen
 import com.example.appointmentbookingapp.presentation.ui.auth.SignupScreen
 import com.example.appointmentbookingapp.presentation.ui.doctorDetail.DocDetailScreen
 import com.example.appointmentbookingapp.presentation.ui.home.HomeScreen
-
+import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun MainApp() {
     Surface (modifier = Modifier.fillMaxSize()){
         val navController = rememberNavController()
 
-        NavHost(navController = navController, startDestination = "SignUp"){
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val start = if (currentUser != null) "HomeScreen" else "SignIn"
+
+        NavHost(navController = navController, startDestination = start){
 
             composable("SignUp"){
                 SignupScreen(navController)
