@@ -14,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val firestore: FirebaseFirestore
+    private val firestore: FirebaseFirestore,
+    private val firebaseAuth: FirebaseAuth
 ) : ViewModel() {
 
     private val _signUp = MutableStateFlow<AuthState>(AuthState.Initial)
@@ -26,7 +27,7 @@ class AuthViewModel @Inject constructor(
     suspend fun signUp(name: String, email: String, password: String, profilePicture : String) {
         _signUp.value = AuthState.Loading
         try {
-            val authResult = FirebaseAuth.getInstance()
+            val authResult = firebaseAuth
                 .createUserWithEmailAndPassword(email, password)
                 .await()
             val user = authResult.user
@@ -56,7 +57,7 @@ class AuthViewModel @Inject constructor(
     suspend fun signIn(email: String, password: String) {
         _signIn.value = AuthState.Loading
         try {
-            FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).await()
+            firebaseAuth.signInWithEmailAndPassword(email, password).await()
             _signIn.value = AuthState.Success
         } catch (e: Exception) {
             _signUp.value = AuthState.Error
