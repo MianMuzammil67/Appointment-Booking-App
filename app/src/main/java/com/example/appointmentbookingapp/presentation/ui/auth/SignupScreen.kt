@@ -139,7 +139,7 @@ fun SignupScreen(navController: NavHostController) {
                 Button(
                     onClick = {
                         coroutineScope.launch {
-                            viewModel.signUp(name, email, password)
+                            viewModel.signUp(name, email, password ,"")
                         }
                     },
                     modifier = Modifier

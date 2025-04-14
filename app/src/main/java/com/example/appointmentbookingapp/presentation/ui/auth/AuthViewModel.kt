@@ -1,8 +1,11 @@
 package com.example.appointmentbookingapp.presentation.ui.auth
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.example.appointmentbookingapp.domain.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,7 +13,9 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel @Inject constructor() : ViewModel() {
+class AuthViewModel @Inject constructor(
+    private val firestore: FirebaseFirestore
+) : ViewModel() {
 
     private val _signUp = MutableStateFlow<AuthState>(AuthState.Initial)
     val signUpState = _signUp.asStateFlow()
@@ -18,10 +23,10 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     private val _signIn = MutableStateFlow<AuthState>(AuthState.Initial)
     val signInState = _signIn.asStateFlow()
 
-    suspend fun signUp(name: String, email: String, password: String) {
+    suspend fun signUp(name: String, email: String, password: String, profilePicture : String) {
         _signUp.value = AuthState.Loading
         try {
-         val authResult = FirebaseAuth.getInstance()
+            val authResult = FirebaseAuth.getInstance()
                 .createUserWithEmailAndPassword(email, password)
                 .await()
             val user = authResult.user
@@ -31,6 +36,13 @@ class AuthViewModel @Inject constructor() : ViewModel() {
                 .build()
 
             user?.updateProfile(profileUpdates)?.await()
+
+            user.let {
+                val userData= User(name,email,password, profilePicture)
+                if (it != null) {
+                    saveDataToFirestore(it.uid,userData)
+                }
+            }
 
             _signUp.value = AuthState.Success
 
@@ -54,13 +66,26 @@ class AuthViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    private suspend fun saveDataToFirestore(userId: String, user: User) {
+        try {
+            firestore.collection("users")
+                .document(userId)
+                .set(user)
+                .await()
+            Log.d("AuthViewModel", "User data successfully saved.")
+        } catch (e: Exception) {
+            e.message?.let { Log.d("AuthViewModel", it) }
+        }
+
+    }
+
 }
 
 sealed class AuthState {
     data object Initial : AuthState()
     data object Loading : AuthState()
     data object Success : AuthState()
-    data object Error: AuthState()
+    data object Error : AuthState()
 //    data class Success<T>(val data: T) : AuthState()
 //    data class Error(val message: String) : AuthState()
 }
