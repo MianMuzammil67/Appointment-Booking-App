@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,18 +33,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
-import com.example.appointmentbookingapp.domain.model.DoctorItem
-import com.example.appointmentbookingapp.presentation.ui.components.DocCard
 import com.example.appointmentbookingapp.presentation.ui.components.SearchDoctorField
 import com.example.appointmentbookingapp.presentation.ui.home.components.CategoryItem
 import com.example.appointmentbookingapp.presentation.ui.home.components.ImageSlider
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
-    val userName by remember { mutableStateOf("Mian Muzammil") }
+    val homeViewModel :HomeViewModel = hiltViewModel()
+
+    val userName by homeViewModel.userName.collectAsState()
+    val profileImageUrl by homeViewModel.profileImageUrl.collectAsState()
+
+//    val userName by remember { mutableStateOf("Mian Muzammil") }
     var search by remember {
         mutableStateOf("")
     }
@@ -54,35 +59,36 @@ fun HomeScreen(navController: NavHostController) {
         CategoryData(R.drawable.ic_cate_placeholder, "#F5AD7E", "Surgeon"),
         CategoryData(R.drawable.ic_cate_placeholder, "#ACA1CD", "Cardiologist")
     )
-    val doctorList = listOf(
-        DoctorItem(
-            id = "1",
-            name = "Dr. Andrew",
-            description = "Dentist",
-            imageUrl = "",
-            rating = "4.3",
-            docCategory = "Dentist",
-            isFavorite = true
-        ),
-        DoctorItem(
-            id = "2",
-            name = "Dr. Emma",
-            description = "Pediatrician",
-            imageUrl = "",
-            rating = "4.8",
-            docCategory = "Pediatrics",
-            isFavorite = false
-        ),
-        DoctorItem(
-            id = "3",
-            name = "Dr. Michael",
-            description = "Cardiologist",
-            imageUrl = "",
-            rating = "4.1",
-            docCategory = "Cardiology",
-            isFavorite = true
-        )
-    )
+//    val doctorList = listOf(
+//        DoctorItem(
+//            id = "1",
+//            name = "Dr. Andrew",
+//            description = "Dentist",
+//            imageUrl = "",
+//            rating = "4.3",
+//            docCategory = "Dentist",
+//            isFavorite = true
+//        ),
+//        DoctorItem(
+//            id = "2",
+//            name = "Dr. Emma",
+//            description = "Pediatrician",
+//            imageUrl = "",
+//            rating = "4.8",
+//            docCategory = "Pediatrics",
+//            isFavorite = false
+//        ),
+//        DoctorItem(
+//            id = "3",
+//            name = "Dr. Michael",
+//            description = "Cardiologist",
+//            imageUrl = "",
+//            rating = "4.1",
+//            docCategory = "Cardiology",
+//            isFavorite = true
+//        )
+//    )
+
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
             modifier = Modifier
@@ -113,7 +119,7 @@ fun HomeScreen(navController: NavHostController) {
                         "Hi,Welcome Back,", color = colorResource(id = R.color.gray)
                     )
                     Text(
-                        text = userName,
+                        text = userName?:"Guest" ,
                         color = colorResource(id = R.color.black),
                         style = MaterialTheme.typography.titleMedium
                     )
@@ -199,12 +205,12 @@ fun HomeScreen(navController: NavHostController) {
             }
 
             Spacer(modifier = Modifier.height(8.dp))
-            doctorList.forEach { docCard ->
-                Spacer(modifier = Modifier.height(8.dp))
-                DocCard(docCard){
-                    navController.navigate("DoctorDetail")
-                }
-            }
+//            doctorList.forEach { docCard ->
+//                Spacer(modifier = Modifier.height(8.dp))
+//                DocCard(docCard){
+//                    navController.navigate("DoctorDetail")
+//                }
+//            }
         }
 
     }
