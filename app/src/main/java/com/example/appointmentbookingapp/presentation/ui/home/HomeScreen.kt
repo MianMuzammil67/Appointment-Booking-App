@@ -153,7 +153,7 @@ fun HomeScreen(navController: NavHostController) {
 
             when (bannerState) {
                 is UiState.Loading -> {
-                    CircularProgressIndicator()
+//                    CircularProgressIndicator()
                 }
 
                 is UiState.Success -> {
