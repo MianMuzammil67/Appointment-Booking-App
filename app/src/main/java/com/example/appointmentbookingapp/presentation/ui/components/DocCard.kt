@@ -1,6 +1,5 @@
 package com.example.appointmentbookingapp.presentation.ui.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Gray
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,12 +31,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
+import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.DoctorItem
 
 @Composable
-    fun DocCard(doctor: DoctorItem, onClick : ()-> Unit ) {
-        Row(
+fun DocCard(doctor: DoctorItem, onClick: () -> Unit) {
+    Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
 
@@ -47,7 +48,7 @@ import com.example.appointmentbookingapp.domain.model.DoctorItem
             .padding(8.dp)
             .clickable { onClick() },
 
-    )
+        )
     {
         Box(
             modifier = Modifier
@@ -56,14 +57,14 @@ import com.example.appointmentbookingapp.domain.model.DoctorItem
                 .background(colorResource(R.color.muted_rose))
 
         ) {
-            Image(
-                painter = painterResource(R.drawable.im_doctor),
+            AsyncImage(
+                model = doctor.imageUrl,
                 contentDescription = null,
                 Modifier
                     .matchParentSize()
-                    .padding(start = 2.dp, end = 2.dp, top = 2.dp)
                     .align(Alignment.Center),
-                )
+                contentScale = ContentScale.Crop
+            )
         }
         Column(
             Modifier

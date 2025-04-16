@@ -3,6 +3,7 @@ package com.example.appointmentbookingapp.presentation.ui.home
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -128,7 +129,16 @@ fun SearchSection(value: String, onSearchChange: (String) -> Unit) {
 @Composable
 fun BannerSection(state: UiState<List<BannerItem>>) {
     when (state) {
-        is UiState.Loading -> CircularProgressIndicator()
+        is UiState.Loading ->{
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
         is UiState.Success -> {
             val imageUrls = state.data.map { it.imageUrl }
             ImageSlider(imageUrls = imageUrls)
@@ -206,7 +216,16 @@ fun DoctorSection(
     Spacer(modifier = Modifier.height(8.dp))
 
     when (state) {
-        is UiState.Loading -> CircularProgressIndicator()
+        is UiState.Loading -> {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
         is UiState.Success -> {
             val topDoctors = state.data
                 .sortedByDescending { it.rating }
