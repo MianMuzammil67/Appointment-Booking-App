@@ -1,7 +1,6 @@
 package com.example.appointmentbookingapp.presentation.ui.home.components
 
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,16 +21,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.R
 import kotlinx.coroutines.delay
 
 @Composable
-fun ImageSlider(modifier: Modifier = Modifier, images: List<Int> ) {
+fun ImageSlider(modifier: Modifier = Modifier, imageUrl: List<String> ) {
 
     val pagerState = rememberPagerState(
-        pageCount = { images.size }
+        pageCount = { imageUrl.size }
     )
     LaunchedEffect(Unit) {
         while (true) {
@@ -57,9 +56,20 @@ fun ImageSlider(modifier: Modifier = Modifier, images: List<Int> ) {
                         .padding(top = 16.dp, bottom = 16.dp),
                     elevation = CardDefaults.cardElevation(8.dp)
                 ) {
-                    Image(
-                        painter = painterResource(id = images[currentPage]), contentDescription = ""
+//                    Image(
+//                        painter = painterResource(id = images[currentPage]), contentDescription = ""
+//                    )
+
+                    AsyncImage(
+                        model = imageUrl[currentPage],
+                        contentDescription = "Banner Image",
+//                        contentScale = ContentScale.Crop,
+//                        modifier = Modifier
+//                            .width(300.dp)
+//                            .height(180.dp)
                     )
+
+
                 }
             }
 //            IconButton(
@@ -115,7 +125,7 @@ fun ImageSlider(modifier: Modifier = Modifier, images: List<Int> ) {
         }
 
         PageIndicator(
-            pageCount = images.size, currentPage = pagerState.currentPage, modifier = modifier
+            pageCount = imageUrl.size, currentPage = pagerState.currentPage, modifier = modifier
         )
 
     }

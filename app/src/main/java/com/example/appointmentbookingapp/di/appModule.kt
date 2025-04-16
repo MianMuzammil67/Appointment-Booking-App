@@ -1,5 +1,8 @@
 package com.example.appointmentbookingapp.di
 
+import com.example.appointmentbookingapp.data.remorte.HomeRemoteDataSource
+import com.example.appointmentbookingapp.data.repository.HomeRepositoryImpl
+import com.example.appointmentbookingapp.domain.repository.HomeRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
@@ -24,5 +27,12 @@ object AppModule {
     fun provideFirebaseAuth(): FirebaseAuth {
         return FirebaseAuth.getInstance()
     }
+
+    @Singleton
+    @Provides
+    fun provideHomeRepository(remote: HomeRemoteDataSource): HomeRepository {
+       return HomeRepositoryImpl(remote)
+    }
+
 
 }

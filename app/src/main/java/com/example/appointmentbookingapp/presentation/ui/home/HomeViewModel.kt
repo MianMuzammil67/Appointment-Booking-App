@@ -1,20 +1,23 @@
 package com.example.appointmentbookingapp.presentation.ui.home
 
 import androidx.lifecycle.ViewModel
-import com.example.appointmentbookingapp.domain.model.BannerItems
+import androidx.lifecycle.viewModelScope
+import com.example.appointmentbookingapp.domain.model.BannerItem
 import com.example.appointmentbookingapp.domain.model.CategoryItem
 import com.example.appointmentbookingapp.domain.model.DoctorItem
+import com.example.appointmentbookingapp.domain.repository.HomeRepository
 import com.example.appointmentbookingapp.presentation.state.UiState
-import com.google.firebase.auth.FirebaseAuth
+import com.example.appointmentbookingapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val firebaseAuth: FirebaseAuth,
+    private val repository: HomeRepository
 ) : ViewModel() {
 
     //    private val TAG = "HomeViewModel"
@@ -26,11 +29,11 @@ class HomeViewModel @Inject constructor(
     private val _profileImageUrl = MutableStateFlow<String?>(null)
     val profileImageUrl: StateFlow<String?> = _profileImageUrl
 
-    private val _bannerState = MutableStateFlow<UiState<List<BannerItems>>>(UiState.Loading)
-    val bannerState: StateFlow<UiState<List<BannerItems>>> = _bannerState.asStateFlow()
+    private val _bannerFlow = MutableStateFlow<UiState<List<BannerItem>>>(UiState.Loading)
+    val bannerFlow: StateFlow<UiState<List<BannerItem>>> = _bannerFlow.asStateFlow()
 
-    private val _categories = MutableStateFlow<UiState<List<CategoryItem>>>(UiState.Loading)
-    val categories: StateFlow<UiState<List<CategoryItem>>> = _categories.asStateFlow()
+    private val _categoriesState = MutableStateFlow<UiState<List<CategoryItem>>>(UiState.Loading)
+    val categories: StateFlow<UiState<List<CategoryItem>>> = _categoriesState.asStateFlow()
 
     private val _doctorState = MutableStateFlow<UiState<List<DoctorItem>>>(UiState.Loading)
     val doctorState: StateFlow<UiState<List<DoctorItem>>> = _doctorState.asStateFlow()
@@ -38,12 +41,61 @@ class HomeViewModel @Inject constructor(
 
     init {
         getCurrentUserInfo()
+        getBanners()
+        getDoctorCategories()
+        getDoctors()
     }
+
     private fun getCurrentUserInfo() {
-        val currentUser = firebaseAuth.currentUser
-        _userName.value = currentUser?.displayName
-        _profileImageUrl.value = currentUser?.photoUrl?.toString()
+        _userName.value = repository.getCurrentUserName()
+        _profileImageUrl.value = repository.getCurrentUserPhoto()
     }
+
+    private fun getBanners() = viewModelScope.launch {
+        _bannerFlow.value = UiState.Loading
+        when (val result = repository.getBanners()) {
+            is Resource.Success -> {
+                _bannerFlow.value = UiState.Success(result.data)
+            }
+
+            is Resource.Error -> {
+                _bannerFlow.value = UiState.Error(result.message)
+            }
+
+            else -> {}
+
+
+        }
+
+    }
+
+    private fun getDoctorCategories() = viewModelScope.launch {
+
+        _categoriesState.value = UiState.Loading
+
+        when(val result = repository.getDoctorCategories()){
+            is Resource.Success ->{
+                _categoriesState.value = UiState.Success(result.data)
+            }
+            is Resource.Error ->{
+                _categoriesState.value = UiState.Error(result.message)
+            }
+
+            else->{}
+        }
+
+    }
+
+    fun getDoctors() = viewModelScope.launch {
+        _doctorState.value = UiState.Loading
+        when (val result = repository.getDoctors()) {
+            is Resource.Success -> _doctorState.value = UiState.Success(result.data)
+            is Resource.Error -> _doctorState.value = UiState.Error(result.message)
+            else->{}
+        }
+    }
+
+
 
 
 

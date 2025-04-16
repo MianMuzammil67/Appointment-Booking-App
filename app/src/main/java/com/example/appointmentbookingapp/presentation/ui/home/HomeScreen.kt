@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -37,16 +38,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
+import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.presentation.ui.components.SearchDoctorField
 import com.example.appointmentbookingapp.presentation.ui.home.components.CategoryItem
 import com.example.appointmentbookingapp.presentation.ui.home.components.ImageSlider
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
-    val homeViewModel :HomeViewModel = hiltViewModel()
+    val homeViewModel: HomeViewModel = hiltViewModel()
 
     val userName by homeViewModel.userName.collectAsState()
     val profileImageUrl by homeViewModel.profileImageUrl.collectAsState()
+    val bannerState by homeViewModel.bannerFlow.collectAsState()
 
 //    val userName by remember { mutableStateOf("Mian Muzammil") }
     var search by remember {
@@ -119,7 +122,7 @@ fun HomeScreen(navController: NavHostController) {
                         "Hi,Welcome Back,", color = colorResource(id = R.color.gray)
                     )
                     Text(
-                        text = userName?:"Guest" ,
+                        text = userName ?: "Guest",
                         color = colorResource(id = R.color.black),
                         style = MaterialTheme.typography.titleMedium
                     )
@@ -135,16 +138,40 @@ fun HomeScreen(navController: NavHostController) {
 
             SearchDoctorField(
                 value = search,
-                onValueChange = {search = it}
+                onValueChange = { search = it }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            val images = listOf(
-                R.drawable.doc1, R.drawable.doc2, R.drawable.doc3
-            )
 
-            ImageSlider(images = images)
+//            val images = listOf(
+//                R.drawable.doc1, R.drawable.doc2, R.drawable.doc3
+//            )
+
+//            ImageSlider(images = banners)
+
+
+            when (bannerState) {
+                is UiState.Loading -> {
+                    CircularProgressIndicator()
+                }
+
+                is UiState.Success -> {
+                    val banners = (bannerState as UiState.Success).data
+                    val imageUrl = banners.map { it.imageUrl }
+                    ImageSlider(
+                        imageUrl = imageUrl
+                    )
+                }
+
+                is UiState.Error -> {
+                    val error = (bannerState as UiState.Error).message
+                    Text("Error: $error", color = Color.Red)
+                }
+
+            }
+
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
