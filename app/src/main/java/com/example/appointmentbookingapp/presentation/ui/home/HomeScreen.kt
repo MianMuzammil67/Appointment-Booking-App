@@ -38,7 +38,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
+import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.presentation.state.UiState
+import com.example.appointmentbookingapp.presentation.ui.components.DocCard
 import com.example.appointmentbookingapp.presentation.ui.components.SearchDoctorField
 import com.example.appointmentbookingapp.presentation.ui.home.components.CategoryItem
 import com.example.appointmentbookingapp.presentation.ui.home.components.ImageSlider
@@ -50,8 +52,8 @@ fun HomeScreen(navController: NavHostController) {
     val userName by homeViewModel.userName.collectAsState()
     val profileImageUrl by homeViewModel.profileImageUrl.collectAsState()
     val bannerState by homeViewModel.bannerFlow.collectAsState()
+    val doctorState by homeViewModel.doctorState.collectAsState()
 
-//    val userName by remember { mutableStateOf("Mian Muzammil") }
     var search by remember {
         mutableStateOf("")
     }
@@ -171,8 +173,6 @@ fun HomeScreen(navController: NavHostController) {
 
             }
 
-
-
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
@@ -238,6 +238,27 @@ fun HomeScreen(navController: NavHostController) {
 //                    navController.navigate("DoctorDetail")
 //                }
 //            }
+
+            when (doctorState) {
+                is UiState.Loading -> CircularProgressIndicator()
+                is UiState.Success -> {
+//                    DoctorSection((doctorState as UiState.Success).data)
+                    val doctorList = (doctorState as UiState.Success<List<DoctorItem>>).data
+                        .sortedByDescending { it.rating }.take(4)
+                    doctorList.forEach { docCard ->
+                        Spacer(modifier = Modifier.height(8.dp))
+                        DocCard(docCard) {
+                            navController.navigate("DoctorDetail")
+                        }
+                    }
+                }
+
+                is UiState.Error -> Text("Failed to load doctors")
+            }
+
+
+
+
         }
 
     }
