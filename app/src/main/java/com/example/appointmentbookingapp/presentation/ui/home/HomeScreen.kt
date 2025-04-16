@@ -38,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
+import com.example.appointmentbookingapp.domain.model.BannerItem
 import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.presentation.ui.components.DocCard
@@ -47,6 +48,7 @@ import com.example.appointmentbookingapp.presentation.ui.home.components.ImageSl
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
+
     val homeViewModel: HomeViewModel = hiltViewModel()
 
     val userName by homeViewModel.userName.collectAsState()
@@ -54,45 +56,7 @@ fun HomeScreen(navController: NavHostController) {
     val bannerState by homeViewModel.bannerFlow.collectAsState()
     val doctorState by homeViewModel.doctorState.collectAsState()
 
-    var search by remember {
-        mutableStateOf("")
-    }
-
-    val categories = listOf(
-        CategoryData(R.drawable.ic_cate_placeholder, "#DC9497", "Dentist"),
-        CategoryData(R.drawable.ic_cate_placeholder, "#93C19E", "Therapist"),
-        CategoryData(R.drawable.ic_cate_placeholder, "#F5AD7E", "Surgeon"),
-        CategoryData(R.drawable.ic_cate_placeholder, "#ACA1CD", "Cardiologist")
-    )
-//    val doctorList = listOf(
-//        DoctorItem(
-//            id = "1",
-//            name = "Dr. Andrew",
-//            description = "Dentist",
-//            imageUrl = "",
-//            rating = "4.3",
-//            docCategory = "Dentist",
-//            isFavorite = true
-//        ),
-//        DoctorItem(
-//            id = "2",
-//            name = "Dr. Emma",
-//            description = "Pediatrician",
-//            imageUrl = "",
-//            rating = "4.8",
-//            docCategory = "Pediatrics",
-//            isFavorite = false
-//        ),
-//        DoctorItem(
-//            id = "3",
-//            name = "Dr. Michael",
-//            description = "Cardiologist",
-//            imageUrl = "",
-//            rating = "4.1",
-//            docCategory = "Cardiology",
-//            isFavorite = true
-//        )
-//    )
+    var search by remember { mutableStateOf("") }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -102,165 +66,159 @@ fun HomeScreen(navController: NavHostController) {
                 .fillMaxSize()
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
-
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Image(
-                    painter = painterResource(id = R.drawable.demo_user),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(70.dp)
-                        .clip(CircleShape)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Column(modifier = Modifier.weight(1f)) {
-
-                    Text(
-                        "Hi,Welcome Back,", color = colorResource(id = R.color.gray)
-                    )
-                    Text(
-                        text = userName ?: "Guest",
-                        color = colorResource(id = R.color.black),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                }
-                Image(
-                    painter = painterResource(id = R.drawable.icon_bell),
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+            HomeHeaderSection(userName = userName, profileUrl = profileImageUrl)
             Spacer(modifier = Modifier.height(16.dp))
 
-            SearchDoctorField(
-                value = search,
-                onValueChange = { search = it }
+            SearchSection(search, onSearchChange = { search = it })
+            Spacer(modifier = Modifier.height(16.dp))
+
+            BannerSection(bannerState)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            CategorySection()
+            Spacer(modifier = Modifier.height(16.dp))
+
+            DoctorSection(doctorState) {
+                navController.navigate("DoctorDetail")
+            }
+        }
+    }
+
+}
+
+@Composable
+fun HomeHeaderSection(userName: String?, profileUrl: String?) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.demo_user),
+            contentDescription = null,
+            modifier = Modifier
+                .size(70.dp)
+                .clip(CircleShape)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text("Hi, Welcome Back,", color = colorResource(id = R.color.gray))
+            Text(
+                text = userName ?: "Guest",
+                color = colorResource(id = R.color.black),
+                style = MaterialTheme.typography.titleMedium
             )
+        }
+        Image(
+            painter = painterResource(id = R.drawable.icon_bell),
+            contentDescription = null,
+            modifier = Modifier.size(24.dp)
+        )
+    }
+}
 
-            Spacer(modifier = Modifier.height(16.dp))
+@Composable
+fun SearchSection(value: String, onSearchChange: (String) -> Unit) {
+    SearchDoctorField(
+        value = value,
+        onValueChange = onSearchChange
+    )
+}
 
-
-//            val images = listOf(
-//                R.drawable.doc1, R.drawable.doc2, R.drawable.doc3
-//            )
-
-//            ImageSlider(images = banners)
-
-
-            when (bannerState) {
-                is UiState.Loading -> {
-//                    CircularProgressIndicator()
-                }
-
-                is UiState.Success -> {
-                    val banners = (bannerState as UiState.Success).data
-                    val imageUrl = banners.map { it.imageUrl }
-                    ImageSlider(
-                        imageUrl = imageUrl
-                    )
-                }
-
-                is UiState.Error -> {
-                    val error = (bannerState as UiState.Error).message
-                    Text("Error: $error", color = Color.Red)
-                }
-
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-
-            ) {
-                Text(
-                    text = "Categories",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = colorResource(id = R.color.black),
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "See All",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = colorResource(id = R.color.gray)
-                )
-            }
-            Spacer(Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                categories.forEach { category ->
-                    CategoryItem(
-                        image = category.icon,
-                        backgroundColor = category.color,
-                        categoryName = category.label,
-                    )
-
-                }
-
-            }
-            Spacer(Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-
-            ) {
-                Text(
-                    text = "Doctors",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = colorResource(id = R.color.black),
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "See All",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = colorResource(id = R.color.gray)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-//            doctorList.forEach { docCard ->
-//                Spacer(modifier = Modifier.height(8.dp))
-//                DocCard(docCard){
-//                    navController.navigate("DoctorDetail")
-//                }
-//            }
-
-            when (doctorState) {
-                is UiState.Loading -> CircularProgressIndicator()
-                is UiState.Success -> {
-//                    DoctorSection((doctorState as UiState.Success).data)
-                    val doctorList = (doctorState as UiState.Success<List<DoctorItem>>).data
-                        .sortedByDescending { it.rating }.take(4)
-                    doctorList.forEach { docCard ->
-                        Spacer(modifier = Modifier.height(8.dp))
-                        DocCard(docCard) {
-                            navController.navigate("DoctorDetail")
-                        }
-                    }
-                }
-
-                is UiState.Error -> Text("Failed to load doctors")
-            }
-
-
-
-
+@Composable
+fun BannerSection(state: UiState<List<BannerItem>>) {
+    when (state) {
+        is UiState.Loading -> CircularProgressIndicator()
+        is UiState.Success -> {
+            val imageUrls = state.data.map { it.imageUrl }
+            ImageSlider(imageUrls = imageUrls)
         }
 
+        is UiState.Error -> Text("Error: ${state.message}", color = Color.Red)
+    }
+}
+
+@Composable
+fun CategorySection() {
+    val categories = listOf(
+        CategoryData(R.drawable.ic_cate_placeholder, "#DC9497", "Dentist"),
+        CategoryData(R.drawable.ic_cate_placeholder, "#93C19E", "Therapist"),
+        CategoryData(R.drawable.ic_cate_placeholder, "#F5AD7E", "Surgeon"),
+        CategoryData(R.drawable.ic_cate_placeholder, "#ACA1CD", "Cardiologist")
+    )
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "Categories",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = colorResource(id = R.color.black)
+        )
+        Text(
+            text = "See All",
+            style = MaterialTheme.typography.titleSmall,
+            color = colorResource(id = R.color.gray)
+        )
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        categories.forEach {
+            CategoryItem(
+                image = it.icon,
+                backgroundColor = it.color,
+                categoryName = it.label
+            )
+        }
+    }
+}
+
+@Composable
+fun DoctorSection(
+    state: UiState<List<DoctorItem>>,
+    onDoctorClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "Doctors",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = colorResource(id = R.color.black)
+        )
+        Text(
+            text = "See All",
+            style = MaterialTheme.typography.titleSmall,
+            color = colorResource(id = R.color.gray)
+        )
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    when (state) {
+        is UiState.Loading -> CircularProgressIndicator()
+        is UiState.Success -> {
+            val topDoctors = state.data
+                .sortedByDescending { it.rating }
+                .take(4)
+
+            topDoctors.forEach { doctor ->
+                Spacer(modifier = Modifier.height(8.dp))
+                DocCard(doctor = doctor, onClick = onDoctorClick)
+            }
+        }
+
+        is UiState.Error -> Text("Failed to load doctors", color = Color.Red)
     }
 }
 
