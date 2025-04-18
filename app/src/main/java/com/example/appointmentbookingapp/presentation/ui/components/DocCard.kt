@@ -138,7 +138,7 @@ fun DocCard(doctor: DoctorItem, onClick: () -> Unit) {
                         color = Gray
                     )
                     Text(
-                        text = "405 Reviews",
+                        text = "${doctor.reviewsCount} Reviews",
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }

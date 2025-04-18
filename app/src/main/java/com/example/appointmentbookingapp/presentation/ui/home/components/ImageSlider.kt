@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -20,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -27,10 +30,10 @@ import com.example.appointmentbookingapp.R
 import kotlinx.coroutines.delay
 
 @Composable
-fun ImageSlider(modifier: Modifier = Modifier, imageUrl: List<String> ) {
+fun ImageSlider(modifier: Modifier = Modifier, imageUrls: List<String> ) {
 
     val pagerState = rememberPagerState(
-        pageCount = { imageUrl.size }
+        pageCount = { imageUrls.size }
     )
     LaunchedEffect(Unit) {
         while (true) {
@@ -53,22 +56,26 @@ fun ImageSlider(modifier: Modifier = Modifier, imageUrl: List<String> ) {
                 Card(
                     modifier
                         .wrapContentSize()
-                        .padding(top = 16.dp, bottom = 16.dp),
+//                        .padding(top = 16.dp, bottom = 16.dp),
+                        .padding( 4.dp)
+                    ,
                     elevation = CardDefaults.cardElevation(8.dp)
                 ) {
 //                    Image(
 //                        painter = painterResource(id = images[currentPage]), contentDescription = ""
 //                    )
 
-                    AsyncImage(
-                        model = imageUrl[currentPage],
-                        contentDescription = "Banner Image",
-//                        contentScale = ContentScale.Crop,
-//                        modifier = Modifier
-//                            .width(300.dp)
-//                            .height(180.dp)
-                    )
+//                    SubcomposeAsyncImage()
 
+
+                   AsyncImage(
+                        model = imageUrls[currentPage],
+                        contentDescription = "Banner Image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .width(400.dp)
+                            .height(180.dp),
+                    )
 
                 }
             }
@@ -125,7 +132,7 @@ fun ImageSlider(modifier: Modifier = Modifier, imageUrl: List<String> ) {
         }
 
         PageIndicator(
-            pageCount = imageUrl.size, currentPage = pagerState.currentPage, modifier = modifier
+            pageCount = imageUrls.size, currentPage = pagerState.currentPage, modifier = modifier
         )
 
     }
