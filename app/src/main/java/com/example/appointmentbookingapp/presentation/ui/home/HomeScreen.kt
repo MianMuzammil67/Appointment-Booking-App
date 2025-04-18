@@ -1,5 +1,6 @@
 package com.example.appointmentbookingapp.presentation.ui.home
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +42,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.BannerItem
 import com.example.appointmentbookingapp.domain.model.DoctorItem
+import com.example.appointmentbookingapp.domain.model.DoctorCategory
 import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.presentation.ui.components.DocCard
 import com.example.appointmentbookingapp.presentation.ui.components.SearchDoctorField
@@ -56,6 +58,7 @@ fun HomeScreen(navController: NavHostController) {
     val profileImageUrl by homeViewModel.profileImageUrl.collectAsState()
     val bannerState by homeViewModel.bannerFlow.collectAsState()
     val doctorState by homeViewModel.doctorState.collectAsState()
+    val categoryState by homeViewModel.categories.collectAsState()
 
     var search by remember { mutableStateOf("") }
 
@@ -77,7 +80,7 @@ fun HomeScreen(navController: NavHostController) {
             BannerSection(bannerState)
             Spacer(modifier = Modifier.height(16.dp))
 
-            CategorySection()
+            CategorySection(categoryState)
             Spacer(modifier = Modifier.height(16.dp))
 
             DoctorSection(doctorState) {
@@ -129,7 +132,7 @@ fun SearchSection(value: String, onSearchChange: (String) -> Unit) {
 @Composable
 fun BannerSection(state: UiState<List<BannerItem>>) {
     when (state) {
-        is UiState.Loading ->{
+        is UiState.Loading -> {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -139,6 +142,7 @@ fun BannerSection(state: UiState<List<BannerItem>>) {
                 CircularProgressIndicator()
             }
         }
+
         is UiState.Success -> {
             val imageUrls = state.data.map { it.imageUrl }
             ImageSlider(imageUrls = imageUrls)
@@ -149,14 +153,7 @@ fun BannerSection(state: UiState<List<BannerItem>>) {
 }
 
 @Composable
-fun CategorySection() {
-    val categories = listOf(
-        CategoryData(R.drawable.ic_cate_placeholder, "#DC9497", "Dentist"),
-        CategoryData(R.drawable.ic_cate_placeholder, "#93C19E", "Therapist"),
-        CategoryData(R.drawable.ic_cate_placeholder, "#F5AD7E", "Surgeon"),
-        CategoryData(R.drawable.ic_cate_placeholder, "#ACA1CD", "Cardiologist")
-    )
-
+fun CategorySection(categoryState: UiState<List<DoctorCategory>>) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -181,12 +178,29 @@ fun CategorySection() {
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        categories.forEach {
-            CategoryItem(
-                image = it.icon,
-                backgroundColor = it.color,
-                categoryName = it.label
-            )
+
+        when (categoryState) {
+            is UiState.Success -> {
+                Log.d("HomeScreen", categoryState.data.toString())
+
+                categoryState.data.forEach { category ->
+                    CategoryItem(
+                        category = category
+//                        image = it.imageUrl,
+//                        backgroundColor = it.backgroundColor,
+//                        categoryName = it.name
+                    )
+                }
+            }
+
+            is UiState.Error -> {
+                Text("Error: ${categoryState.message}", color = Color.Red)
+                Log.d("HomeScreen", categoryState.message)
+            }
+
+            else -> {
+
+            }
         }
     }
 }
@@ -226,6 +240,7 @@ fun DoctorSection(
                 CircularProgressIndicator()
             }
         }
+
         is UiState.Success -> {
             val topDoctors = state.data
                 .sortedByDescending { it.rating }
@@ -241,7 +256,7 @@ fun DoctorSection(
     }
 }
 
-data class CategoryData(val icon: Int, val color: String, val label: String)
+//data class CategoryData(val icon: Int, val color: String, val label: String)
 
 @Preview
 @Composable

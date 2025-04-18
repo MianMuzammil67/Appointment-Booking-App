@@ -1,6 +1,5 @@
 package com.example.appointmentbookingapp.presentation.ui.home.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,18 +15,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
+import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.R
+import com.example.appointmentbookingapp.domain.model.DoctorCategory
 
 @Composable
 fun CategoryItem(
-    image: Int,
-    backgroundColor: String,
-    categoryName: String
+//    image: String,
+//    backgroundColor: String,
+//    categoryName: String
+    category: DoctorCategory
+
 ) {
-    val color = Color(backgroundColor.toColorInt())
+//    val color = Color(category.backgroundColor.toColorInt())
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
@@ -37,21 +39,20 @@ fun CategoryItem(
                 .padding(16.dp)
                 .size(60.dp)
                 .clip(RoundedCornerShape(4.dp))
-                .background(color)
+                .background(Color(category.backgroundColor.toColorInt()))
             ,
             contentAlignment = Alignment.Center
 
         ) {
-
-            Image(
-                painter = painterResource(id = image),
+            AsyncImage(
+                model = category.categoryIcon,
                 contentDescription = null,
                 modifier = Modifier
                     .size(42.dp)
             )
         }
         Text(
-            text = categoryName,
+            text = category.label,
             color = colorResource(R.color.gray),
             style = MaterialTheme.typography.titleSmall
 

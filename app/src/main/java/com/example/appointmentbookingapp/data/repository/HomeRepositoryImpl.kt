@@ -2,8 +2,8 @@ package com.example.appointmentbookingapp.data.repository
 
 import com.example.appointmentbookingapp.data.remorte.HomeRemoteDataSource
 import com.example.appointmentbookingapp.domain.model.BannerItem
-import com.example.appointmentbookingapp.domain.model.CategoryItem
 import com.example.appointmentbookingapp.domain.model.DoctorItem
+import com.example.appointmentbookingapp.domain.model.DoctorCategory
 import com.example.appointmentbookingapp.domain.repository.HomeRepository
 import com.example.appointmentbookingapp.util.Resource
 import javax.inject.Inject
@@ -21,9 +21,10 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDoctorCategories(): Resource<List<CategoryItem>> {
+    override suspend fun getSpecializationCategory(): Resource<List<DoctorCategory>> {
         return try {
-            val categories = remote.getDoctorCategories()
+            val categories = remote.getSpecializationCategory()
+
             Resource.Success(categories)
         } catch (e: Exception) {
             Resource.Error(e.message.toString())

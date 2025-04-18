@@ -1,8 +1,9 @@
 package com.example.appointmentbookingapp.data.remorte
 
+import android.util.Log
 import com.example.appointmentbookingapp.domain.model.BannerItem
-import com.example.appointmentbookingapp.domain.model.CategoryItem
 import com.example.appointmentbookingapp.domain.model.DoctorItem
+import com.example.appointmentbookingapp.domain.model.DoctorCategory
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -32,9 +33,17 @@ class HomeRemoteDataSource @Inject constructor(
 
     }
 
-    suspend fun getDoctorCategories(): List<CategoryItem> {
-        val snapshot = firestore.collection("doctorCategories").get().await()
-        return snapshot.documents.mapNotNull { it.toObject(CategoryItem::class.java) }
+    suspend fun getSpecializationCategory(): List<DoctorCategory> {
+        return try {
+            val snapshot = firestore.collection("doctorCategories").get().await()
+            Log.d(logTag, "getSpecializationCategory: ${snapshot.documents}")
+             snapshot.documents.mapNotNull {
+                it.toObject(DoctorCategory::class.java)
+            }
+        }catch (e:Exception){
+            Log.d(logTag, "getSpecializationCategory: catch  ${e.message}")
+            emptyList()
+        }
 
     }
 

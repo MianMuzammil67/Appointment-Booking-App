@@ -3,8 +3,8 @@ package com.example.appointmentbookingapp.presentation.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appointmentbookingapp.domain.model.BannerItem
-import com.example.appointmentbookingapp.domain.model.CategoryItem
 import com.example.appointmentbookingapp.domain.model.DoctorItem
+import com.example.appointmentbookingapp.domain.model.DoctorCategory
 import com.example.appointmentbookingapp.domain.repository.HomeRepository
 import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.util.Resource
@@ -32,8 +32,8 @@ class HomeViewModel @Inject constructor(
     private val _bannerFlow = MutableStateFlow<UiState<List<BannerItem>>>(UiState.Loading)
     val bannerFlow: StateFlow<UiState<List<BannerItem>>> = _bannerFlow.asStateFlow()
 
-    private val _categoriesState = MutableStateFlow<UiState<List<CategoryItem>>>(UiState.Loading)
-    val categories: StateFlow<UiState<List<CategoryItem>>> = _categoriesState.asStateFlow()
+    private val _categoriesState = MutableStateFlow<UiState<List<DoctorCategory>>>(UiState.Loading)
+    val categories: StateFlow<UiState<List<DoctorCategory>>> = _categoriesState.asStateFlow()
 
     private val _doctorState = MutableStateFlow<UiState<List<DoctorItem>>>(UiState.Loading)
     val doctorState: StateFlow<UiState<List<DoctorItem>>> = _doctorState.asStateFlow()
@@ -42,7 +42,7 @@ class HomeViewModel @Inject constructor(
     init {
         getCurrentUserInfo()
         getBanners()
-        getDoctorCategories()
+        getSpecializationCategory()
         getDoctors()
     }
 
@@ -69,18 +69,17 @@ class HomeViewModel @Inject constructor(
 
     }
 
-    private fun getDoctorCategories() = viewModelScope.launch {
+    private fun getSpecializationCategory() = viewModelScope.launch {
 
         _categoriesState.value = UiState.Loading
 
-        when(val result = repository.getDoctorCategories()){
+        when(val result = repository.getSpecializationCategory()){
             is Resource.Success ->{
                 _categoriesState.value = UiState.Success(result.data)
             }
             is Resource.Error ->{
                 _categoriesState.value = UiState.Error(result.message)
             }
-
             else->{}
         }
 
