@@ -1,5 +1,6 @@
 package com.example.appointmentbookingapp.presentation.ui.doctorDetail
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +32,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,14 +49,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
+import com.example.appointmentbookingapp.domain.model.DoctorItem
+import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DocDetailScreen(navController: NavHostController) {
+fun DocDetailScreen(navController: NavHostController, sharedDoctorViewModel: SharedDoctorViewModel = viewModel()) {
+
+    val currentDoctor by sharedDoctorViewModel.selectedDoctor.collectAsState()
+
+// This code returns the hash code of the object, which helps in comparing two objects.
+
+//    LaunchedEffect(sharedDoctorViewModel) {
+//        println("DocDetailScreen ViewModel Hash: ${System.identityHashCode(sharedDoctorViewModel)}")
+//        Log.d("DocDetail", "SelectedDoctor: $currentDoctor")
+//    }
+
     Scaffold(
         Modifier.fillMaxSize(),
         topBar = {
@@ -134,7 +150,7 @@ fun DocDetailScreen(navController: NavHostController) {
                 .fillMaxSize()
         )
         {
-            TopCard()
+            TopCard(currentDoctor)
             Spacer(Modifier.height(24.dp))
             TabBar()
             Spacer(Modifier.height(24.dp))
@@ -143,9 +159,12 @@ fun DocDetailScreen(navController: NavHostController) {
     }
 }
 
-
 @Composable
-fun TopCard() {
+fun TopCard(currentDoctor:DoctorItem) {
+
+    Log.d("DocDetail", "SelectedDoctor: $currentDoctor")
+
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -175,7 +194,7 @@ fun TopCard() {
 
         Column {
             Text(
-                text = "Dr. Andrew",
+                text = currentDoctor.name,
                 style = MaterialTheme.typography.titleLarge,
                 color = Color.Black,
                 fontWeight = FontWeight.Bold,
@@ -258,7 +277,7 @@ fun ItemWithIcon(
         Box(
             Modifier
                 .clip(CircleShape)
-                .background(colorResource(R.color.light_gray)) // Circle background
+                .background(colorResource(R.color.light_gray))
                 .padding(12.dp)
         ) {
             if (icon != null) {
