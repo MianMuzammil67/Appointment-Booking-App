@@ -1,6 +1,5 @@
 package com.example.appointmentbookingapp.presentation.ui.doctorDetail
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Woman
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,9 +38,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Gray
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -52,6 +52,7 @@ import androidx.core.graphics.toColorInt
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
@@ -59,7 +60,10 @@ import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DocDetailScreen(navController: NavHostController, sharedDoctorViewModel: SharedDoctorViewModel = viewModel()) {
+fun DocDetailScreen(
+    navController: NavHostController,
+    sharedDoctorViewModel: SharedDoctorViewModel = viewModel()
+) {
 
     val currentDoctor by sharedDoctorViewModel.selectedDoctor.collectAsState()
 
@@ -84,8 +88,11 @@ fun DocDetailScreen(navController: NavHostController, sharedDoctorViewModel: Sha
                     }
                 },
                 actions = {
-                    IconButton(onClick = {  }) {
-                        Icon(painter = painterResource(R.drawable.ic_fav), contentDescription = "add to Favorite")
+                    IconButton(onClick = { }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_fav),
+                            contentDescription = "add to Favorite"
+                        )
 
                     }
                 },
@@ -150,21 +157,19 @@ fun DocDetailScreen(navController: NavHostController, sharedDoctorViewModel: Sha
                 .fillMaxSize()
         )
         {
-            TopCard(currentDoctor)
+            TopCardSection(currentDoctor)
             Spacer(Modifier.height(24.dp))
-            TabBar()
+            TabBarSection(currentDoctor)
             Spacer(Modifier.height(24.dp))
-            AboutMe()
+            AboutMeSection(currentDoctor)
+            Spacer(Modifier.height(24.dp))
+            SpokenLanguageSection(currentDoctor)
         }
     }
 }
 
 @Composable
-fun TopCard(currentDoctor:DoctorItem) {
-
-    Log.d("DocDetail", "SelectedDoctor: $currentDoctor")
-
-
+fun TopCardSection(currentDoctor: DoctorItem) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -182,13 +187,13 @@ fun TopCard(currentDoctor:DoctorItem) {
                 .clip(RoundedCornerShape(12.dp))
                 .background(colorResource(R.color.muted_rose))
         ) {
-            Image(
-                painter = painterResource(R.drawable.im_doctor),
+            AsyncImage(
+                model = currentDoctor.imageUrl,
                 contentDescription = null,
                 Modifier
                     .matchParentSize()
-                    .padding(start = 2.dp, end = 2.dp, top = 2.dp)
                     .align(Alignment.Center),
+                contentScale = ContentScale.Crop
             )
         }
 
@@ -202,11 +207,11 @@ fun TopCard(currentDoctor:DoctorItem) {
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 4.dp),
                 thickness = 1.dp,
-                color = Gray
+                color = colorResource(R.color.gray)
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                text = "Dentist",
+                text = currentDoctor.docCategory,
                 style = MaterialTheme.typography.bodyLarge,
 
                 )
@@ -219,7 +224,7 @@ fun TopCard(currentDoctor:DoctorItem) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Fee: 12$",
+                    text = "Fee: ${currentDoctor.consultationFee}",
                     style = MaterialTheme.typography.titleMedium,
                     color = colorResource(R.color.white),
                     textAlign = TextAlign.Center,
@@ -235,34 +240,39 @@ fun TopCard(currentDoctor:DoctorItem) {
 }
 
 @Composable
-fun TabBar() {
+fun TabBarSection(currentDoctor: DoctorItem) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        val gender = currentDoctor.gender == "Male"
         ItemWithIcon(
-            icon = Icons.Filled.Person,
-            text = "200+\nPatients"
+            icon = if (gender) {
+                Icons.Filled.Person
+            } else {
+                Icons.Filled.Woman
+            },
+//            icon = Icons.Filled.Person,
+//            text = "200+\nPatients"
+            text = currentDoctor.gender ?: "Unknown"
         )
         ItemWithIcon(
             imageResId = R.drawable.ic_experience,
-            text = "10+\nExperience"
+            text = "${currentDoctor.experienceYears} Years\nExperience"
         )
 
         ItemWithIcon(
             icon = Icons.Filled.Star,
-            text = "3.4\nRating"
+            text = "${currentDoctor.rating}\nRating"
         )
 
         ItemWithIcon(
             imageResId = R.drawable.feedback,
-            text = "23\nReviews"
+            text = "${currentDoctor.reviewsCount}\nReviews"
         )
     }
-
 }
-
 
 @Composable
 fun ItemWithIcon(
@@ -308,21 +318,60 @@ fun ItemWithIcon(
 }
 
 @Composable
-fun AboutMe() {
+fun AboutMeSection(currentDoctor: DoctorItem) {
     Column {
-
         Text(
             text = "About Me",
             style = MaterialTheme.typography.titleLarge,
-            color = colorResource(R.color.black),
+//            color = colorResource(R.color.black),
             fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            text = "Dr. David Patel, a dedicated cardiologist, brings a wealth of experience to Golden Gate Cardiology Center in Golden Gate, CA.",
+//            text = "Dr. David Patel, a dedicated cardiologist, brings a wealth of experience to Golden Gate Cardiology Center in Golden Gate, CA.",
+            text = currentDoctor.aboutDoctor,
             style = MaterialTheme.typography.bodyMedium,
         )
     }
+}
+
+@Composable
+fun SpokenLanguageSection(currentDoctor: DoctorItem) {
+
+    Column {
+        Text(
+            text = "Spoken Languages",
+            style = MaterialTheme.typography.titleMedium,
+//            color = colorResource(R.color.black),
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(Modifier.height(8.dp))
+        val languageList = currentDoctor.languagesSpoken
+//        i want to add languageList as bullet points here
+
+        languageList?.forEach { language ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(bottom = 4.dp)
+            ) {
+                Text(
+//                    text = "⦿",
+                    text = "➤",
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.padding(end = 8.dp)
+
+                )
+                Text(
+                    text = language,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+        }
+
+    }
+
 
 }
 

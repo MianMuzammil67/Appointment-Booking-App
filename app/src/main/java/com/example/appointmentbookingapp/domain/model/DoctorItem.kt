@@ -10,7 +10,7 @@ data class DoctorItem(
     var isFavorite: Boolean = false,
 
     val experienceYears: Int? = 0,
-    val consultationFee: String? = "",
+    val consultationFee: String = "",
 //    val isOnlineAvailable: Boolean?,
     val languagesSpoken: List<String>? = emptyList(),
     val gender: String? = "",
