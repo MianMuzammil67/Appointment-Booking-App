@@ -1,5 +1,6 @@
 package com.example.appointmentbookingapp.presentation.ui.appointment
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +34,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,15 +48,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.appointmentbookingapp.presentation.state.UiState
 import java.time.LocalDate
 import java.time.YearMonth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BookAppointmentScreen(navController: NavHostController) {
-    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
+
+    val viewModel: AppointmentViewModel = hiltViewModel()
+    val firebaseDateState by viewModel.firebaseTimeFlow.collectAsState()
+
+//    var selectedDate by remember { mutableStateOf(firebaseDateState ) }
+    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
+
+//    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var selectedTime by remember { mutableStateOf<String?>(null) }
 
     val timeSlots = listOf(
@@ -99,10 +111,45 @@ fun BookAppointmentScreen(navController: NavHostController) {
         ) {
             Text("Select Date", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
-            AppointmentCalendar(
-                selectedDate = selectedDate,
-                onDateSelected = { selectedDate = it }
-            )
+
+//            AppointmentCalendar(
+//                selectedDate = selectedDate,
+//                onDateSelected = { selectedDate = it },
+//                firebaseToday = firebaseDate!!
+//
+//            )
+//            AppointmentCalendar(
+//                selectedDate = selectedDate!!,
+//                onDateSelected = { selectedDate = it },
+//                firebaseToday = firebaseDate
+//            )
+
+            when (firebaseDateState) {
+                is UiState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+                is UiState.Error -> {
+                    // Show error message (you can customize this)
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text("Failed to fetch server time.")
+                    }
+                }
+                is UiState.Success -> {
+                    val firebaseDate = (firebaseDateState as UiState.Success).data
+                    // Initialize selectedDate only once
+                    if (selectedDate == null) {
+                        selectedDate = firebaseDate
+                    }
+                    AppointmentCalendar(
+                        selectedDate = selectedDate!!,
+                        onDateSelected = { selectedDate = it },
+                        firebaseToday = firebaseDate
+                    )
+                    Log.d("appointmentScreen", firebaseDate.toString())
+                }
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -144,10 +191,14 @@ fun BookAppointmentScreen(navController: NavHostController) {
 @Composable
 fun AppointmentCalendar(
     selectedDate: LocalDate = LocalDate.now(),
-    onDateSelected: (LocalDate) -> Unit = {}
+    onDateSelected: (LocalDate) -> Unit = {},
+    firebaseToday: LocalDate
+
 ) {
-    var currentMonth by remember { mutableStateOf(YearMonth.now()) }
-    val today = LocalDate.now()
+//    var currentMonth by remember { mutableStateOf(YearMonth.now()) }
+//    val today = LocalDate.now()
+    var currentMonth by remember { mutableStateOf(YearMonth.from(firebaseToday)) }
+    val today = firebaseToday
     val daysOfWeek = listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
 
     val firstDayOfMonth = currentMonth.atDay(1)
