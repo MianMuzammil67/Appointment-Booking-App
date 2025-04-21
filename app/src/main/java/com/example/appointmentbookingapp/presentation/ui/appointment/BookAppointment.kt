@@ -26,6 +26,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -43,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.presentation.state.UiState
 import java.time.LocalDate
 import java.time.YearMonth
@@ -63,16 +66,20 @@ fun BookAppointmentScreen(navController: NavHostController) {
     val firebaseDateState by viewModel.firebaseTimeFlow.collectAsState()
 
 //    var selectedDate by remember { mutableStateOf(firebaseDateState ) }
-    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
+    var selectedDate by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
 
 //    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var selectedTime by remember { mutableStateOf<String?>(null) }
 
+//    val timeSlots = listOf(
+//        "09.00 AM", "09.30 AM", "10.00 AM",
+//        "10.30 AM", "11.00 AM", "11.30 AM",
+//        "3.00 PM", "3.30 PM", "4.00 PM",
+//        "4.30 PM", "5.00 PM", "5.30 PM"
+//    )
     val timeSlots = listOf(
-        "09.00 AM", "09.30 AM", "10.00 AM",
-        "10.30 AM", "11.00 AM", "11.30 AM",
-        "3.00 PM", "3.30 PM", "4.00 PM",
-        "4.30 PM", "5.00 PM", "5.30 PM"
+        "09-10 AM", "10-11 AM", "11-12 AM",
+        "12-01 PM", "03-04 PM", "04-05 PM",
     )
     Scaffold(
         topBar = {
@@ -93,10 +100,15 @@ fun BookAppointmentScreen(navController: NavHostController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
-                    .navigationBarsPadding()
-                ,
+                    .navigationBarsPadding(),
                 shape = RoundedCornerShape(8.dp),
-                enabled = selectedTime != null
+                enabled = selectedTime != null,
+
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (selectedTime != null) colorResource(R.color.colorPrimary) else Color.Gray,
+                    disabledContainerColor = Color.Gray
+                )
+
             ) {
                 Text("Confirm", color = Color.White)
             }
@@ -130,12 +142,13 @@ fun BookAppointmentScreen(navController: NavHostController) {
                         CircularProgressIndicator()
                     }
                 }
+
                 is UiState.Error -> {
-                    // Show error message (you can customize this)
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text("Failed to fetch server time.")
                     }
                 }
+
                 is UiState.Success -> {
                     val firebaseDate = (firebaseDateState as UiState.Success).data
                     // Initialize selectedDate only once
@@ -158,7 +171,9 @@ fun BookAppointmentScreen(navController: NavHostController) {
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
-                modifier = Modifier.height(220.dp),
+//                modifier = Modifier.height(220.dp),
+                modifier = Modifier.height(150.dp),
+//                modifier = Modifier.wrapContentHeight(),
                 contentPadding = PaddingValues(4.dp)
             ) {
                 items(timeSlots.size) { index ->
@@ -168,7 +183,8 @@ fun BookAppointmentScreen(navController: NavHostController) {
                             .padding(6.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(
-                                if (selectedTime == time) Color(0xFF0F172A)
+//                                if (selectedTime == time) Color(0xFF0F172A)
+                                if (selectedTime == time) colorResource(R.color.colorPrimary)
                                 else Color(0xFFF1F5F9)
                             )
                             .clickable { selectedTime = time }
@@ -187,7 +203,6 @@ fun BookAppointmentScreen(navController: NavHostController) {
         }
     }
 }
-
 @Composable
 fun AppointmentCalendar(
     selectedDate: LocalDate = LocalDate.now(),
@@ -195,8 +210,6 @@ fun AppointmentCalendar(
     firebaseToday: LocalDate
 
 ) {
-//    var currentMonth by remember { mutableStateOf(YearMonth.now()) }
-//    val today = LocalDate.now()
     var currentMonth by remember { mutableStateOf(YearMonth.from(firebaseToday)) }
     val today = firebaseToday
     val daysOfWeek = listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
@@ -204,6 +217,9 @@ fun AppointmentCalendar(
     val firstDayOfMonth = currentMonth.atDay(1)
     val lastDayOfMonth = currentMonth.atEndOfMonth()
     val startDayOffset = firstDayOfMonth.dayOfWeek.value % 7
+    val daysInMonth = lastDayOfMonth.dayOfMonth
+    val totalCells = startDayOffset + daysInMonth
+    val remainingCells = if (totalCells % 7 != 0) 7 - (totalCells % 7) else 0
 
     Column(
         modifier = Modifier
@@ -215,10 +231,6 @@ fun AppointmentCalendar(
             .padding(16.dp)
             .fillMaxWidth()
     ) {
-//        Text("Select Date", fontSize = 16.sp, fontWeight = FontWeight.Medium)
-
-//        Spacer(modifier = Modifier.height(16.dp))
-
         // Month navigation
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -234,11 +246,16 @@ fun AppointmentCalendar(
                 },
                 enabled = !currentMonth.atDay(1).isBefore(today.withDayOfMonth(1))
             ) {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Previous Month")
+                Icon(
+                    Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = "Previous Month"
+                )
             }
 
             Text(
-                text = "${currentMonth.month.name.lowercase().replaceFirstChar { it.uppercase() }} ${currentMonth.year}",
+                text = "${
+                    currentMonth.month.name.lowercase().replaceFirstChar { it.uppercase() }
+                } ${currentMonth.year}",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -246,7 +263,10 @@ fun AppointmentCalendar(
             IconButton(
                 onClick = { currentMonth = currentMonth.plusMonths(1) }
             ) {
-                Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next Month")
+                Icon(
+                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "Next Month"
+                )
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -271,8 +291,11 @@ fun AppointmentCalendar(
         repeat(startDayOffset) {
             days.add(null)
         }
-        for (day in 1..lastDayOfMonth.dayOfMonth) {
+        for (day in 1..daysInMonth) {
             days.add(currentMonth.atDay(day))
+        }
+        repeat(remainingCells) {
+            days.add(null)
         }
 
         days.chunked(7).forEach { week ->
@@ -289,7 +312,7 @@ fun AppointmentCalendar(
                             .clip(CircleShape)
                             .background(
                                 when {
-                                    isSelected -> Color.Black
+                                    isSelected -> colorResource(R.color.colorPrimary)
                                     else -> Color.Transparent
                                 }
                             )
