@@ -51,19 +51,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
+import com.example.appointmentbookingapp.domain.model.Appointment
 import com.example.appointmentbookingapp.presentation.state.UiState
+import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
 import java.time.LocalDate
 import java.time.YearMonth
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BookAppointmentScreen(navController: NavHostController) {
+fun BookAppointmentScreen(
+    navController: NavHostController,
+    sharedDoctorViewModel: SharedDoctorViewModel = viewModel()
+) {
 
     val viewModel: AppointmentViewModel = hiltViewModel()
     val firebaseDateState by viewModel.firebaseTimeFlow.collectAsState()
+    val currentDoctor by sharedDoctorViewModel.selectedDoctor.collectAsState()
+    val currentUser by viewModel.currentUserId.collectAsState()
+
 
 //    var selectedDate by remember { mutableStateOf(firebaseDateState ) }
     var selectedDate by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
@@ -96,6 +106,15 @@ fun BookAppointmentScreen(navController: NavHostController) {
             Button(
                 onClick = {
                     // Handle confirmation
+                    val appointment = Appointment(
+                        appointmentId = UUID.randomUUID().toString(),
+                        patientId = currentUser ?: "currentUser is null",
+                        appointmentDate = selectedDate,
+                        timeSlot = selectedTime ?: "selectedTime is null",
+                        status = "Pending",
+                        doctorId = currentDoctor.id
+                    )
+                    viewModel.bookAppointment(appointment)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -130,11 +149,7 @@ fun BookAppointmentScreen(navController: NavHostController) {
 //                firebaseToday = firebaseDate!!
 //
 //            )
-//            AppointmentCalendar(
-//                selectedDate = selectedDate!!,
-//                onDateSelected = { selectedDate = it },
-//                firebaseToday = firebaseDate
-//            )
+
 
             when (firebaseDateState) {
                 is UiState.Loading -> {
@@ -203,6 +218,7 @@ fun BookAppointmentScreen(navController: NavHostController) {
         }
     }
 }
+
 @Composable
 fun AppointmentCalendar(
     selectedDate: LocalDate = LocalDate.now(),
