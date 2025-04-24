@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.appointmentbookingapp.presentation.ui.allCategories.AllDoctorCategories
 import com.example.appointmentbookingapp.presentation.ui.appointment.BookAppointmentScreen
 import com.example.appointmentbookingapp.presentation.ui.auth.SignInScreen
 import com.example.appointmentbookingapp.presentation.ui.auth.SignupScreen
@@ -40,7 +41,10 @@ fun MainApp() {
                 DocDetailScreen(navController,sharedDoctorViewModel)
             }
             composable("BookAppointment"){
-                BookAppointmentScreen(navController)
+                BookAppointmentScreen(navController,sharedDoctorViewModel)
+            }
+            composable("AllDoctorCategories"){
+                AllDoctorCategories(navController)
             }
 
 
