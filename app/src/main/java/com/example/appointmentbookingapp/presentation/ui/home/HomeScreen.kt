@@ -3,6 +3,7 @@ package com.example.appointmentbookingapp.presentation.ui.home
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +18,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -55,8 +59,11 @@ import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDo
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(navController: NavHostController, sharedDoctorViewModel: SharedDoctorViewModel = viewModel()) {
-    val homeViewModel: HomeViewModel = hiltViewModel()
+fun HomeScreen(
+    navController: NavHostController,
+    sharedDoctorViewModel: SharedDoctorViewModel = viewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel()
+) {
 
     val userName by homeViewModel.userName.collectAsState()
     val profileImageUrl by homeViewModel.profileImageUrl.collectAsState()
@@ -85,12 +92,14 @@ fun HomeScreen(navController: NavHostController, sharedDoctorViewModel: SharedDo
             BannerSection(bannerState)
             Spacer(modifier = Modifier.height(16.dp))
 
-            CategorySection(categoryState)
+            CategorySection(categoryState, navController)
             Spacer(modifier = Modifier.height(16.dp))
 
             DoctorSection(doctorState) { currentDoctor ->
                 scope.launch { sharedDoctorViewModel.setSelectedDoctor(currentDoctor) }
                 navController.navigate("DoctorDetail")
+                Log.d("HomeScreen", "HomeScreen: ${currentDoctor.id}")
+
             }
         }
     }
@@ -119,8 +128,14 @@ fun HomeHeaderSection(userName: String?, profileUrl: String?) {
                 style = MaterialTheme.typography.titleMedium
             )
         }
-        Image(
-            painter = painterResource(id = R.drawable.icon_bell),
+//        Image(
+////            painter = painterResource(id = R.drawable.icon_bell),
+//            icon = Icons.Filled.Notifications,
+//            contentDescription = null,
+//            modifier = Modifier.size(24.dp)
+//        )
+        Icon(
+            imageVector = Icons.Filled.Notifications,
             contentDescription = null,
             modifier = Modifier.size(24.dp)
         )
@@ -159,7 +174,7 @@ fun BannerSection(state: UiState<List<BannerItem>>) {
 }
 
 @Composable
-fun CategorySection(categoryState: UiState<List<DoctorCategory>>) {
+fun CategorySection(categoryState: UiState<List<DoctorCategory>>, navController: NavHostController) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -173,7 +188,10 @@ fun CategorySection(categoryState: UiState<List<DoctorCategory>>) {
         Text(
             text = "See All",
             style = MaterialTheme.typography.titleSmall,
-            color = colorResource(id = R.color.gray)
+            color = colorResource(id = R.color.gray),
+            modifier = Modifier.clickable {
+                navController.navigate("AllDoctorCategories")
+            }
         )
     }
 
@@ -192,9 +210,6 @@ fun CategorySection(categoryState: UiState<List<DoctorCategory>>) {
                 categoryState.data.forEach { category ->
                     CategoryItem(
                         category = category
-//                        image = it.imageUrl,
-//                        backgroundColor = it.backgroundColor,
-//                        categoryName = it.name
                     )
                 }
             }
@@ -246,7 +261,6 @@ fun DoctorSection(
                 CircularProgressIndicator()
             }
         }
-
         is UiState.Success -> {
             val topDoctors = state.data
                 .sortedByDescending { it.rating }

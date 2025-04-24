@@ -31,10 +31,10 @@ import com.example.appointmentbookingapp.presentation.ui.home.viewModel.HomeView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AllDoctorCategories(navController: NavHostController) {
-    val viewMode: HomeViewModel = hiltViewModel()
+fun AllDoctorCategories(navController: NavHostController,
+    viewModel: HomeViewModel = hiltViewModel()){
 
-    val allCategories by viewMode.allCategoriesState.collectAsState()
+    val allCategories by viewModel.allCategoriesState.collectAsState()
 
     Scaffold(
         Modifier.fillMaxSize(),

@@ -1,10 +1,11 @@
 package com.example.appointmentbookingapp.presentation.ui.home.viewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appointmentbookingapp.domain.model.BannerItem
-import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.domain.model.DoctorCategory
+import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.domain.repository.HomeRepository
 import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.util.Resource
@@ -20,9 +21,7 @@ class HomeViewModel @Inject constructor(
     private val repository: HomeRepository
 ) : ViewModel() {
 
-    //    private val TAG = "HomeViewModel"
-    private val logTag = HomeViewModel::class.java.simpleName
-
+    private val logTag = "HomeViewModel"
     private val _userName = MutableStateFlow<String?>(null)
     val userName: StateFlow<String?> = _userName
 
@@ -35,8 +34,10 @@ class HomeViewModel @Inject constructor(
     private val _categoriesState = MutableStateFlow<UiState<List<DoctorCategory>>>(UiState.Loading)
     val categories: StateFlow<UiState<List<DoctorCategory>>> = _categoriesState.asStateFlow()
 
-    private val _allCategoriesState = MutableStateFlow<UiState<List<DoctorCategory>>>(UiState.Loading)
-    val allCategoriesState: StateFlow<UiState<List<DoctorCategory>>> =_allCategoriesState.asStateFlow()
+    private val _allCategoriesState =
+        MutableStateFlow<UiState<List<DoctorCategory>>>(UiState.Loading)
+    val allCategoriesState: StateFlow<UiState<List<DoctorCategory>>> =
+        _allCategoriesState.asStateFlow()
 
     private val _doctorState = MutableStateFlow<UiState<List<DoctorItem>>>(UiState.Loading)
     val doctorState: StateFlow<UiState<List<DoctorItem>>> = _doctorState.asStateFlow()
@@ -45,7 +46,6 @@ class HomeViewModel @Inject constructor(
     init {
         getCurrentUserInfo()
         getBanners()
-        getSpecializationCategory()
         getAllSpecializationCategory()
         getDoctors()
     }
@@ -64,40 +64,38 @@ class HomeViewModel @Inject constructor(
 
             is Resource.Error -> {
                 _bannerFlow.value = UiState.Error(result.message)
+                Log.d(logTag, "getBanners: ${result.message}")
             }
 
             else -> {}
-
-
         }
-
     }
 
+    private var getAllCategoryCallCount = 0
+
     private fun getAllSpecializationCategory() = viewModelScope.launch {
+        getAllCategoryCallCount++
+        Log.d(logTag, "getAllSpecializationCategory called: $getAllCategoryCallCount times")
+
+        _categoriesState.value = UiState.Loading
         _allCategoriesState.value = UiState.Loading
 
         when (val result = repository.getSpecializationCategory()) {
             is Resource.Success -> {
-                _allCategoriesState.value = UiState.Success(result.data)
+                val allCategories = result.data
+                val topCategories = allCategories.take(4)
+                _categoriesState.value = UiState.Success(topCategories)
+                _allCategoriesState.value = UiState.Success(allCategories)
             }
+
             is Resource.Error -> {
                 _allCategoriesState.value = UiState.Error(result.message)
-            }
-            else -> {}
-        }
-    }
-
-    private fun getSpecializationCategory() = viewModelScope.launch {
-        _categoriesState.value = UiState.Loading
-        when (val result = repository.getSpecializationCategory()) {
-            is Resource.Success -> {
-                val categories = result.data.take(4)
-                _categoriesState.value = UiState.Success(categories)
-            }
-
-            is Resource.Error -> {
                 _categoriesState.value = UiState.Error(result.message)
+
+                Log.d(logTag, "getBanners: ${result.message}")
+
             }
+
             else -> {}
         }
     }
@@ -110,34 +108,5 @@ class HomeViewModel @Inject constructor(
             else -> {}
         }
     }
-
-
-//        private val _categories = mutableStateOf<List<CategoryItem>>(emptyList())
-//        val categories: State<List<CategoryData>> = _categories
-//
-//        private val _doctorList = mutableStateOf<List<DoctorItem>>(emptyList())
-//        val doctorList: State<List<DoctorItem>> = _doctorList
-//
-//        private val _userName = mutableStateOf("Mian Muzammil")
-//        val userName: State<String> = _userName
-//
-//        private val _search = mutableStateOf("")
-//        val search: State<String> = _search
-//
-//        fun onSearchChange(newValue: String) {
-//            _search.value = newValue
-//        }
-//
-//        init {
-//            loadData()
-//        }
-//
-//        private fun loadData() {
-//            // Simulate loading
-//            _categories.value = TempDatabase.getCategories()
-//            _doctorList.value = TempDatabase.getDoctors()
-//        }
-//    }
-
 
 }

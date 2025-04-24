@@ -14,6 +14,7 @@ import com.example.appointmentbookingapp.presentation.ui.auth.SignInScreen
 import com.example.appointmentbookingapp.presentation.ui.auth.SignupScreen
 import com.example.appointmentbookingapp.presentation.ui.doctorDetail.DocDetailScreen
 import com.example.appointmentbookingapp.presentation.ui.home.HomeScreen
+import com.example.appointmentbookingapp.presentation.ui.home.viewModel.HomeViewModel
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
 import com.google.firebase.auth.FirebaseAuth
 @Composable
@@ -22,6 +23,7 @@ fun MainApp() {
         val navController = rememberNavController()
 
         val sharedDoctorViewModel: SharedDoctorViewModel = viewModel()
+        val homeViewModel: HomeViewModel = viewModel()
 
         val currentUser = FirebaseAuth.getInstance().currentUser
         val start = if (currentUser != null) "HomeScreen" else "SignIn"
@@ -35,7 +37,7 @@ fun MainApp() {
                 SignInScreen(navController)
             }
             composable("HomeScreen"){
-                HomeScreen(navController,sharedDoctorViewModel)
+                HomeScreen(navController,sharedDoctorViewModel,homeViewModel)
             }
             composable("DoctorDetail"){
                 DocDetailScreen(navController,sharedDoctorViewModel)
@@ -44,7 +46,7 @@ fun MainApp() {
                 BookAppointmentScreen(navController,sharedDoctorViewModel)
             }
             composable("AllDoctorCategories"){
-                AllDoctorCategories(navController)
+                AllDoctorCategories(navController,homeViewModel)
             }
 
 
