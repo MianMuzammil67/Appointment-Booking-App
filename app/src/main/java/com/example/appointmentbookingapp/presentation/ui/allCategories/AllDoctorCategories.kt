@@ -5,9 +5,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -17,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -26,16 +33,29 @@ import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.presentation.ui.home.components.CategoryItem
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.HomeViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AllDoctorCategories(navController: NavHostController) {
     val viewMode: HomeViewModel = hiltViewModel()
 
-    val allCategories by viewMode.categories.collectAsState()
-    var categoryList by remember { mutableStateOf(emptyList<DoctorCategory>()) }
+    val allCategories by viewMode.allCategoriesState.collectAsState()
+//    var categoryList by remember { mutableStateOf(emptyList<DoctorCategory>()) }
 
-    Scaffold(Modifier.fillMaxSize()) { contentPadding ->
+    Scaffold(
+        Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = { Text("Doctor Categories", fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
+    ) { contentPadding ->
 
-        when (allCategories) {
+        when (val state =allCategories) {
             is UiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
@@ -50,16 +70,15 @@ fun AllDoctorCategories(navController: NavHostController) {
                 }
             }
             is UiState.Success -> {
-                categoryList = (allCategories as UiState.Success<List<DoctorCategory>>).data
-            }
-        }
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
-            Modifier.padding(contentPadding)
-        ) {
-            items(categoryList.size) { index ->
-                val item = categoryList[index]
-                CategoryItem(item)
+                val categoryList = state.data
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier.padding(contentPadding)
+                ) {
+                    items(categoryList.size) { index ->
+                        CategoryItem(categoryList[index])
+                    }
+                }
             }
         }
     }

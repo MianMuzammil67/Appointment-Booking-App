@@ -35,6 +35,9 @@ class HomeViewModel @Inject constructor(
     private val _categoriesState = MutableStateFlow<UiState<List<DoctorCategory>>>(UiState.Loading)
     val categories: StateFlow<UiState<List<DoctorCategory>>> = _categoriesState.asStateFlow()
 
+    private val _allCategoriesState = MutableStateFlow<UiState<List<DoctorCategory>>>(UiState.Loading)
+    val allCategoriesState: StateFlow<UiState<List<DoctorCategory>>> =_allCategoriesState.asStateFlow()
+
     private val _doctorState = MutableStateFlow<UiState<List<DoctorItem>>>(UiState.Loading)
     val doctorState: StateFlow<UiState<List<DoctorItem>>> = _doctorState.asStateFlow()
 
@@ -43,6 +46,7 @@ class HomeViewModel @Inject constructor(
         getCurrentUserInfo()
         getBanners()
         getSpecializationCategory()
+        getAllSpecializationCategory()
         getDoctors()
     }
 
@@ -69,33 +73,43 @@ class HomeViewModel @Inject constructor(
 
     }
 
-    private fun getSpecializationCategory() = viewModelScope.launch {
+    private fun getAllSpecializationCategory() = viewModelScope.launch {
+        _allCategoriesState.value = UiState.Loading
 
-        _categoriesState.value = UiState.Loading
-
-        when(val result = repository.getSpecializationCategory()){
-            is Resource.Success ->{
-                _categoriesState.value = UiState.Success(result.data)
+        when (val result = repository.getSpecializationCategory()) {
+            is Resource.Success -> {
+                _allCategoriesState.value = UiState.Success(result.data)
             }
-            is Resource.Error ->{
-                _categoriesState.value = UiState.Error(result.message)
+            is Resource.Error -> {
+                _allCategoriesState.value = UiState.Error(result.message)
             }
-            else->{}
+            else -> {}
         }
-
     }
 
-    fun getDoctors() = viewModelScope.launch {
+    private fun getSpecializationCategory() = viewModelScope.launch {
+        _categoriesState.value = UiState.Loading
+        when (val result = repository.getSpecializationCategory()) {
+            is Resource.Success -> {
+                val categories = result.data.take(4)
+                _categoriesState.value = UiState.Success(categories)
+            }
+
+            is Resource.Error -> {
+                _categoriesState.value = UiState.Error(result.message)
+            }
+            else -> {}
+        }
+    }
+
+    private fun getDoctors() = viewModelScope.launch {
         _doctorState.value = UiState.Loading
         when (val result = repository.getDoctors()) {
             is Resource.Success -> _doctorState.value = UiState.Success(result.data)
             is Resource.Error -> _doctorState.value = UiState.Error(result.message)
-            else->{}
+            else -> {}
         }
     }
-
-
-
 
 
 //        private val _categories = mutableStateOf<List<CategoryItem>>(emptyList())
