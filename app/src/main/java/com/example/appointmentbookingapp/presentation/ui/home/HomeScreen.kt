@@ -68,7 +68,7 @@ fun HomeScreen(
     val userName by homeViewModel.userName.collectAsState()
     val profileImageUrl by homeViewModel.profileImageUrl.collectAsState()
     val bannerState by homeViewModel.bannerFlow.collectAsState()
-    val doctorState by homeViewModel.doctorState.collectAsState()
+    val doctorState by homeViewModel.topDoctorState.collectAsState()
     val categoryState by homeViewModel.categories.collectAsState()
 
     var search by remember { mutableStateOf("") }
@@ -95,12 +95,19 @@ fun HomeScreen(
             CategorySection(categoryState, navController)
             Spacer(modifier = Modifier.height(16.dp))
 
-            DoctorSection(doctorState) { currentDoctor ->
-                scope.launch { sharedDoctorViewModel.setSelectedDoctor(currentDoctor) }
-                navController.navigate("DoctorDetail")
-                Log.d("HomeScreen", "HomeScreen: ${currentDoctor.id}")
-
-            }
+            DoctorSection(
+                state = doctorState,
+                onDoctorClick = { currentDoctor ->
+                    scope.launch {
+                        sharedDoctorViewModel.setSelectedDoctor(currentDoctor)
+                    }
+                    navController.navigate("DoctorDetail")
+                    Log.d("HomeScreen", "HomeScreen: ${currentDoctor.id}")
+                },
+                onSeeAllClicked = {
+                    navController.navigate("DoctorScreen")
+                }
+            )
         }
     }
 
@@ -208,9 +215,9 @@ fun CategorySection(categoryState: UiState<List<DoctorCategory>>, navController:
                 Log.d("HomeScreen", categoryState.data.toString())
 
                 categoryState.data.forEach { category ->
-                    CategoryItem(
-                        category = category
-                    )
+                    CategoryItem(category = category){itemName->
+                        navController.navigate("DoctorScreen")
+                    }
                 }
             }
 
@@ -229,7 +236,8 @@ fun CategorySection(categoryState: UiState<List<DoctorCategory>>, navController:
 @Composable
 fun DoctorSection(
     state: UiState<List<DoctorItem>>,
-    onDoctorClick: (DoctorItem) -> Unit
+    onDoctorClick: (DoctorItem) -> Unit,
+    onSeeAllClicked : ()-> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -244,7 +252,10 @@ fun DoctorSection(
         Text(
             text = "See All",
             style = MaterialTheme.typography.titleSmall,
-            color = colorResource(id = R.color.gray)
+            color = colorResource(id = R.color.gray),
+            modifier = Modifier.clickable {
+                onSeeAllClicked()
+            }
         )
     }
 
@@ -263,8 +274,8 @@ fun DoctorSection(
         }
         is UiState.Success -> {
             val topDoctors = state.data
-                .sortedByDescending { it.rating }
-                .take(4)
+//                .sortedByDescending { it.rating }
+//                .take(4)
 
             topDoctors.forEach { doctor ->
                 Spacer(modifier = Modifier.height(8.dp))

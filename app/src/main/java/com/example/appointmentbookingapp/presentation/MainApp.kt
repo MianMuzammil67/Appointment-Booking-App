@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.presentation.ui.allCategories.AllDoctorCategories
+import com.example.appointmentbookingapp.presentation.ui.allDoctors.DoctorScreen
 import com.example.appointmentbookingapp.presentation.ui.appointment.BookAppointmentScreen
 import com.example.appointmentbookingapp.presentation.ui.auth.SignInScreen
 import com.example.appointmentbookingapp.presentation.ui.auth.SignupScreen
@@ -48,7 +49,9 @@ fun MainApp() {
             composable("AllDoctorCategories"){
                 AllDoctorCategories(navController,homeViewModel)
             }
-
+            composable("DoctorScreen"){
+                DoctorScreen(navController,homeViewModel,sharedDoctorViewModel)
+            }
 
         }
 

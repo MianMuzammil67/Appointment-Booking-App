@@ -39,8 +39,11 @@ class HomeViewModel @Inject constructor(
     val allCategoriesState: StateFlow<UiState<List<DoctorCategory>>> =
         _allCategoriesState.asStateFlow()
 
-    private val _doctorState = MutableStateFlow<UiState<List<DoctorItem>>>(UiState.Loading)
-    val doctorState: StateFlow<UiState<List<DoctorItem>>> = _doctorState.asStateFlow()
+    private val _allDoctorState = MutableStateFlow<UiState<List<DoctorItem>>>(UiState.Loading)
+    val allDoctorState: StateFlow<UiState<List<DoctorItem>>> = _allDoctorState.asStateFlow()
+
+    private val _topDoctorState = MutableStateFlow<UiState<List<DoctorItem>>>(UiState.Loading)
+    val topDoctorState: StateFlow<UiState<List<DoctorItem>>> = _topDoctorState.asStateFlow()
 
 
     init {
@@ -99,12 +102,28 @@ class HomeViewModel @Inject constructor(
             else -> {}
         }
     }
+    private var getAllDoctorsCallCount = 0
 
     private fun getDoctors() = viewModelScope.launch {
-        _doctorState.value = UiState.Loading
+        getAllDoctorsCallCount++
+        Log.d(logTag, "getDoctors called: $getAllDoctorsCallCount times")
+
+        _topDoctorState.value = UiState.Loading
+        _allDoctorState.value = UiState.Loading
+
         when (val result = repository.getDoctors()) {
-            is Resource.Success -> _doctorState.value = UiState.Success(result.data)
-            is Resource.Error -> _doctorState.value = UiState.Error(result.message)
+            is Resource.Success -> {
+                val allDoctors = result.data
+                val topDoctors = allDoctors.sortedByDescending { it.rating }.take(4)
+                _allDoctorState.value = UiState.Success(allDoctors)
+                _topDoctorState.value = UiState.Success(topDoctors)
+            }
+
+            is Resource.Error -> {
+                _allDoctorState.value = UiState.Error(result.message)
+                _topDoctorState.value = UiState.Error(result.message)
+            }
+
             else -> {}
         }
     }
