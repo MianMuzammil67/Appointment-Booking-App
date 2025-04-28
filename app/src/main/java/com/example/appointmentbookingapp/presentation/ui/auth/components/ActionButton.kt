@@ -13,13 +13,14 @@ import androidx.compose.ui.unit.dp
 import com.example.appointmentbookingapp.R
 
 @Composable
-fun ActionButton (
-    onClick : () -> Unit,
-    buttonText : String
+fun ActionButton(
+    onClick: () -> Unit,
+    buttonText: String
 ) {
     Button(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(top = 24.dp, bottom = 24.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = colorResource(id = R.color.colorPrimary)

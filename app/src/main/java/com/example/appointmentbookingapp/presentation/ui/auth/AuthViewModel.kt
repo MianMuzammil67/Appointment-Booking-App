@@ -24,7 +24,7 @@ class AuthViewModel @Inject constructor(
     private val _signIn = MutableStateFlow<AuthState>(AuthState.Initial)
     val signInState = _signIn.asStateFlow()
 
-    suspend fun signUp(name: String, email: String, password: String, profilePicture : String) {
+    suspend fun signUp(name: String, email: String, password: String, profilePicture: String) {
         _signUp.value = AuthState.Loading
         try {
             val authResult = firebaseAuth
@@ -39,9 +39,9 @@ class AuthViewModel @Inject constructor(
             user?.updateProfile(profileUpdates)?.await()
 
             user.let {
-                val userData= User(name,email,password, profilePicture)
+                val userData = User(name, email, password, profilePicture)
                 if (it != null) {
-                    saveDataToFirestore(it.uid,userData)
+                    saveDataToFirestore(it.uid, userData)
                 }
             }
 

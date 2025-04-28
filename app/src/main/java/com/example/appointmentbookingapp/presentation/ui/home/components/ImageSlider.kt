@@ -30,7 +30,7 @@ import com.example.appointmentbookingapp.R
 import kotlinx.coroutines.delay
 
 @Composable
-fun ImageSlider(modifier: Modifier = Modifier, imageUrls: List<String> ) {
+fun ImageSlider(modifier: Modifier = Modifier, imageUrls: List<String>) {
 
     val pagerState = rememberPagerState(
         pageCount = { imageUrls.size }
@@ -57,8 +57,7 @@ fun ImageSlider(modifier: Modifier = Modifier, imageUrls: List<String> ) {
                     modifier
                         .wrapContentSize()
 //                        .padding(top = 16.dp, bottom = 16.dp),
-                        .padding( 4.dp)
-                    ,
+                        .padding(4.dp),
                     elevation = CardDefaults.cardElevation(8.dp)
                 ) {
 //                    Image(
@@ -68,7 +67,7 @@ fun ImageSlider(modifier: Modifier = Modifier, imageUrls: List<String> ) {
 //                    SubcomposeAsyncImage()
 
 
-                   AsyncImage(
+                    AsyncImage(
                         model = imageUrls[currentPage],
                         contentDescription = "Banner Image",
                         contentScale = ContentScale.Crop,

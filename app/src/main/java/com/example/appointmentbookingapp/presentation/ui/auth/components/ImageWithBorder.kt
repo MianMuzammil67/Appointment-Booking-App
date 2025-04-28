@@ -20,9 +20,9 @@ fun ImageWithBorder(image: Int) {
 
         modifier = Modifier
             .size(54.dp)
-            .border(1.dp, colorResource(id =R.color.gray), shape = CircleShape),
+            .border(1.dp, colorResource(id = R.color.gray), shape = CircleShape),
 
-    ) {
+        ) {
         Image(
             painter = painterResource(id = image), // Replace with your image
             contentDescription = null,

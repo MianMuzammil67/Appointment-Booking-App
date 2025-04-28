@@ -20,8 +20,8 @@ import com.example.appointmentbookingapp.R
 
 @Composable
 fun SearchDoctorField(
-    value:String,
-    onValueChange:(String)->Unit
+    value: String,
+    onValueChange: (String) -> Unit
 ) {
     Column(
         modifier = Modifier

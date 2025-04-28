@@ -64,9 +64,11 @@ fun SignInScreen(navController: NavHostController) {
                     popUpTo("SignIn") { inclusive = true }
                 }
             }
+
             is AuthState.Error -> {
                 Toast.makeText(context, "SignIn Filed", Toast.LENGTH_SHORT).show()
             }
+
             else -> {}
         }
     }

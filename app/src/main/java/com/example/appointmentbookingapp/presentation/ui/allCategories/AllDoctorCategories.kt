@@ -31,8 +31,10 @@ import com.example.appointmentbookingapp.presentation.ui.home.viewModel.HomeView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AllDoctorCategories(navController: NavHostController,
-    viewModel: HomeViewModel = hiltViewModel()){
+fun AllDoctorCategories(
+    navController: NavHostController,
+    viewModel: HomeViewModel = hiltViewModel()
+) {
 
     val allCategories by viewModel.allCategoriesState.collectAsState()
 
@@ -50,12 +52,13 @@ fun AllDoctorCategories(navController: NavHostController,
         }
     ) { contentPadding ->
 
-        when (val state =allCategories) {
+        when (val state = allCategories) {
             is UiState.Loading -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             }
+
             is UiState.Error -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
@@ -64,6 +67,7 @@ fun AllDoctorCategories(navController: NavHostController,
                     )
                 }
             }
+
             is UiState.Success -> {
                 val categoryList = state.data
                 LazyVerticalGrid(
@@ -71,7 +75,9 @@ fun AllDoctorCategories(navController: NavHostController,
                     modifier = Modifier.padding(contentPadding)
                 ) {
                     items(categoryList.size) { index ->
-                        CategoryItem(categoryList[index])
+                        CategoryItem(categoryList[index]) { itemName ->
+                            navController.navigate("DoctorScreen")
+                        }
                     }
                 }
             }

@@ -81,12 +81,6 @@ fun BookAppointmentScreen(
 //    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var selectedTime by remember { mutableStateOf<String?>(null) }
 
-//    val timeSlots = listOf(
-//        "09.00 AM", "09.30 AM", "10.00 AM",
-//        "10.30 AM", "11.00 AM", "11.30 AM",
-//        "3.00 PM", "3.30 PM", "4.00 PM",
-//        "4.30 PM", "5.00 PM", "5.30 PM"
-//    )
     val timeSlots = listOf(
         "09-10 AM", "10-11 AM", "11-12 AM",
         "12-01 PM", "03-04 PM", "04-05 PM",
@@ -127,7 +121,6 @@ fun BookAppointmentScreen(
                     containerColor = if (selectedTime != null) colorResource(R.color.colorPrimary) else Color.Gray,
                     disabledContainerColor = Color.Gray
                 )
-
             ) {
                 Text("Confirm", color = Color.White)
             }
@@ -149,7 +142,6 @@ fun BookAppointmentScreen(
 //                firebaseToday = firebaseDate!!
 //
 //            )
-
 
             when (firebaseDateState) {
                 is UiState.Loading -> {
@@ -353,6 +345,7 @@ fun AppointmentCalendar(
         }
     }
 }
+
 
 @Preview
 @Composable

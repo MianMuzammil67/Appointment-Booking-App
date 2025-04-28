@@ -28,11 +28,15 @@ fun TextInputField(
 
 ) {
     Column(modifier = modifier) {
-        Text(text = tittle, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+        Text(
+            text = tittle,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold
+        )
         Spacer(modifier.height(8.dp))
 
         OutlinedTextField(
-            value = value ,
+            value = value,
             onValueChange = onValueChange,
             label = { Text(label) },
             visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,

@@ -31,28 +31,30 @@ class AppointmentViewModel @Inject constructor(
         getCurrentUserId()
     }
 
-     private fun getCurrentUserId() {
+    private fun getCurrentUserId() {
         _currentUserId.value = repository.getCurrentUserId()
     }
 
 
     private fun getFirebaseServerTime() = viewModelScope.launch {
-        Log.d("AppointmentViewModel","getFirebaseServerTime is called")
+        Log.d("AppointmentViewModel", "getFirebaseServerTime is called")
         _firebaseTimeFlow.value = UiState.Loading
 
         when (val time = repository.getFirebaseServerTime()) {
-            is Resource.Success->{
+            is Resource.Success -> {
                 _firebaseTimeFlow.value = UiState.Success(time.data)
             }
-            is Resource.Error ->{
+
+            is Resource.Error -> {
                 _firebaseTimeFlow.value = UiState.Error(time.message)
             }
-            else ->{}
+
+            else -> {}
         }
     }
 
     fun bookAppointment(appointment: Appointment) = viewModelScope.launch {
-        Log.d("AppointmentViewModel","bookAppointment is called")
+        Log.d("AppointmentViewModel", "bookAppointment is called")
         repository.bookAppointment(appointment)
     }
 

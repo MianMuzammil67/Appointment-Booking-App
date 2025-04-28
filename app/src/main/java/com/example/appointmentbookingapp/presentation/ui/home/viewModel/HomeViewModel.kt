@@ -102,6 +102,7 @@ class HomeViewModel @Inject constructor(
             else -> {}
         }
     }
+
     private var getAllDoctorsCallCount = 0
 
     private fun getDoctors() = viewModelScope.launch {

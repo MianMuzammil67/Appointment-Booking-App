@@ -1,6 +1,7 @@
 package com.example.appointmentbookingapp.presentation.ui.home.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,24 +24,21 @@ import com.example.appointmentbookingapp.domain.model.DoctorCategory
 
 @Composable
 fun CategoryItem(
-//    image: String,
-//    backgroundColor: String,
-//    categoryName: String
-    category: DoctorCategory
-
+    category: DoctorCategory,
+    onClick: (String) -> Unit
 ) {
-//    val color = Color(category.backgroundColor.toColorInt())
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
+        verticalArrangement = Arrangement.Top,
+        modifier = Modifier.clickable {
+            onClick(category.label)
+        }) {
         Box(
             Modifier
                 .padding(16.dp)
                 .size(60.dp)
                 .clip(RoundedCornerShape(4.dp))
-                .background(Color(category.backgroundColor.toColorInt()))
-            ,
+                .background(Color(category.backgroundColor.toColorInt())),
             contentAlignment = Alignment.Center
 
         ) {
@@ -55,7 +53,6 @@ fun CategoryItem(
             text = category.label,
             color = colorResource(R.color.gray),
             style = MaterialTheme.typography.titleSmall
-
         )
     }
 

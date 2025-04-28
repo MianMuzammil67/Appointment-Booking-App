@@ -181,7 +181,10 @@ fun BannerSection(state: UiState<List<BannerItem>>) {
 }
 
 @Composable
-fun CategorySection(categoryState: UiState<List<DoctorCategory>>, navController: NavHostController) {
+fun CategorySection(
+    categoryState: UiState<List<DoctorCategory>>,
+    navController: NavHostController
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -215,7 +218,7 @@ fun CategorySection(categoryState: UiState<List<DoctorCategory>>, navController:
                 Log.d("HomeScreen", categoryState.data.toString())
 
                 categoryState.data.forEach { category ->
-                    CategoryItem(category = category){itemName->
+                    CategoryItem(category = category) { itemName ->
                         navController.navigate("DoctorScreen")
                     }
                 }
@@ -237,7 +240,7 @@ fun CategorySection(categoryState: UiState<List<DoctorCategory>>, navController:
 fun DoctorSection(
     state: UiState<List<DoctorItem>>,
     onDoctorClick: (DoctorItem) -> Unit,
-    onSeeAllClicked : ()-> Unit
+    onSeeAllClicked: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -272,10 +275,9 @@ fun DoctorSection(
                 CircularProgressIndicator()
             }
         }
+
         is UiState.Success -> {
             val topDoctors = state.data
-//                .sortedByDescending { it.rating }
-//                .take(4)
 
             topDoctors.forEach { doctor ->
                 Spacer(modifier = Modifier.height(8.dp))

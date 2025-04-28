@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class SharedDoctorViewModel @Inject constructor(): ViewModel() {
+class SharedDoctorViewModel @Inject constructor() : ViewModel() {
 
     private var _selectedDoctor = MutableStateFlow<DoctorItem>(DoctorItem())
     val selectedDoctor = _selectedDoctor.asStateFlow()
 
 
-    suspend fun setSelectedDoctor(doctorItem: DoctorItem){
+    suspend fun setSelectedDoctor(doctorItem: DoctorItem) {
         _selectedDoctor.emit(doctorItem)
         Log.d("SharedDoctorViewModel", "setSelectedDoctor: $doctorItem")
     }

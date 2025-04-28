@@ -2,8 +2,8 @@ package com.example.appointmentbookingapp.data.repository
 
 import com.example.appointmentbookingapp.data.remorte.HomeRemoteDataSource
 import com.example.appointmentbookingapp.domain.model.BannerItem
-import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.domain.model.DoctorCategory
+import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.domain.repository.HomeRepository
 import com.example.appointmentbookingapp.util.Resource
 import javax.inject.Inject

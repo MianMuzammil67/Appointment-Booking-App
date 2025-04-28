@@ -40,10 +40,7 @@ fun MainApp() {
             startDestination = start,
 //            Modifier.padding(innerPadding)
 
-
         ) {
-
-//        NavHost(navController = navController, startDestination = start){
 
             composable("SignUp") {
                 SignupScreen(navController)

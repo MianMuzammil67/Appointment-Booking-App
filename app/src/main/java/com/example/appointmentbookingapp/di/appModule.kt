@@ -34,12 +34,12 @@ object AppModule {
     @Singleton
     @Provides
     fun provideHomeRepository(remote: HomeRemoteDataSource): HomeRepository {
-       return HomeRepositoryImpl(remote)
+        return HomeRepositoryImpl(remote)
     }
 
     @Singleton
     @Provides
-    fun provideAppointmentRepository(remote: AppointmentRemoteDataSource) : AppointmentRepository{
+    fun provideAppointmentRepository(remote: AppointmentRemoteDataSource): AppointmentRepository {
         return AppointmentRepositoryImpl(remote)
     }
 }

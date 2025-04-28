@@ -13,7 +13,7 @@ import com.example.appointmentbookingapp.R
 
 @Composable
 fun WelcomeText(text: String) {
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
