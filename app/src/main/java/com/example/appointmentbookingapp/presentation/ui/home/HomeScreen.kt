@@ -80,7 +80,7 @@ fun HomeScreen(
                 .padding(innerPadding)
                 .background(Color.White)
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
             HomeHeaderSection(userName = userName, profileUrl = profileImageUrl)
@@ -108,15 +108,16 @@ fun HomeScreen(
                     navController.navigate("DoctorScreen")
                 }
             )
+            Spacer(modifier = Modifier.height(16.dp))
+
         }
     }
-
 }
 
 @Composable
 fun HomeHeaderSection(userName: String?, profileUrl: String?) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
