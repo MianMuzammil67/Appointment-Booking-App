@@ -36,7 +36,7 @@ import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.DoctorItem
 
 @Composable
-fun DocCard(doctor: DoctorItem, onClick: () -> Unit) {
+fun DocCard(doctor: DoctorItem, onClick: () -> Unit, isFavorite: Boolean) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
@@ -82,12 +82,13 @@ fun DocCard(doctor: DoctorItem, onClick: () -> Unit) {
                     fontWeight = FontWeight.Bold
                 )
                 Icon(
-                    painter = painterResource(R.drawable.ic_fav),
+                    painter = if (isFavorite){painterResource(R.drawable.ic_fav_filled)}
+                    else{painterResource(R.drawable.ic_fav)},
                     contentDescription = null,
                     Modifier
                         .size(24.dp)
                         .clickable {
-                            doctor.isFavorite = !doctor.isFavorite
+//                            doctor.isFavorite = !doctor.isFavorite
                         },
                     tint = colorResource(R.color.colorPrimary),
                 )
@@ -163,7 +164,7 @@ fun DocCard(doctor: DoctorItem, onClick: () -> Unit) {
 @Preview
 @Composable
 fun DocCardPreview(modifier: Modifier = Modifier) {
-    DocCard(doctor = DoctorItem()) { }
+    DocCard(doctor = DoctorItem(), { }, isFavorite = true)
 }
 
 

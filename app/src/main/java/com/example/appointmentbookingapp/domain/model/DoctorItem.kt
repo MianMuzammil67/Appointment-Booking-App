@@ -7,8 +7,6 @@ data class DoctorItem(
     val imageUrl: String = "",
     val rating: String = "",
     val docCategory: String = "",
-    var isFavorite: Boolean = false,
-
     val experienceYears: Int? = 0,
     val consultationFee: String = "",
 //    val isOnlineAvailable: Boolean?,

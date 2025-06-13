@@ -52,6 +52,7 @@ import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.presentation.ui.components.DocCard
 import com.example.appointmentbookingapp.presentation.ui.components.SearchDoctorField
+import com.example.appointmentbookingapp.presentation.ui.favorite.viewModel.FavoriteViewModel
 import com.example.appointmentbookingapp.presentation.ui.home.components.CategoryItem
 import com.example.appointmentbookingapp.presentation.ui.home.components.ImageSlider
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.HomeViewModel
@@ -64,12 +65,16 @@ fun HomeScreen(
     sharedDoctorViewModel: SharedDoctorViewModel = viewModel(),
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
+    val favoriteViewModel: FavoriteViewModel = hiltViewModel()
 
     val userName by homeViewModel.userName.collectAsState()
     val profileImageUrl by homeViewModel.profileImageUrl.collectAsState()
     val bannerState by homeViewModel.bannerFlow.collectAsState()
     val doctorState by homeViewModel.topDoctorState.collectAsState()
     val categoryState by homeViewModel.categories.collectAsState()
+
+    val isFavorite by favoriteViewModel.isFavorite.collectAsState()
+
 
     var search by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
@@ -106,7 +111,9 @@ fun HomeScreen(
                 },
                 onSeeAllClicked = {
                     navController.navigate("DoctorScreen")
-                }
+                },
+                isFavorite,
+                favoriteViewModel
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -117,7 +124,9 @@ fun HomeScreen(
 @Composable
 fun HomeHeaderSection(userName: String?, profileUrl: String?) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
@@ -241,7 +250,9 @@ fun CategorySection(
 fun DoctorSection(
     state: UiState<List<DoctorItem>>,
     onDoctorClick: (DoctorItem) -> Unit,
-    onSeeAllClicked: () -> Unit
+    onSeeAllClicked: () -> Unit,
+    isFavorite: Boolean,
+    favoriteViewModel: FavoriteViewModel
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -282,7 +293,13 @@ fun DoctorSection(
 
             topDoctors.forEach { doctor ->
                 Spacer(modifier = Modifier.height(8.dp))
-                DocCard(doctor = doctor, onClick = { onDoctorClick(doctor) })
+                favoriteViewModel.checkIfFavorite(doctor.id)
+
+                DocCard(
+                    doctor = doctor,
+                    onClick = { onDoctorClick(doctor) },
+                    isFavorite
+                )
             }
         }
 

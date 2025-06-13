@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -49,12 +50,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.DoctorItem
+import com.example.appointmentbookingapp.presentation.ui.favorite.viewModel.FavoriteViewModel
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
 
 
@@ -64,15 +67,20 @@ fun DocDetailScreen(
     navController: NavHostController,
     sharedDoctorViewModel: SharedDoctorViewModel = viewModel()
 ) {
-
+    val favoriteViewModel : FavoriteViewModel = hiltViewModel()
     val currentDoctor by sharedDoctorViewModel.selectedDoctor.collectAsState()
-
 // This code returns the hash code of the object, which helps in comparing two objects.
 
 //    LaunchedEffect(sharedDoctorViewModel) {
 //        println("DocDetailScreen ViewModel Hash: ${System.identityHashCode(sharedDoctorViewModel)}")
 //        Log.d("DocDetail", "SelectedDoctor: $currentDoctor")
 //    }
+
+    val isFavorite by favoriteViewModel.isFavorite.collectAsState()
+
+    LaunchedEffect(currentDoctor.id) {
+        favoriteViewModel.checkIfFavorite(currentDoctor.id)
+    }
 
     Scaffold(
         Modifier.fillMaxSize(),
@@ -88,10 +96,16 @@ fun DocDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { }) {
+                    IconButton(onClick = {
+                        favoriteViewModel.toggleFavorite(currentDoctor)
+                    }) {
                         Icon(
-                            painter = painterResource(R.drawable.ic_fav),
-                            contentDescription = "add to Favorite"
+                            painter =  if (isFavorite) {painterResource(R.drawable.ic_fav_filled)} else {painterResource(R.drawable.ic_fav)},
+//                            painter = painterResource(R.drawable.ic_fav),
+//                            imageVector = Icons.Default.FavoriteBorder,
+                            contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
+//                            tint = colorResource(R.color.colorPrimary)
+                            tint = Color.Unspecified
                         )
 
                     }

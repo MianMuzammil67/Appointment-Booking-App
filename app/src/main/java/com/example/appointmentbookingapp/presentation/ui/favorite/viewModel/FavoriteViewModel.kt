@@ -19,18 +19,21 @@ class FavoriteViewModel @Inject constructor(
     private val _favoritesState = MutableStateFlow<UiState<List<DoctorItem>>>(UiState.Loading)
     val favoritesState: StateFlow<UiState<List<DoctorItem>>> = _favoritesState
 
-    fun addToFavorites(doctorItem: DoctorItem) {
+    private val _isFavorite = MutableStateFlow(false)
+    val isFavorite: StateFlow<Boolean> = _isFavorite
+
+
+    private fun addToFavorites(doctorItem: DoctorItem) {
         viewModelScope.launch {
             favoriteRepository.addToFavorites(doctorItem)
         }
     }
 
-    fun removeFromFavorites(doctorItem: DoctorItem) {
+    private fun removeFromFavorites(doctorItem: DoctorItem) {
         viewModelScope.launch {
             favoriteRepository.removeFromFavorites(doctorItem)
         }
     }
-
     fun getFavorites() {
         viewModelScope.launch {
             _favoritesState.value = UiState.Loading
@@ -44,9 +47,24 @@ class FavoriteViewModel @Inject constructor(
         }
     }
 
-    fun isDoctorFavorite(doctorId: String) {
+    fun checkIfFavorite(doctorId: String) {
         viewModelScope.launch {
-            favoriteRepository.isDoctorFavorite(doctorId)
+         _isFavorite.value = favoriteRepository.isDoctorFavorite(doctorId)
         }
     }
+
+    fun toggleFavorite(doctorItem: DoctorItem) {
+        viewModelScope.launch {
+            val currentlyFavorite = favoriteRepository.isDoctorFavorite(doctorItem.id)
+            if (currentlyFavorite){
+                removeFromFavorites(doctorItem)
+                _isFavorite.value = false
+            }else{
+                addToFavorites(doctorItem)
+                _isFavorite.value = true
+            }
+        }
+
+    }
+
 }

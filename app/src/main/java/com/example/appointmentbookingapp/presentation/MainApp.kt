@@ -73,7 +73,7 @@ fun MainApp() {
                 DoctorScreen(navController, homeViewModel, sharedDoctorViewModel)
             }
             composable("FavoriteScreen") {
-                FavoriteScreen(navController)
+                FavoriteScreen(navController,sharedDoctorViewModel)
             }
         }
     }

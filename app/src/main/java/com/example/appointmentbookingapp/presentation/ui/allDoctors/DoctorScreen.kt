@@ -88,7 +88,7 @@ fun DoctorScreen(
                                 sharedDoctorViewModel.setSelectedDoctor(doctor)
                             }
                             navController.navigate("DoctorDetail")
-                        })
+                        }, isFavorite = true)
                     }
                 }
             }
