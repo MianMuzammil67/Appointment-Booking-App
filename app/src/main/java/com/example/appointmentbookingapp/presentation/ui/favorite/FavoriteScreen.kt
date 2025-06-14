@@ -18,7 +18,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -41,16 +40,14 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoriteScreen(navController: NavHostController,
-                   sharedDoctorViewModel: SharedDoctorViewModel = viewModel(),
+fun FavoriteScreen(
+    navController: NavHostController,
+    sharedDoctorViewModel: SharedDoctorViewModel = viewModel(),
+    favoriteViewModel: FavoriteViewModel = hiltViewModel()
 ) {
-    val favoriteViewModel: FavoriteViewModel = hiltViewModel()
     val favoriteDoctorsState by favoriteViewModel.favoritesState.collectAsState()
-    val isFavorite by favoriteViewModel.isFavorite.collectAsState()
+    val favoriteIds by favoriteViewModel.favoriteIds.collectAsState()
 
-    LaunchedEffect(Unit){
-        favoriteViewModel.getFavorites()
-    }
     val scope = rememberCoroutineScope()
 
     Scaffold(
@@ -93,20 +90,25 @@ fun FavoriteScreen(navController: NavHostController,
                             modifier = Modifier.align(Alignment.Center),
                             style = MaterialTheme.typography.bodyLarge
                         )
-                    }else {
-                        LazyColumn(modifier = Modifier
-                            .fillMaxSize()
-                            .padding(8.dp))
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(8.dp)
+                        )
                         {
                             items(doctors) { doctor ->
                                 Spacer(modifier = Modifier.height(8.dp))
-                                favoriteViewModel.checkIfFavorite(doctor.id)
-                                DocCard(doctor = doctor, onClick = {
-                                    scope.launch {
-                                        sharedDoctorViewModel.setSelectedDoctor(doctor)
-                                    }
-                                    navController.navigate("DoctorDetail")
-                                }, isFavorite)
+                                val isFavorite = favoriteIds.contains(doctor.id)
+                                DocCard(
+                                    doctor = doctor, onClick = {
+                                        scope.launch {
+                                            sharedDoctorViewModel.setSelectedDoctor(doctor)
+                                        }
+                                        navController.navigate("DoctorDetail")
+                                    }, isFavorite = isFavorite,
+                                    onToggleFavorite = { favoriteViewModel.toggleFavorite(doctor) }
+                                )
                             }
                         }
                     }
@@ -122,8 +124,9 @@ fun FavoriteScreen(navController: NavHostController,
 
     }
 }
+
 @Preview
 @Composable
-fun FavoriteScreenPreview(){
+fun FavoriteScreenPreview() {
     FavoriteScreen(navController = rememberNavController())
 }

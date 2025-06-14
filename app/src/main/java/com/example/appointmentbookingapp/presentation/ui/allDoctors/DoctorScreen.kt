@@ -29,6 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.presentation.ui.components.DocCard
+import com.example.appointmentbookingapp.presentation.ui.favorite.viewModel.FavoriteViewModel
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.HomeViewModel
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
 import kotlinx.coroutines.launch
@@ -37,12 +38,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun DoctorScreen(
     navController: NavHostController,
-    viewModel: HomeViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
     sharedDoctorViewModel: SharedDoctorViewModel = viewModel(),
+    favoriteViewModel: FavoriteViewModel = hiltViewModel()
 ) {
-    val scope = rememberCoroutineScope()
+    val favoriteIds by favoriteViewModel.favoriteIds.collectAsState()
 
-    val allDoctors by viewModel.allDoctorState.collectAsState()
+    val scope = rememberCoroutineScope()
+    val allDoctors by homeViewModel.allDoctorState.collectAsState()
 
     Scaffold(
         Modifier
@@ -77,18 +80,22 @@ fun DoctorScreen(
             is UiState.Success -> {
                 val categoryList = state.data
                 LazyColumn(
-                    modifier = Modifier.padding(contentPadding)
+                    modifier = Modifier
+                        .padding(contentPadding)
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
 
                 ) {
                     items(categoryList) { doctor ->
-                        DocCard(doctor = doctor, onClick = {
-                            scope.launch {
-                                sharedDoctorViewModel.setSelectedDoctor(doctor)
-                            }
-                            navController.navigate("DoctorDetail")
-                        }, isFavorite = true)
+                        val isFavorite = favoriteIds.contains(doctor.id)
+                        DocCard(
+                            doctor = doctor, onClick = {
+                                scope.launch {
+                                    sharedDoctorViewModel.setSelectedDoctor(doctor)
+                                }
+                                navController.navigate("DoctorDetail")
+                            }, isFavorite = isFavorite,
+                            onToggleFavorite = { favoriteViewModel.toggleFavorite(doctor) })
                     }
                 }
             }

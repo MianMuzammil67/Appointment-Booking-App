@@ -1,5 +1,6 @@
 package com.example.appointmentbookingapp.presentation.ui.favorite.viewModel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appointmentbookingapp.domain.model.DoctorItem
@@ -19,10 +20,17 @@ class FavoriteViewModel @Inject constructor(
     private val _favoritesState = MutableStateFlow<UiState<List<DoctorItem>>>(UiState.Loading)
     val favoritesState: StateFlow<UiState<List<DoctorItem>>> = _favoritesState
 
+    private val _favoriteIds = MutableStateFlow<Set<String>>(emptySet())
+    val favoriteIds: StateFlow<Set<String>> = _favoriteIds
+
+
     private val _isFavorite = MutableStateFlow(false)
     val isFavorite: StateFlow<Boolean> = _isFavorite
 
 
+    init {
+        getFavorites()
+    }
     private fun addToFavorites(doctorItem: DoctorItem) {
         viewModelScope.launch {
             favoriteRepository.addToFavorites(doctorItem)
@@ -34,12 +42,14 @@ class FavoriteViewModel @Inject constructor(
             favoriteRepository.removeFromFavorites(doctorItem)
         }
     }
-    fun getFavorites() {
+    private fun getFavorites() {
+        Log.d("FavoriteViewModel","getFavorites called")
         viewModelScope.launch {
             _favoritesState.value = UiState.Loading
             try {
                 val favorites = favoriteRepository.getFavorites()
                 _favoritesState.value = UiState.Success(favorites)
+                _favoriteIds.value = favorites.map { it.id }.toSet()
 
             } catch (e: Exception) {
                 _favoritesState.value = UiState.Error(e.message.toString())
@@ -58,9 +68,16 @@ class FavoriteViewModel @Inject constructor(
             val currentlyFavorite = favoriteRepository.isDoctorFavorite(doctorItem.id)
             if (currentlyFavorite){
                 removeFromFavorites(doctorItem)
+                _favoriteIds.value -= doctorItem.id  // remove from set
+
                 _isFavorite.value = false
+
+
             }else{
                 addToFavorites(doctorItem)
+                _favoriteIds.value += doctorItem.id  // add to set
+//                _favoriteIds.value = _favoriteIds.value + doctorItem.id  // add to set
+
                 _isFavorite.value = true
             }
         }

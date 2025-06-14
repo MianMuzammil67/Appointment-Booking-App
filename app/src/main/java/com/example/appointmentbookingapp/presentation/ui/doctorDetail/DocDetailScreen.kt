@@ -65,9 +65,10 @@ import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDo
 @Composable
 fun DocDetailScreen(
     navController: NavHostController,
-    sharedDoctorViewModel: SharedDoctorViewModel = viewModel()
+    sharedDoctorViewModel: SharedDoctorViewModel = viewModel(),
+    favoriteViewModel: FavoriteViewModel = hiltViewModel()
+
 ) {
-    val favoriteViewModel : FavoriteViewModel = hiltViewModel()
     val currentDoctor by sharedDoctorViewModel.selectedDoctor.collectAsState()
 // This code returns the hash code of the object, which helps in comparing two objects.
 
@@ -100,14 +101,14 @@ fun DocDetailScreen(
                         favoriteViewModel.toggleFavorite(currentDoctor)
                     }) {
                         Icon(
-                            painter =  if (isFavorite) {painterResource(R.drawable.ic_fav_filled)} else {painterResource(R.drawable.ic_fav)},
-//                            painter = painterResource(R.drawable.ic_fav),
-//                            imageVector = Icons.Default.FavoriteBorder,
+                            painter = if (isFavorite) {
+                                painterResource(R.drawable.ic_fav_filled)
+                            } else {
+                                painterResource(R.drawable.ic_fav)
+                            },
                             contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
-//                            tint = colorResource(R.color.colorPrimary)
                             tint = Color.Unspecified
                         )
-
                     }
                 },
                 colors = TopAppBarColors(

@@ -63,9 +63,10 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     navController: NavHostController,
     sharedDoctorViewModel: SharedDoctorViewModel = viewModel(),
-    homeViewModel: HomeViewModel = hiltViewModel()
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    favoriteViewModel: FavoriteViewModel = hiltViewModel()
+
 ) {
-    val favoriteViewModel: FavoriteViewModel = hiltViewModel()
 
     val userName by homeViewModel.userName.collectAsState()
     val profileImageUrl by homeViewModel.profileImageUrl.collectAsState()
@@ -73,8 +74,7 @@ fun HomeScreen(
     val doctorState by homeViewModel.topDoctorState.collectAsState()
     val categoryState by homeViewModel.categories.collectAsState()
 
-    val isFavorite by favoriteViewModel.isFavorite.collectAsState()
-
+    val favoriteIds by favoriteViewModel.favoriteIds.collectAsState()
 
     var search by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
@@ -112,8 +112,8 @@ fun HomeScreen(
                 onSeeAllClicked = {
                     navController.navigate("DoctorScreen")
                 },
-                isFavorite,
-                favoriteViewModel
+                favoriteViewModel = favoriteViewModel,
+                favoriteIds = favoriteIds
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -251,8 +251,8 @@ fun DoctorSection(
     state: UiState<List<DoctorItem>>,
     onDoctorClick: (DoctorItem) -> Unit,
     onSeeAllClicked: () -> Unit,
-    isFavorite: Boolean,
-    favoriteViewModel: FavoriteViewModel
+    favoriteViewModel: FavoriteViewModel,
+    favoriteIds: Set<String>
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -293,12 +293,13 @@ fun DoctorSection(
 
             topDoctors.forEach { doctor ->
                 Spacer(modifier = Modifier.height(8.dp))
-                favoriteViewModel.checkIfFavorite(doctor.id)
+                val favorite = favoriteIds.contains(doctor.id)
 
                 DocCard(
                     doctor = doctor,
                     onClick = { onDoctorClick(doctor) },
-                    isFavorite
+                    isFavorite = favorite,
+                    onToggleFavorite = {favoriteViewModel.toggleFavorite(doctor)}
                 )
             }
         }
