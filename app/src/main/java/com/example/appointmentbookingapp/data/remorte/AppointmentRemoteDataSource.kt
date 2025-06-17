@@ -34,18 +34,33 @@ class AppointmentRemoteDataSource @Inject constructor(
     suspend fun bookAppointment(appointment: Appointment) {
         try {
             val batch = firestore.batch()
+
+            /**
+             * - Full data: appointments/{appointmentId}
+             * - Only IDs: users/{userId}/appointments/{appointmentId}
+             *             doctors/{doctorId}/appointments/{appointmentId}
+             *
+             * - No data duplication
+             * - Cleaner and simpler Firestore
+             */
+
+            val appointmentRef = firestore.collection("appointments")
+                .document(appointment.appointmentId)
+
             val userRef = firestore.collection("users")
                 .document(getCurrentUserId())
-                .collection("Appointments")
+                .collection("appointments")
                 .document(appointment.appointmentId)
-//            .set(appointment).await()
 
             val doctorRef = firestore.collection("doctors")
-                .document(appointment.doctorId).collection("Appointments")
+                .document(appointment.doctorId)
+                .collection("appointments")
                 .document(appointment.appointmentId)
-//                .set(appointment).await()
-            batch.set(userRef,appointment)
-            batch.set(doctorRef,appointment)
+
+            batch.set(appointmentRef, appointment)
+            batch.set(userRef, mapOf("appointmentId" to appointment.appointmentId))
+            batch.set(doctorRef, mapOf("appointmentId" to appointment.appointmentId))
+
             batch.commit().await()
 
         } catch (e: Exception) {
