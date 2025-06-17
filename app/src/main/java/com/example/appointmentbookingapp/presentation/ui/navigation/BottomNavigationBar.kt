@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -20,7 +21,8 @@ fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         NavigationItem("Home", Icons.Filled.Home, "HomeScreen"),
         NavigationItem("Categories", Icons.Filled.List, "AllDoctorCategories"),
-        NavigationItem("Favorite", Icons.Filled.Favorite, "FavoriteScreen")
+        NavigationItem("Favorite", Icons.Filled.Favorite, "FavoriteScreen"),
+        NavigationItem("Profile", Icons.Filled.Person, "ProfileScreen")
     )
     NavigationBar {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
