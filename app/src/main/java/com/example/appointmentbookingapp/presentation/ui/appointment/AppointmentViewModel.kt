@@ -20,6 +20,9 @@ class AppointmentViewModel @Inject constructor(
     private val repository: AppointmentRepository
 ) : ViewModel() {
 
+    private val _bookingState = MutableStateFlow<UiState<Unit>?>(null)
+    val bookingState: StateFlow<UiState<Unit>?> = _bookingState
+
     private val _currentUserId = MutableStateFlow<String?>(null)
     val currentUserId: StateFlow<String?> = _currentUserId
 
@@ -53,9 +56,16 @@ class AppointmentViewModel @Inject constructor(
         }
     }
 
-    fun bookAppointment(appointment: Appointment) = viewModelScope.launch {
-        Log.d("AppointmentViewModel", "bookAppointment is called")
-        repository.bookAppointment(appointment)
+    fun bookAppointment(appointment: Appointment) {
+        viewModelScope.launch {
+            _bookingState.value = UiState.Loading
+            try {
+                repository.bookAppointment(appointment)
+                _bookingState.value = UiState.Success(Unit)
+            } catch (e: Exception) {
+                _bookingState.value = UiState.Error(e.message ?: "Something went wrong")
+            }
+        }
     }
 
 

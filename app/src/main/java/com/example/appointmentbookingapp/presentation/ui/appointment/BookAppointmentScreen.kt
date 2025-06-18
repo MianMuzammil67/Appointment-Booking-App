@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
@@ -35,6 +36,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +59,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.Appointment
 import com.example.appointmentbookingapp.presentation.state.UiState
+import com.example.appointmentbookingapp.presentation.ui.components.BookingSuccessDialog
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
 import java.time.LocalDate
 import java.time.YearMonth
@@ -74,6 +77,12 @@ fun BookAppointmentScreen(
     val currentDoctor by sharedDoctorViewModel.selectedDoctor.collectAsState()
     val currentUser by viewModel.currentUserId.collectAsState()
 
+    val bookingState by viewModel.bookingState.collectAsState()
+    val isLoading = bookingState is UiState.Loading
+    val isSuccess = bookingState is UiState.Success
+
+    var showSuccessDialog by remember { mutableStateOf(false) }
+
 
 //    var selectedDate by remember { mutableStateOf(firebaseDateState ) }
     var selectedDate by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
@@ -85,6 +94,21 @@ fun BookAppointmentScreen(
         "09-10 AM", "10-11 AM", "11-12 AM",
         "12-01 PM", "03-04 PM", "04-05 PM",
     )
+
+    LaunchedEffect(isSuccess) {
+        if (isSuccess) {
+            showSuccessDialog = true
+        }
+    }
+
+    if (showSuccessDialog) {
+        BookingSuccessDialog(
+            onDismiss = {
+                showSuccessDialog = false
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -122,6 +146,16 @@ fun BookAppointmentScreen(
                     disabledContainerColor = Color.Gray
                 )
             ) {
+                if(isLoading){
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .padding(end = 8.dp),
+                        strokeWidth = 2.dp
+                    )
+                    Text("Booking...", color = Color.White)
+                }else
                 Text("Confirm", color = Color.White)
             }
         }
