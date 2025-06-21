@@ -110,6 +110,7 @@ fun DocCard(
             Text(
                 text = doctor.docCategory,
                 style = MaterialTheme.typography.bodyLarge,
+                color = Color.Black,
             )
 
             Spacer(Modifier.height(8.dp))
@@ -138,6 +139,7 @@ fun DocCard(
                     Text(
                         text = doctor.rating,
                         style = MaterialTheme.typography.bodySmall,
+                        color = Gray
                     )
                     VerticalDivider(
                         modifier = Modifier
@@ -149,6 +151,8 @@ fun DocCard(
                     Text(
                         text = "${doctor.reviewsCount} Reviews",
                         style = MaterialTheme.typography.bodySmall,
+                        color = Gray
+
                     )
                 }
                 Text(

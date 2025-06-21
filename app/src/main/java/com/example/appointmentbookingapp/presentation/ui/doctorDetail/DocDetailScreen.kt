@@ -30,7 +30,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -110,14 +109,7 @@ fun DocDetailScreen(
                             tint = Color.Unspecified
                         )
                     }
-                },
-                colors = TopAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = Color.Black,
-                    actionIconContentColor = Color.Black,
-                    navigationIconContentColor = Color.Black,
-                    scrolledContainerColor = Color.White,
-                )
+                }
             )
         },
         bottomBar = {
@@ -167,7 +159,6 @@ fun DocDetailScreen(
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .background(Color.White)
                 .padding(16.dp)
                 .fillMaxSize()
         )
@@ -228,7 +219,7 @@ fun TopCardSection(currentDoctor: DoctorItem) {
             Text(
                 text = currentDoctor.docCategory,
                 style = MaterialTheme.typography.bodyLarge,
-
+                color = Color.Black,
                 )
 
             Spacer(Modifier.height(8.dp))
@@ -311,14 +302,14 @@ fun ItemWithIcon(
                     imageVector = icon,
                     contentDescription = null,
                     modifier = Modifier.size(32.dp),
-                    tint = colorResource(R.color.colorPrimary) // You can customize the tint here
+                    tint = colorResource(R.color.colorPrimary)
                 )
             } else if (imageResId != null) {
                 Image(
                     painter = painterResource(id = imageResId),
                     contentDescription = null,
                     modifier = Modifier.size(32.dp),
-                    colorFilter = ColorFilter.tint(colorResource(R.color.colorPrimary)) // Optional tint
+                    colorFilter = ColorFilter.tint(colorResource(R.color.colorPrimary))
                 )
             }
         }
@@ -326,7 +317,7 @@ fun ItemWithIcon(
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge,
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
         )
     }
@@ -338,15 +329,15 @@ fun AboutMeSection(currentDoctor: DoctorItem) {
         Text(
             text = "About Me",
             style = MaterialTheme.typography.titleLarge,
-//            color = colorResource(R.color.black),
+            color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(8.dp))
         Text(
-//            text = "Dr. David Patel, a dedicated cardiologist, brings a wealth of experience to Golden Gate Cardiology Center in Golden Gate, CA.",
             text = currentDoctor.aboutDoctor,
             style = MaterialTheme.typography.bodyMedium,
-        )
+            color = MaterialTheme.colorScheme.onBackground,
+            )
     }
 }
 
@@ -357,12 +348,11 @@ fun SpokenLanguageSection(currentDoctor: DoctorItem) {
         Text(
             text = "Spoken Languages",
             style = MaterialTheme.typography.titleMedium,
-//            color = colorResource(R.color.black),
+            color = MaterialTheme.colorScheme.onBackground,
             fontWeight = FontWeight.Bold
         )
         Spacer(Modifier.height(8.dp))
         val languageList = currentDoctor.languagesSpoken
-//        i want to add languageList as bullet points here
 
         languageList?.forEach { language ->
             Row(

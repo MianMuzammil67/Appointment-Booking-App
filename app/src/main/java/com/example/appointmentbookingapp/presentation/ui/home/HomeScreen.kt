@@ -1,7 +1,6 @@
 package com.example.appointmentbookingapp.presentation.ui.home
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -82,7 +81,6 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .background(Color.White)
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState())
@@ -140,7 +138,7 @@ fun HomeHeaderSection(userName: String?, profileUrl: String?) {
             Text("Hi, Welcome Back,", color = colorResource(id = R.color.gray))
             Text(
                 text = userName ?: "Guest",
-                color = colorResource(id = R.color.black),
+                color = MaterialTheme.colorScheme.onBackground,
                 style = MaterialTheme.typography.titleMedium
             )
         }
@@ -196,7 +194,8 @@ fun CategorySection(
             text = "Categories",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = colorResource(id = R.color.black)
+            color = MaterialTheme.colorScheme.onBackground
+
         )
         Text(
             text = "See All",
@@ -255,7 +254,8 @@ fun DoctorSection(
             text = "Doctors",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = colorResource(id = R.color.black)
+            color = MaterialTheme.colorScheme.onBackground
+
         )
         Text(
             text = "See All",
@@ -300,8 +300,6 @@ fun DoctorSection(
         is UiState.Error -> Text("Failed to load doctors", color = Color.Red)
     }
 }
-
-//data class CategoryData(val icon: Int, val color: String, val label: String)
 
 @Preview(showBackground = true)
 @Composable
