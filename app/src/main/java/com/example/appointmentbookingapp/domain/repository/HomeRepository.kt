@@ -10,6 +10,4 @@ interface HomeRepository {
     suspend fun getBanners(): Resource<List<BannerItem>>
     suspend fun getSpecializationCategory(): Resource<List<DoctorCategory>>
     suspend fun getDoctors(): Resource<List<DoctorItem>>
-    fun getCurrentUserName(): String?
-    fun getCurrentUserPhoto(): String?
 }

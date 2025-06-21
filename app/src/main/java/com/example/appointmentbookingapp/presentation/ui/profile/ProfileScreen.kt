@@ -1,6 +1,5 @@
 package com.example.appointmentbookingapp.presentation.ui.profile
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -33,27 +32,26 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil3.compose.rememberAsyncImagePainter
-import com.example.appointmentbookingapp.domain.model.User
+import coil3.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    user: User,
-    onEditProfileClick: () -> Unit = {},
-    onPrivacyPolicyClick: () -> Unit = {},
-    onAboutUsClick: () -> Unit = {},
-    onLogoutClick: () -> Unit = {}
+    profileViewModel: ProfileViewModel
 ) {
+    val userName by profileViewModel.userName.collectAsState()
+    val userEmail by profileViewModel.userEmail.collectAsState()
+    val userProfile by profileViewModel.photoUrl.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -78,9 +76,8 @@ fun ProfileScreen(
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.secondaryContainer)
             ) {
-                val painter: Painter = rememberAsyncImagePainter(model = user.profileUrl)
-                Image(
-                    painter = painter,
+                AsyncImage(
+                    model = userProfile,
                     contentDescription = "Profile Picture",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
@@ -91,7 +88,7 @@ fun ProfileScreen(
 
             // User Name
             Text(
-                text = user.name,
+                text = userName ?: "error to fetch name",
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -100,7 +97,7 @@ fun ProfileScreen(
 
             // User Email
             Text(
-                text = user.email,
+                text = userEmail ?: "error to fetch email",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -120,13 +117,13 @@ fun ProfileScreen(
                     ProfileInfoRow(
                         icon = Icons.Default.Person,
                         label = "Full Name",
-                        value = user.name
+                        value = userName ?: "error to fetch name"
                     )
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                     ProfileInfoRow(
                         icon = Icons.Default.Email,
                         label = "Email Address",
-                        value = user.email
+                        value = userEmail ?: "error to fetch email"
                     )
                 }
             }
@@ -146,28 +143,32 @@ fun ProfileScreen(
                     ProfileActionItem(
                         icon = Icons.Default.Person,
                         text = "Edit Profile",
-                        onClick = onEditProfileClick
+//                        onClick = onEditProfileClick
+                        onClick = {}
                     )
                     HorizontalDivider() // Subtle divider
                     // Privacy Policy
                     ProfileActionItem(
                         icon = Icons.Default.PrivacyTip,
                         text = "Privacy Policy",
-                        onClick = onPrivacyPolicyClick
+                        onClick = {}
+//                        onClick = onPrivacyPolicyClick
                     )
                     HorizontalDivider()
                     // About Us
                     ProfileActionItem(
                         icon = Icons.Default.Info,
                         text = "About Us",
-                        onClick = onAboutUsClick
+                        onClick = { }
+//                        onClick = onAboutUsClick
                     )
                     HorizontalDivider()
                     // Logout
                     ProfileActionItem(
                         icon = Icons.AutoMirrored.Filled.Logout,
                         text = "Logout",
-                        onClick = onLogoutClick,
+                        onClick = {},
+//                        onClick = onLogoutClick,
                         isDestructive = true // Indicates a destructive action
                     )
                 }
@@ -241,27 +242,25 @@ fun ProfileActionItem(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewProfileScreen() {
-    val sampleUser = User(
-        name = "John Doe",
-        email = "john.doe@example.com",
-        password = "SecurePassword",
-        profileUrl = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
-    )
-    MaterialTheme {
-        ProfileScreen(
-            user = sampleUser,
-            onEditProfileClick = { /* Preview action */ },
-            onPrivacyPolicyClick = { /* Preview action */ },
-            onAboutUsClick = { /* Preview action */ },
-            onLogoutClick = { /* Preview action */ }
-        )
-    }
-}
-
-
+//@Preview(showBackground = true)
+//@Composable
+//fun PreviewProfileScreen() {
+//    val sampleUser = User(
+//        name = "John Doe",
+//        email = "john.doe@example.com",
+//        password = "SecurePassword",
+//        profileUrl = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+//    )
+//    MaterialTheme {
+//        ProfileScreen(
+////            user = sampleUser,
+////            onEditProfileClick = { /* Preview action */ },
+////            onPrivacyPolicyClick = { /* Preview action */ },
+////            onAboutUsClick = { /* Preview action */ },
+////            onLogoutClick = { /* Preview action */ }
+//        )
+//    }
+//}
 
 
 //package com.example.appointmentbookingapp.presentation.ui.profile

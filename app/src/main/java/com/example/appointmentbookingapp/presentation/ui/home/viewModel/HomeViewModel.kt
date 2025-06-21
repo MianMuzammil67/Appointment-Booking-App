@@ -22,11 +22,6 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val logTag = "HomeViewModel"
-    private val _userName = MutableStateFlow<String?>(null)
-    val userName: StateFlow<String?> = _userName
-
-    private val _profileImageUrl = MutableStateFlow<String?>(null)
-    val profileImageUrl: StateFlow<String?> = _profileImageUrl
 
     private val _bannerFlow = MutableStateFlow<UiState<List<BannerItem>>>(UiState.Loading)
     val bannerFlow: StateFlow<UiState<List<BannerItem>>> = _bannerFlow.asStateFlow()
@@ -47,15 +42,9 @@ class HomeViewModel @Inject constructor(
 
 
     init {
-        getCurrentUserInfo()
         getBanners()
         getAllSpecializationCategory()
         getDoctors()
-    }
-
-    private fun getCurrentUserInfo() {
-        _userName.value = repository.getCurrentUserName()
-        _profileImageUrl.value = repository.getCurrentUserPhoto()
     }
 
     private fun getBanners() = viewModelScope.launch {

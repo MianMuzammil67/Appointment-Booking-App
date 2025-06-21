@@ -12,7 +12,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.appointmentbookingapp.domain.model.User
 import com.example.appointmentbookingapp.presentation.ui.allCategories.AllDoctorCategories
 import com.example.appointmentbookingapp.presentation.ui.allDoctors.DoctorScreen
 import com.example.appointmentbookingapp.presentation.ui.appointment.BookAppointmentScreen
@@ -26,6 +25,7 @@ import com.example.appointmentbookingapp.presentation.ui.home.viewModel.HomeView
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
 import com.example.appointmentbookingapp.presentation.ui.navigation.BottomNavigationBar
 import com.example.appointmentbookingapp.presentation.ui.profile.ProfileScreen
+import com.example.appointmentbookingapp.presentation.ui.profile.ProfileViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -36,6 +36,8 @@ fun MainApp() {
     val sharedDoctorViewModel: SharedDoctorViewModel = hiltViewModel()
     val homeViewModel: HomeViewModel = hiltViewModel()
     val favoriteViewModel: FavoriteViewModel = hiltViewModel()
+    val profileViewModel: ProfileViewModel = hiltViewModel()
+
 
     val currentUser = FirebaseAuth.getInstance().currentUser
     val start = if (currentUser != null) "HomeScreen" else "SignIn"
@@ -43,7 +45,8 @@ fun MainApp() {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
 
-    val bottomBarScreens = listOf("HomeScreen", "AllDoctorCategories", "FavoriteScreen","ProfileScreen")
+    val bottomBarScreens =
+        listOf("HomeScreen", "AllDoctorCategories", "FavoriteScreen", "ProfileScreen")
     val showBottomBar = currentRoute in bottomBarScreens
     val bottomPadding = if (showBottomBar) 80.dp else 0.dp
 
@@ -62,7 +65,13 @@ fun MainApp() {
             composable("SignUp") { SignupScreen(navController) }
             composable("SignIn") { SignInScreen(navController) }
             composable("HomeScreen") {
-                HomeScreen(navController, sharedDoctorViewModel, homeViewModel, favoriteViewModel)
+                HomeScreen(
+                    navController,
+                    sharedDoctorViewModel,
+                    homeViewModel,
+                    favoriteViewModel,
+                    profileViewModel
+                )
             }
             composable("DoctorDetail") {
                 DocDetailScreen(navController, sharedDoctorViewModel, favoriteViewModel)
@@ -79,19 +88,10 @@ fun MainApp() {
             composable("FavoriteScreen") {
                 FavoriteScreen(navController, sharedDoctorViewModel, favoriteViewModel)
             }
-            val sampleUser = User(
-                name = "John Doe",
-                email = "john.doe@example.com",
-                password = "securepassword",
-                profileUrl = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
-            )
-
             composable("ProfileScreen") {
-                ProfileScreen(user = sampleUser,
-                    onEditProfileClick = { /* Preview action */ },
-                    onPrivacyPolicyClick = { /* Preview action */ },
-                    onAboutUsClick = { /* Preview action */ },
-                    onLogoutClick = { /* Preview action */ })
+                ProfileScreen(
+                    profileViewModel
+                )
             }
         }
     }

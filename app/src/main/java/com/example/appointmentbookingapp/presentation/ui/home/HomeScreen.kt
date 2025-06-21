@@ -1,7 +1,6 @@
 package com.example.appointmentbookingapp.presentation.ui.home
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,14 +36,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.BannerItem
 import com.example.appointmentbookingapp.domain.model.DoctorCategory
@@ -57,19 +55,20 @@ import com.example.appointmentbookingapp.presentation.ui.home.components.Categor
 import com.example.appointmentbookingapp.presentation.ui.home.components.ImageSlider
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.HomeViewModel
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
+import com.example.appointmentbookingapp.presentation.ui.profile.ProfileViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
     navController: NavHostController,
-    sharedDoctorViewModel: SharedDoctorViewModel = viewModel(),
-    homeViewModel: HomeViewModel = hiltViewModel(),
-    favoriteViewModel: FavoriteViewModel = hiltViewModel()
-
+    sharedDoctorViewModel: SharedDoctorViewModel,
+    homeViewModel: HomeViewModel,
+    favoriteViewModel: FavoriteViewModel,
+    profileViewModel: ProfileViewModel
 ) {
 
-    val userName by homeViewModel.userName.collectAsState()
-    val profileImageUrl by homeViewModel.profileImageUrl.collectAsState()
+    val userName by profileViewModel.userName.collectAsState()
+    val profileImageUrl by profileViewModel.photoUrl.collectAsState()
     val bannerState by homeViewModel.bannerFlow.collectAsState()
     val doctorState by homeViewModel.topDoctorState.collectAsState()
     val categoryState by homeViewModel.categories.collectAsState()
@@ -129,8 +128,8 @@ fun HomeHeaderSection(userName: String?, profileUrl: String?) {
             .padding(top = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.demo_user),
+        AsyncImage(
+            model = profileUrl,
             contentDescription = null,
             modifier = Modifier
                 .size(70.dp)
@@ -145,12 +144,6 @@ fun HomeHeaderSection(userName: String?, profileUrl: String?) {
                 style = MaterialTheme.typography.titleMedium
             )
         }
-//        Image(
-////            painter = painterResource(id = R.drawable.icon_bell),
-//            icon = Icons.Filled.Notifications,
-//            contentDescription = null,
-//            modifier = Modifier.size(24.dp)
-//        )
         Icon(
             imageVector = Icons.Filled.Notifications,
             contentDescription = null,
@@ -299,7 +292,7 @@ fun DoctorSection(
                     doctor = doctor,
                     onClick = { onDoctorClick(doctor) },
                     isFavorite = favorite,
-                    onToggleFavorite = {favoriteViewModel.toggleFavorite(doctor)}
+                    onToggleFavorite = { favoriteViewModel.toggleFavorite(doctor) }
                 )
             }
         }
@@ -310,8 +303,20 @@ fun DoctorSection(
 
 //data class CategoryData(val icon: Int, val color: String, val label: String)
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(navController = rememberNavController())
+//    HomeScreen(navController = rememberNavController())
+    val sharedDoctorViewModel: SharedDoctorViewModel = hiltViewModel()
+    val homeViewModel: HomeViewModel = hiltViewModel()
+    val favoriteViewModel: FavoriteViewModel = hiltViewModel()
+    val profileViewModel: ProfileViewModel = hiltViewModel()
+
+    HomeScreen(
+        navController = rememberNavController(),
+        sharedDoctorViewModel = sharedDoctorViewModel,
+        homeViewModel = homeViewModel,
+        favoriteViewModel = favoriteViewModel,
+        profileViewModel = profileViewModel
+    )
 }
