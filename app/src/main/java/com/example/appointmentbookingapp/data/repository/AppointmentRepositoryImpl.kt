@@ -5,6 +5,7 @@ import com.example.appointmentbookingapp.domain.model.Appointment
 import com.example.appointmentbookingapp.domain.repository.AppointmentRepository
 import com.example.appointmentbookingapp.util.Resource
 import java.time.LocalDate
+import java.util.Date
 
 class AppointmentRepositoryImpl(
     private val remote: AppointmentRemoteDataSource
@@ -30,5 +31,17 @@ class AppointmentRepositoryImpl(
             Resource.Error(e.message.toString())
         }
 
+    }
+
+    override suspend fun isTimeSlotAvailable(
+        doctorId: String,
+        date: LocalDate,
+        time: String
+    ): Boolean {
+        return remote.isTimeSlotAvailable(doctorId, date, time)
+    }
+
+    override suspend fun getNotAvailableSlots(doctorId: String, date: Date): List<String?> {
+        return remote.getNotAvailableSlots(doctorId,date)
     }
 }

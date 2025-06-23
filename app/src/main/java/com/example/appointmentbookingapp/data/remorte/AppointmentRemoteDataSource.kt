@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.ZoneId
+import java.util.Date
 import javax.inject.Inject
 
 class AppointmentRemoteDataSource @Inject constructor(
@@ -22,19 +23,21 @@ class AppointmentRemoteDataSource @Inject constructor(
     }
 
     suspend fun getFirebaseServerTime(): LocalDate {
-        val dummyRef = firestore.collection("time").document("server_time_temp")
-        dummyRef.set(mapOf("timestamp" to FieldValue.serverTimestamp())).await()
-        val snapshot = dummyRef.get().await()
-        val timestamp = snapshot.getTimestamp("timestamp")
+        val snapshot = firestore.collection("time")
+            .add(mapOf("timestamp" to FieldValue.serverTimestamp()))
+            .await()
+            .get()
+            .await()
 
-        return timestamp?.toDate()?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
-            ?: LocalDate.now()
+        val timestamp = snapshot.getTimestamp("timestamp")
+        return timestamp?.toDate()?.toInstant()?.atZone(ZoneId.of("UTC"))?.toLocalDate()
+            ?: LocalDate.now(ZoneId.of("UTC"))
     }
+
 
     suspend fun bookAppointment(appointment: Appointment) {
         try {
             val batch = firestore.batch()
-
             /**
              * - Full data: appointments/{appointmentId}
              * - Only IDs: users/{userId}/appointments/{appointmentId}
@@ -66,6 +69,43 @@ class AppointmentRemoteDataSource @Inject constructor(
         } catch (e: Exception) {
             Log.d(logTag, "bookAppointment: ${e.message}")
         }
+    }
+
+    suspend fun isTimeSlotAvailable(doctorId: String, date: LocalDate, time: String): Boolean {
+        val startOfDay = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant())
+        val endOfDay = Date.from(date.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant())
+        return try {
+            val snapshot = firestore.collection("appointments")
+                .whereEqualTo("doctorId", doctorId)
+                .whereGreaterThanOrEqualTo("appointmentDate", startOfDay)
+                .whereLessThan("appointmentDate", endOfDay)
+                .whereEqualTo("time", time)
+                .get()
+                .await()
+            Log.d(logTag, "isTimeSlotAvailable: ${snapshot.toString()}")
+            snapshot.isEmpty // true if slot is free, false if taken
+
+        } catch (e: Exception) {
+            Log.e(logTag, "Error checking availability: ${e.message}")
+            false // assume not available if error occurs
+        }
+    }
+
+    suspend fun getNotAvailableSlots(doctorId: String, date: Date): List<String?> {
+        val zoneId = ZoneId.of("UTC")
+        val localDate = date.toInstant().atZone(zoneId).toLocalDate()
+
+        val startOfDay = Date.from(localDate.atStartOfDay(zoneId).toInstant())
+        val endOfDay = Date.from(localDate.plusDays(1).atStartOfDay(zoneId).toInstant())
+
+        val snapshot = firestore.collection("appointments")
+            .whereEqualTo("doctorId", doctorId)
+            .whereGreaterThanOrEqualTo("appointmentDate", startOfDay)
+            .whereLessThan("appointmentDate", endOfDay)
+            .get()
+            .await()
+        return snapshot.documents.map { it.getString("timeSlot") }
+
     }
 
 }

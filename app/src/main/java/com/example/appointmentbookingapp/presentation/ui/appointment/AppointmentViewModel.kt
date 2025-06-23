@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,6 +29,12 @@ class AppointmentViewModel @Inject constructor(
 
     private val _firebaseTimeFlow = MutableStateFlow<UiState<LocalDate>>(UiState.Loading)
     val firebaseTimeFlow = _firebaseTimeFlow.asStateFlow()
+
+    private val _isSlotAvailable = MutableStateFlow<Boolean?>(null)
+    val isSlotAvailable: StateFlow<Boolean?> = _isSlotAvailable
+
+    private val _notAvailableSlots = MutableStateFlow<List<String?>>(emptyList())
+    val notAvailableSlots: MutableStateFlow<List<String?>> = _notAvailableSlots
 
     init {
         getFirebaseServerTime()
@@ -68,5 +75,22 @@ class AppointmentViewModel @Inject constructor(
         }
     }
 
+    fun isTimeSlotAvailable(doctorId: String, date: LocalDate, time: String) {
+        viewModelScope.launch {
+            try {
+                _isSlotAvailable.value = repository.isTimeSlotAvailable(doctorId, date, time)
+            } catch (e: Exception) {
+                _isSlotAvailable.value = false
+            }
+        }
+    }
+
+    fun getNotAvailableSlots(doctorId: String, date: Date) = viewModelScope.launch {
+        val result = repository.getNotAvailableSlots(doctorId, date)
+        _notAvailableSlots.value = result
+
+        Log.d("AppointmentViewModel", "getNotAvailableSlots: $result")
+
+    }
 
 }

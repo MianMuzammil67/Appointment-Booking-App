@@ -63,6 +63,8 @@ import com.example.appointmentbookingapp.presentation.ui.components.BookingSucce
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.ZoneId
+import java.util.Date
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,24 +78,34 @@ fun BookAppointmentScreen(
     val firebaseDateState by viewModel.firebaseTimeFlow.collectAsState()
     val currentDoctor by sharedDoctorViewModel.selectedDoctor.collectAsState()
     val currentUser by viewModel.currentUserId.collectAsState()
+    val notAvailableSlots by viewModel.notAvailableSlots.collectAsState()
 
     val bookingState by viewModel.bookingState.collectAsState()
     val isLoading = bookingState is UiState.Loading
     val isSuccess = bookingState is UiState.Success
 
     var showSuccessDialog by remember { mutableStateOf(false) }
-
-
 //    var selectedDate by remember { mutableStateOf(firebaseDateState ) }
     var selectedDate by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
 
-//    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var selectedTime by remember { mutableStateOf<String?>(null) }
+    val utcDate = Date.from(selectedDate!!.atStartOfDay(ZoneId.of("UTC")).toInstant())
 
     val timeSlots = listOf(
         "09-10 AM", "10-11 AM", "11-12 AM",
         "12-01 PM", "03-04 PM", "04-05 PM",
     )
+
+    LaunchedEffect(key1 = selectedDate) {
+        selectedDate?.let {
+            viewModel.getNotAvailableSlots(currentDoctor.id, utcDate)
+        }
+    }
+
+    // Log when it changes
+    LaunchedEffect(notAvailableSlots) {
+        Log.d("appointmentScreen", "Updated slots: $notAvailableSlots")
+    }
 
     LaunchedEffect(isSuccess) {
         if (isSuccess) {
@@ -127,12 +139,16 @@ fun BookAppointmentScreen(
                     val appointment = Appointment(
                         appointmentId = UUID.randomUUID().toString(),
                         patientId = currentUser ?: "currentUser is null",
-                        appointmentDate = selectedDate,
+                        appointmentDate = utcDate,
                         timeSlot = selectedTime ?: "selectedTime is null",
                         status = "Pending",
                         doctorId = currentDoctor.id
                     )
                     viewModel.bookAppointment(appointment)
+//                  updating appointment date again to update ui in real time
+                    appointment.appointmentDate?.let { date ->
+                        viewModel.getNotAvailableSlots(appointment.doctorId, date)
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -156,7 +172,7 @@ fun BookAppointmentScreen(
                     )
                     Text("Booking...", color = Color.White)
                 }else
-                Text("Confirm", color = Color.White)
+                    Text("Confirm", color = Color.White)
             }
         }
     ) { innerPadding ->
@@ -169,13 +185,6 @@ fun BookAppointmentScreen(
         ) {
             Text("Select Date", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
-
-//            AppointmentCalendar(
-//                selectedDate = selectedDate,
-//                onDateSelected = { selectedDate = it },
-//                firebaseToday = firebaseDate!!
-//
-//            )
 
             when (firebaseDateState) {
                 is UiState.Loading -> {
@@ -212,28 +221,32 @@ fun BookAppointmentScreen(
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
-//                modifier = Modifier.height(220.dp),
                 modifier = Modifier.height(150.dp),
-//                modifier = Modifier.wrapContentHeight(),
                 contentPadding = PaddingValues(4.dp)
             ) {
                 items(timeSlots.size) { index ->
                     val time = timeSlots[index]
+                    val isBooked = notAvailableSlots.contains(time)
+                    val isSelected = selectedTime == time
                     Box(
                         modifier = Modifier
                             .padding(6.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(
-//                                if (selectedTime == time) Color(0xFF0F172A)
-                                if (selectedTime == time) colorResource(R.color.colorPrimary)
-                                else Color(0xFFF1F5F9)
+                                when {
+                                    isBooked -> Color.Gray
+                                    isSelected -> colorResource(R.color.colorPrimary)
+                                    else -> Color(0xFFF1F5F9)
+                                }
                             )
-                            .clickable { selectedTime = time }
+                            .clickable(enabled = !isBooked) {
+                                selectedTime = if (isSelected) null else time
+                            }
                             .padding(vertical = 12.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = time,
+                            text = if (isBooked) "Booked" else time,
                             color = if (selectedTime == time) Color.White else Color.Black,
                             fontWeight = FontWeight.Medium,
                             fontSize = 14.sp
