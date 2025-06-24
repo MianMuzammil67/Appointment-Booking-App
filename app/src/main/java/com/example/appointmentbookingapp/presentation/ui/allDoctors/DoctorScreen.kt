@@ -52,7 +52,7 @@ fun DoctorScreen(
             .fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("Doctor Categories", fontWeight = FontWeight.Bold) },
+                title = { Text("All Doctors", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
