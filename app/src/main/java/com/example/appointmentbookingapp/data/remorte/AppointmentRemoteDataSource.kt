@@ -23,19 +23,16 @@ class AppointmentRemoteDataSource @Inject constructor(
     }
 
     suspend fun getFirebaseServerTime(): LocalDate {
-        val snapshot = firestore.collection("time")
-            .add(mapOf("timestamp" to FieldValue.serverTimestamp()))
-            .await()
-            .get()
-            .await()
-
+        val dummyRef = firestore.collection("time").document("server_time_temp")
+        dummyRef.set(mapOf("timestamp" to FieldValue.serverTimestamp())).await()
+        val snapshot = dummyRef.get().await()
         val timestamp = snapshot.getTimestamp("timestamp")
+
         return timestamp?.toDate()?.toInstant()?.atZone(ZoneId.of("UTC"))?.toLocalDate()
             ?: LocalDate.now(ZoneId.of("UTC"))
     }
 
-
-    suspend fun bookAppointment(appointment: Appointment) {
+        suspend fun bookAppointment(appointment: Appointment) {
         try {
             val batch = firestore.batch()
             /**
@@ -106,6 +103,21 @@ class AppointmentRemoteDataSource @Inject constructor(
             .await()
         return snapshot.documents.map { it.getString("timeSlot") }
 
+    }
+
+    suspend fun getMyAppointments(): List<Appointment?>{
+        return try {
+
+            val snapshot = firestore.collection("appointments")
+                .whereEqualTo("patientId", firebaseAuth.currentUser?.uid)
+                .get().await()
+
+            Log.d(logTag, snapshot.documents.toString())
+            snapshot.documents.map { it.toObject(Appointment::class.java) }
+        }catch (e: Exception){
+            Log.d(logTag, "getMyAppointments: ${e.message}")
+            emptyList()
+        }
     }
 
 }

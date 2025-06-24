@@ -21,6 +21,8 @@ class AppointmentViewModel @Inject constructor(
     private val repository: AppointmentRepository
 ) : ViewModel() {
 
+    private val logTag: String = "AppointmentViewModel"
+
     private val _bookingState = MutableStateFlow<UiState<Unit>?>(null)
     val bookingState: StateFlow<UiState<Unit>?> = _bookingState
 
@@ -36,9 +38,13 @@ class AppointmentViewModel @Inject constructor(
     private val _notAvailableSlots = MutableStateFlow<List<String?>>(emptyList())
     val notAvailableSlots: MutableStateFlow<List<String?>> = _notAvailableSlots
 
+    private val _myAppointments = MutableStateFlow<UiState<List<Appointment?>>>(UiState.Loading)
+    val myAppointments : StateFlow<UiState<List<Appointment?>>> = _myAppointments
+
     init {
         getFirebaseServerTime()
         getCurrentUserId()
+        getMyAppointments()
     }
 
     private fun getCurrentUserId() {
@@ -91,6 +97,17 @@ class AppointmentViewModel @Inject constructor(
 
         Log.d("AppointmentViewModel", "getNotAvailableSlots: $result")
 
+    }
+
+    fun getMyAppointments() = viewModelScope.launch {
+        _myAppointments.value = UiState.Loading
+        try {
+            val myAppointments = repository.getMyAppointments()
+            _myAppointments.value = UiState.Success(myAppointments)
+            Log.d(logTag, "getMyAppointments: $myAppointments")
+        }catch (e: Exception){
+            _myAppointments.value = UiState.Error(e.message ?: "Something went wrong")
+        }
     }
 
 }

@@ -44,4 +44,8 @@ class AppointmentRepositoryImpl(
     override suspend fun getNotAvailableSlots(doctorId: String, date: Date): List<String?> {
         return remote.getNotAvailableSlots(doctorId,date)
     }
+
+    override suspend fun getMyAppointments(): List<Appointment?> {
+       return remote.getMyAppointments()
+    }
 }

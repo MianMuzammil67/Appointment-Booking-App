@@ -12,4 +12,5 @@ interface AppointmentRepository {
     suspend fun bookAppointment(appointment: Appointment)
     suspend fun isTimeSlotAvailable(doctorId: String, date: LocalDate, time: String): Boolean
     suspend fun getNotAvailableSlots(doctorId: String, date: Date): List<String?>
+    suspend fun getMyAppointments(): List<Appointment?>
 }
