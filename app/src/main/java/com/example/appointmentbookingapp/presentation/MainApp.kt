@@ -14,7 +14,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.presentation.ui.allCategories.AllDoctorCategories
 import com.example.appointmentbookingapp.presentation.ui.allDoctors.DoctorScreen
+import com.example.appointmentbookingapp.presentation.ui.appointment.AppointmentViewModel
 import com.example.appointmentbookingapp.presentation.ui.appointment.BookAppointmentScreen
+import com.example.appointmentbookingapp.presentation.ui.appointment.MyAppointments
 import com.example.appointmentbookingapp.presentation.ui.auth.SignInScreen
 import com.example.appointmentbookingapp.presentation.ui.auth.SignupScreen
 import com.example.appointmentbookingapp.presentation.ui.doctorDetail.DocDetailScreen
@@ -37,6 +39,7 @@ fun MainApp() {
     val homeViewModel: HomeViewModel = hiltViewModel()
     val favoriteViewModel: FavoriteViewModel = hiltViewModel()
     val profileViewModel: ProfileViewModel = hiltViewModel()
+    val appointmentViewModel: AppointmentViewModel = hiltViewModel()
 
 
     val currentUser = FirebaseAuth.getInstance().currentUser
@@ -46,7 +49,7 @@ fun MainApp() {
     val currentRoute = currentBackStackEntry?.destination?.route
 
     val bottomBarScreens =
-        listOf("HomeScreen", "AllDoctorCategories", "FavoriteScreen", "ProfileScreen")
+        listOf("HomeScreen", "MyAppointmentsScreen", "FavoriteScreen", "ProfileScreen")
     val showBottomBar = currentRoute in bottomBarScreens
     val bottomPadding = if (showBottomBar) 80.dp else 0.dp
 
@@ -89,9 +92,10 @@ fun MainApp() {
                 FavoriteScreen(navController, sharedDoctorViewModel, favoriteViewModel)
             }
             composable("ProfileScreen") {
-                ProfileScreen(
-                    profileViewModel
-                )
+                ProfileScreen(profileViewModel)
+            }
+            composable("MyAppointmentsScreen") {
+                MyAppointments(navController, appointmentViewModel)
             }
         }
     }

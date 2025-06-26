@@ -20,7 +20,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         NavigationItem("Home", Icons.Filled.Home, "HomeScreen"),
-        NavigationItem("Categories", Icons.AutoMirrored.Filled.List, "AllDoctorCategories"),
+        NavigationItem("Appointments", Icons.AutoMirrored.Filled.List, "MyAppointmentsScreen"),
         NavigationItem("Favorite", Icons.Filled.Favorite, "FavoriteScreen"),
         NavigationItem("Profile", Icons.Filled.Person, "ProfileScreen")
     )
