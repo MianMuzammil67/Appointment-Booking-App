@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appointmentbookingapp.domain.model.Appointment
+import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.domain.repository.AppointmentRepository
 import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.util.Resource
@@ -44,7 +45,6 @@ class AppointmentViewModel @Inject constructor(
     init {
         getFirebaseServerTime()
         getCurrentUserId()
-        getMyAppointments()
     }
 
     private fun getCurrentUserId() {
@@ -107,6 +107,13 @@ class AppointmentViewModel @Inject constructor(
             Log.d(logTag, "getMyAppointments: $myAppointments")
         }catch (e: Exception){
             _myAppointments.value = UiState.Error(e.message ?: "Something went wrong")
+        }
+    }
+    suspend fun getDoctorById(doctorId: String): DoctorItem? {
+        return try {
+            repository.getDoctorById(doctorId)
+        } catch (e: Exception) {
+            null
         }
     }
 

@@ -2,6 +2,7 @@ package com.example.appointmentbookingapp.data.remorte
 
 import android.util.Log
 import com.example.appointmentbookingapp.domain.model.Appointment
+import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -119,5 +120,16 @@ class AppointmentRemoteDataSource @Inject constructor(
             emptyList()
         }
     }
+    suspend fun getDoctorById(doctorId: String): DoctorItem? {
+        return try {
+           val snapshot= firestore.collection("doctors")
+                .document(doctorId)
+                .get().await()
 
+            snapshot.toObject(DoctorItem::class.java)
+        }catch (e:Exception){
+            null
+        }
+
+    }
 }

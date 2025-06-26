@@ -11,8 +11,11 @@
     <color name="colorPrimary">#0B8FAC</color>
     <color name="colorSecondary">#7BC1B7</color>
     <color name="gray">#858585</color>
+    <color name="gray200">#E5E7EB</color>
     <color name="light_gray">#F3F4F6</color>
     <color name="yellow">#F89603</color>
+    <color name="card_color">#D2EBE7</color>
+
 
 
     <color name="muted_rose">#DC9497</color>
