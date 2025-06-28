@@ -162,10 +162,3 @@ fun AppointmentItem(
         }
     }
 }
-
-
-//@Preview
-//@Composable
-//fun PreviewAppointmentItem() {
-//    AppointmentItem()
-//}
