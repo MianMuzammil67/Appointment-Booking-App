@@ -28,7 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.appointmentbookingapp.domain.model.Appointment
+import com.example.appointmentbookingapp.domain.model.AppointmentWithDoctor
 import com.example.appointmentbookingapp.presentation.state.UiState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,7 +40,7 @@ fun MyAppointments(
     val myAppointmentsState by appointmentViewModel.myAppointments.collectAsState()
 
     LaunchedEffect(Unit) {
-        appointmentViewModel.getMyAppointments()
+        appointmentViewModel.getAppointments()
     }
 
     Scaffold(
@@ -77,7 +77,7 @@ fun MyAppointments(
 
                 is UiState.Success -> {
                     val appointment =
-                        (myAppointmentsState as UiState.Success<List<Appointment?>>).data
+                        (myAppointmentsState as UiState.Success<List<AppointmentWithDoctor?>>).data
                     if (appointment.isEmpty()) {
                         Text(
                             "No appointments found.",
@@ -91,13 +91,15 @@ fun MyAppointments(
                                 .padding(horizontal = 8.dp)
                         )
                         {
-                            items(appointment) { appointments ->
+                            items(appointment) { item ->
                                 Spacer(modifier = Modifier.height(8.dp))
-                                AppointmentItem(
-                                    appointments!!,
-                                    onClick = {},
-                                    appointmentViewModel
-                                )
+                                item?.let {
+                                    AppointmentItem(
+                                        it.appointment,
+                                        item.doctor!!,
+                                        onClick = {},
+                                    )
+                                }
                             }
                         }
                     }

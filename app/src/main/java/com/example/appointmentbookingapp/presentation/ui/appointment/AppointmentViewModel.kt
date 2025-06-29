@@ -4,11 +4,12 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appointmentbookingapp.domain.model.Appointment
-import com.example.appointmentbookingapp.domain.model.DoctorItem
+import com.example.appointmentbookingapp.domain.model.AppointmentWithDoctor
 import com.example.appointmentbookingapp.domain.repository.AppointmentRepository
 import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,8 +40,9 @@ class AppointmentViewModel @Inject constructor(
     private val _notAvailableSlots = MutableStateFlow<List<String?>>(emptyList())
     val notAvailableSlots: MutableStateFlow<List<String?>> = _notAvailableSlots
 
-    private val _myAppointments = MutableStateFlow<UiState<List<Appointment?>>>(UiState.Loading)
-    val myAppointments : StateFlow<UiState<List<Appointment?>>> = _myAppointments
+    private val _myAppointments =
+        MutableStateFlow<UiState<List<AppointmentWithDoctor?>>>(UiState.Loading)
+    val myAppointments: StateFlow<UiState<List<AppointmentWithDoctor?>>> = _myAppointments
 
     init {
         getFirebaseServerTime()
@@ -99,22 +101,26 @@ class AppointmentViewModel @Inject constructor(
 
     }
 
-    fun getMyAppointments() = viewModelScope.launch {
+    fun getAppointments() = viewModelScope.launch {
         _myAppointments.value = UiState.Loading
         try {
             val myAppointments = repository.getMyAppointments()
-            _myAppointments.value = UiState.Success(myAppointments)
-            Log.d(logTag, "getMyAppointments: $myAppointments")
-        }catch (e: Exception){
+
+            val doctorIds = myAppointments.map { it?.doctorId }.distinct()
+
+            val doctorMap = doctorIds.associateWith { id ->
+                async { repository.getDoctorById(id!!) }
+            }.mapValues { it.value.await() }
+
+            val result = myAppointments.map {
+                AppointmentWithDoctor(
+                    appointment = it!!,
+                    doctor = doctorMap[it.doctorId]
+                )
+            }
+            _myAppointments.value = UiState.Success(result)
+        } catch (e: Exception) {
             _myAppointments.value = UiState.Error(e.message ?: "Something went wrong")
         }
     }
-    suspend fun getDoctorById(doctorId: String): DoctorItem? {
-        return try {
-            repository.getDoctorById(doctorId)
-        } catch (e: Exception) {
-            null
-        }
-    }
-
 }

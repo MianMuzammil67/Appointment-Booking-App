@@ -19,11 +19,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,26 +36,13 @@ import com.example.appointmentbookingapp.domain.model.DoctorItem
 @Composable
 fun AppointmentItem(
     appointment: Appointment,
-    onClick: () -> Unit,
-    appointmentViewModel: AppointmentViewModel
+    doctorItem: DoctorItem,
+    onClick: () -> Unit
 ) {
-
-    var doctor by remember { mutableStateOf<DoctorItem?>(null) }
-    var isLoading by remember { mutableStateOf(true) }
-
 
     val appointmentDate = appointment.appointmentDate
     val appointmentTime = appointment.timeSlot
 
-    LaunchedEffect(appointment.doctorId) {
-        isLoading = true
-        try {
-            doctor = appointmentViewModel.getDoctorById(appointment.doctorId)
-        } catch (e: Exception) {
-            doctor = null
-        }
-        isLoading = false
-    }
 
     Column(
         modifier = Modifier
@@ -97,7 +79,7 @@ fun AppointmentItem(
                     modifier = Modifier
                         .matchParentSize()
                         .align(Alignment.Center),
-                    model = doctor?.imageUrl,
+                    model = doctorItem.imageUrl,
                     contentDescription = null,
                     contentScale = ContentScale.Crop
                 )
@@ -105,21 +87,13 @@ fun AppointmentItem(
             Spacer(modifier = Modifier.width(8.dp))
             Column {
                 Text(
-                    text = when {
-                        isLoading -> "Loading..."
-                        doctor != null -> doctor!!.name
-                        else -> "Unknown Doctor"
-                    },
+                    text = doctorItem.name,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text = when {
-                        isLoading -> "Loading..."
-                        doctor != null -> doctor!!.docCategory
-                        else -> "Unknown Specialty"
-                    },
+                    text = doctorItem.docCategory,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
