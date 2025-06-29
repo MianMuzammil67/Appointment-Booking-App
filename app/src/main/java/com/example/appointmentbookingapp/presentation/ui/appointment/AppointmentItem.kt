@@ -45,7 +45,7 @@ fun AppointmentItem(
     val appointmentDate = appointment.appointmentDate
     val appointmentTime = appointment.timeSlot
     val formatedDate = appointmentDate.let{
-        SimpleDateFormat("MMM dd, YYYY", Locale.ENGLISH).format(it)
+        SimpleDateFormat("MMM dd, yyyy", Locale.ENGLISH).format(it!!)
     }
 
     Column(
@@ -61,7 +61,7 @@ fun AppointmentItem(
             text = "$formatedDate   -   $appointmentTime",
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onBackground
+            color = Color.Black
         )
         HorizontalDivider(thickness = 2.dp)
 
@@ -93,13 +93,13 @@ fun AppointmentItem(
                 Text(
                     text = doctorItem.name,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = Color.Black
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = doctorItem.docCategory,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = Color.Black
                 )
 
             }
@@ -115,7 +115,7 @@ fun AppointmentItem(
                 onClick = {},
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.gray200),
-                    contentColor = MaterialTheme.colorScheme.onBackground
+                    contentColor = Color.Black
                 )
             ) {
                 Text(
@@ -129,7 +129,7 @@ fun AppointmentItem(
                 onClick = {},
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.colorPrimary),
-                    contentColor = MaterialTheme.colorScheme.onBackground
+                    contentColor = Color.White
                 )
             ) {
                 Text(
