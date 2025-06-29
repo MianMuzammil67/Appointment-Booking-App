@@ -32,6 +32,8 @@ import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.Appointment
 import com.example.appointmentbookingapp.domain.model.DoctorItem
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun AppointmentItem(
@@ -42,7 +44,9 @@ fun AppointmentItem(
 
     val appointmentDate = appointment.appointmentDate
     val appointmentTime = appointment.timeSlot
-
+    val formatedDate = appointmentDate.let{
+        SimpleDateFormat("MMM dd, YYYY", Locale.ENGLISH).format(it)
+    }
 
     Column(
         modifier = Modifier
@@ -54,7 +58,7 @@ fun AppointmentItem(
     ) {
         Text(
 //            text = "May 14, 2023 - 10.00 AM",
-            text = "$appointmentDate - $appointmentTime",
+            text = "$formatedDate   -   $appointmentTime",
             fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onBackground
