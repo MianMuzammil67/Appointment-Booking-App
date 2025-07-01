@@ -39,7 +39,9 @@ import java.util.Locale
 fun AppointmentItem(
     appointment: Appointment,
     doctorItem: DoctorItem,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onCancelClick:() -> Unit,
+    onRescheduleClick:() -> Unit
 ) {
 
     val appointmentDate = appointment.appointmentDate
@@ -112,7 +114,7 @@ fun AppointmentItem(
         ) {
             Button(
                 modifier = Modifier.weight(1f),
-                onClick = {},
+                onClick = {onCancelClick()},
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.gray200),
                     contentColor = Color.Black
@@ -126,7 +128,7 @@ fun AppointmentItem(
             }
             Button(
                 modifier = Modifier.weight(1f),
-                onClick = {},
+                onClick = {onRescheduleClick()},
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.colorPrimary),
                     contentColor = Color.White

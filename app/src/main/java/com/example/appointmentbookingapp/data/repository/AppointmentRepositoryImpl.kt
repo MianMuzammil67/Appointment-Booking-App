@@ -34,6 +34,14 @@ class AppointmentRepositoryImpl(
 
     }
 
+    override suspend fun cancelAppointment(appointment: Appointment) {
+        try {
+            remote.cancelAppointment(appointment)
+        } catch (e: Exception) {
+            Resource.Error(e.message.toString())
+        }    }
+    
+
     override suspend fun isTimeSlotAvailable(
         doctorId: String,
         date: LocalDate,

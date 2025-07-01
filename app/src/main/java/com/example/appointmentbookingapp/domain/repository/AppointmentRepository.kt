@@ -11,6 +11,7 @@ interface AppointmentRepository {
     fun getCurrentUserId(): String
     suspend fun getFirebaseServerTime(): Resource<LocalDate>
     suspend fun bookAppointment(appointment: Appointment)
+    suspend fun cancelAppointment(appointment: Appointment)
     suspend fun isTimeSlotAvailable(doctorId: String, date: LocalDate, time: String): Boolean
     suspend fun getNotAvailableSlots(doctorId: String, date: Date): List<String?>
     suspend fun getMyAppointments(): List<Appointment?>

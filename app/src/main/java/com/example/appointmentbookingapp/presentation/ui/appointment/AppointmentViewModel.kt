@@ -28,6 +28,9 @@ class AppointmentViewModel @Inject constructor(
     private val _bookingState = MutableStateFlow<UiState<Unit>?>(null)
     val bookingState: StateFlow<UiState<Unit>?> = _bookingState
 
+    private val _bookingCancelState = MutableStateFlow<UiState<Unit>?>(null)
+    val bookingCancelState: StateFlow<UiState<Unit>?> = _bookingCancelState
+
     private val _currentUserId = MutableStateFlow<String?>(null)
     val currentUserId: StateFlow<String?> = _currentUserId
 
@@ -79,6 +82,19 @@ class AppointmentViewModel @Inject constructor(
                 _bookingState.value = UiState.Success(Unit)
             } catch (e: Exception) {
                 _bookingState.value = UiState.Error(e.message ?: "Something went wrong")
+            }
+        }
+    }
+
+    fun cancelAppointment(appointment: Appointment) {
+        viewModelScope.launch {
+            _bookingCancelState.value = UiState.Loading
+            try {
+                repository.cancelAppointment(appointment)
+                _bookingCancelState.value = UiState.Success(Unit)
+            } catch (e: Exception) {
+                _bookingCancelState.value = UiState.Error(e.message ?: "Something went wrong")
+                Log.d(logTag, "cancelAppointment: ${e.message}")
             }
         }
     }

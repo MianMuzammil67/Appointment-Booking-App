@@ -69,6 +69,36 @@ class AppointmentRemoteDataSource @Inject constructor(
         }
     }
 
+    suspend fun cancelAppointment(appointment: Appointment){
+        try {
+            val batch = firestore.batch()
+
+            val appointmentRef = firestore.collection("appointments")
+                .document(appointment.appointmentId)
+
+            val userRef = firestore.collection("users")
+                .document(getCurrentUserId())
+                .collection("appointments")
+                .document(appointment.appointmentId)
+
+            val doctorRef = firestore.collection("doctors")
+                .document(appointment.doctorId)
+                .collection("appointments")
+                .document(appointment.appointmentId)
+
+            batch.delete(appointmentRef)
+            batch.delete(userRef)
+            batch.delete(doctorRef)
+
+            batch.commit().await()
+
+        } catch (e: Exception) {
+            Log.d(logTag, "cancelAppointment: ${e.message}")
+        }
+    }
+
+
+
     suspend fun isTimeSlotAvailable(doctorId: String, date: LocalDate, time: String): Boolean {
         val startOfDay = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant())
         val endOfDay = Date.from(date.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant())
