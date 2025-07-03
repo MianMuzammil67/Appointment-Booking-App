@@ -60,7 +60,7 @@ class AuthViewModel @Inject constructor(
             firebaseAuth.signInWithEmailAndPassword(email, password).await()
             _signIn.value = AuthState.Success
         } catch (e: Exception) {
-            _signUp.value = AuthState.Error
+            _signIn.value = AuthState.Error
 
 //            _signIn.value = AuthState.Error(e.message ?: "Unknown error")
 
