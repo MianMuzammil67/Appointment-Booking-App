@@ -1,8 +1,8 @@
 package com.example.appointmentbookingapp.presentation.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
@@ -20,8 +20,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
         NavigationItem("Home", Icons.Filled.Home, "HomeScreen"),
+        NavigationItem("Conversations", Icons.AutoMirrored.Filled.Chat, "ChatListScreen"),
         NavigationItem("Appointments", Icons.AutoMirrored.Filled.List, "MyAppointmentsScreen"),
-        NavigationItem("Favorite", Icons.Filled.Favorite, "FavoriteScreen"),
+//        NavigationItem("Favorite", Icons.Filled.Favorite, "FavoriteScreen"),
         NavigationItem("Profile", Icons.Filled.Person, "ProfileScreen")
     )
     NavigationBar {

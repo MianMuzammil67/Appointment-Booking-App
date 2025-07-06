@@ -51,7 +51,7 @@ fun MainApp() {
     val currentRoute = currentBackStackEntry?.destination?.route
 
     val bottomBarScreens =
-        listOf("HomeScreen", "MyAppointmentsScreen", "FavoriteScreen", "ProfileScreen")
+        listOf("HomeScreen", "ChatListScreen", "MyAppointmentsScreen",  "ProfileScreen")
     val showBottomBar = currentRoute in bottomBarScreens
     val bottomPadding = if (showBottomBar) 80.dp else 0.dp
 
