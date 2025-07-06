@@ -19,6 +19,8 @@ import com.example.appointmentbookingapp.presentation.ui.appointment.BookAppoint
 import com.example.appointmentbookingapp.presentation.ui.appointment.MyAppointments
 import com.example.appointmentbookingapp.presentation.ui.auth.SignInScreen
 import com.example.appointmentbookingapp.presentation.ui.auth.SignupScreen
+import com.example.appointmentbookingapp.presentation.ui.chat.ChatListScreen
+import com.example.appointmentbookingapp.presentation.ui.chat.ChatScreen
 import com.example.appointmentbookingapp.presentation.ui.doctorDetail.DocDetailScreen
 import com.example.appointmentbookingapp.presentation.ui.favorite.FavoriteScreen
 import com.example.appointmentbookingapp.presentation.ui.favorite.viewModel.FavoriteViewModel
@@ -96,6 +98,12 @@ fun MainApp() {
             }
             composable("MyAppointmentsScreen") {
                 MyAppointments(navController, appointmentViewModel)
+            }
+            composable("ChatListScreen") {
+                ChatListScreen(navController)
+            }
+            composable("ChatScreen") {
+                ChatScreen(navController)
             }
         }
     }

@@ -28,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +40,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.ChatListItem
 import com.example.appointmentbookingapp.ui.theme.mediumGray
@@ -48,10 +51,53 @@ import com.example.appointmentbookingapp.util.getRandomColor
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatListScreen(
-    chatListItem: List<ChatListItem>,
-    onChatClick: (ChatListItem) -> Unit,
-    onNewChatClick: () -> Unit
+    navController: NavController,
+//    chatListItem: List<ChatListItem>,
+//    onChatClick: (ChatListItem) -> Unit,
 ) {
+    val chatListItem = listOf(
+        ChatListItem(
+            id = "1",
+            doctorName = "Alice Johnson",
+            lastMessage = "Hey, how are you doing?",
+            timestamp = "10:30 AM",
+            unreadCount = 2,
+            imageUrl = null
+        ),
+        ChatListItem(
+            id = "2",
+            doctorName = "Bob Smith",
+            lastMessage = "I'll send you the details tomorrow.",
+            timestamp = "Yesterday",
+            unreadCount = 0,
+            imageUrl = null
+        ),
+        ChatListItem(
+            id = "3",
+            doctorName = "Team Project",
+            lastMessage = "Don't forget the meeting at 3 PM.",
+            timestamp = "09:15 AM",
+            unreadCount = 5,
+            imageUrl = null
+        ),
+        ChatListItem(
+            id = "4",
+            doctorName = "Charlie Brown",
+            lastMessage = "Sounds good!",
+            timestamp = "Wed",
+            unreadCount = 0,
+            imageUrl = null
+        ),
+        ChatListItem(
+            id = "5",
+            doctorName = "Marketing Updates",
+            lastMessage = "New campaign launched!",
+            timestamp = "Mon",
+            unreadCount = 1,
+            imageUrl = null
+        )
+    )
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -73,7 +119,9 @@ fun ChatListScreen(
                     .padding(paddingValues)
             ) {
                 items(chatListItem, key = { it.id }) { conversation ->
-                    ChatListItem(conversation = conversation, onChatClick = onChatClick)
+                    ChatListItem(
+                        conversation = conversation,
+                        onChatClick = { navController.navigate("ChatScreen") })
                     HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                 }
             }
@@ -191,52 +239,53 @@ fun EmptyChatListMessage(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun ChatListScreenPreview() {
-    val sampleConversations = listOf(
-        ChatListItem(
-            id = "1",
-            doctorName = "Alice Johnson",
-            lastMessage = "Hey, how are you doing?",
-            timestamp = "10:30 AM",
-            unreadCount = 2,
-            imageUrl = null
-        ),
-        ChatListItem(
-            id = "2",
-            doctorName = "Bob Smith",
-            lastMessage = "I'll send you the details tomorrow.",
-            timestamp = "Yesterday",
-            unreadCount = 0,
-            imageUrl = null
-        ),
-        ChatListItem(
-            id = "3",
-            doctorName = "Team Project",
-            lastMessage = "Don't forget the meeting at 3 PM.",
-            timestamp = "09:15 AM",
-            unreadCount = 5,
-            imageUrl = null
-        ),
-        ChatListItem(
-            id = "4",
-            doctorName = "Charlie Brown",
-            lastMessage = "Sounds good!",
-            timestamp = "Wed",
-            unreadCount = 0,
-            imageUrl = null
-        ),
-        ChatListItem(
-            id = "5",
-            doctorName = "Marketing Updates",
-            lastMessage = "New campaign launched!",
-            timestamp = "Mon",
-            unreadCount = 1,
-            imageUrl = null
-        )
-    )
+//    val sampleConversations = listOf(
+//        ChatListItem(
+//            id = "1",
+//            doctorName = "Alice Johnson",
+//            lastMessage = "Hey, how are you doing?",
+//            timestamp = "10:30 AM",
+//            unreadCount = 2,
+//            imageUrl = null
+//        ),
+//        ChatListItem(
+//            id = "2",
+//            doctorName = "Bob Smith",
+//            lastMessage = "I'll send you the details tomorrow.",
+//            timestamp = "Yesterday",
+//            unreadCount = 0,
+//            imageUrl = null
+//        ),
+//        ChatListItem(
+//            id = "3",
+//            doctorName = "Team Project",
+//            lastMessage = "Don't forget the meeting at 3 PM.",
+//            timestamp = "09:15 AM",
+//            unreadCount = 5,
+//            imageUrl = null
+//        ),
+//        ChatListItem(
+//            id = "4",
+//            doctorName = "Charlie Brown",
+//            lastMessage = "Sounds good!",
+//            timestamp = "Wed",
+//            unreadCount = 0,
+//            imageUrl = null
+//        ),
+//        ChatListItem(
+//            id = "5",
+//            doctorName = "Marketing Updates",
+//            lastMessage = "New campaign launched!",
+//            timestamp = "Mon",
+//            unreadCount = 1,
+//            imageUrl = null
+//        )
+//    )
     ChatListScreen(
-        chatListItem = sampleConversations,
-        onChatClick = {},
-        onNewChatClick = {}
+        navController = rememberNavController()
+//        chatListItem = sampleConversations,
+//        onChatClick = {},
+//        onNewChatClick = {}
     )
 }
 
@@ -244,8 +293,9 @@ fun ChatListScreenPreview() {
 @Composable
 fun EmptyChatListScreenPreview() {
     ChatListScreen(
-        chatListItem = emptyList(),
-        onChatClick = {},
-        onNewChatClick = {}
+        navController = rememberNavController()
+    //    chatListItem = emptyList(),
+//        onChatClick = {},
+//        onNewChatClick = {}
     )
 }
