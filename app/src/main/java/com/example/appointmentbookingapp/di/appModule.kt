@@ -1,12 +1,15 @@
 package com.example.appointmentbookingapp.di
 
 import com.example.appointmentbookingapp.data.remorte.AppointmentRemoteDataSource
+import com.example.appointmentbookingapp.data.remorte.ChatRemoteDataSource
 import com.example.appointmentbookingapp.data.remorte.FavoritesRemoteDataSource
 import com.example.appointmentbookingapp.data.remorte.HomeRemoteDataSource
 import com.example.appointmentbookingapp.data.repository.AppointmentRepositoryImpl
+import com.example.appointmentbookingapp.data.repository.ChatRepositoryImpl
 import com.example.appointmentbookingapp.data.repository.FavoriteRepositoryImpl
 import com.example.appointmentbookingapp.data.repository.HomeRepositoryImpl
 import com.example.appointmentbookingapp.domain.repository.AppointmentRepository
+import com.example.appointmentbookingapp.domain.repository.ChatRepository
 import com.example.appointmentbookingapp.domain.repository.FavoriteRepository
 import com.example.appointmentbookingapp.domain.repository.HomeRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -50,5 +53,10 @@ object AppModule {
     @Provides
     fun provideAppointmentRepository(remote: AppointmentRemoteDataSource): AppointmentRepository {
         return AppointmentRepositoryImpl(remote)
+    }
+    @Singleton
+    @Provides
+    fun provideChatRepository(remote: ChatRemoteDataSource) : ChatRepository {
+        return ChatRepositoryImpl(remote)
     }
 }

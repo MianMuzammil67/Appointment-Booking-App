@@ -18,40 +18,37 @@ class ChatRemoteDataSource @Inject constructor(
 
     fun getCurrentUserId(): String {
         return firebaseAuth.currentUser?.uid ?: throw IllegalStateException("User not logged in")
-//        return firebaseAuth.currentUser?.uid.toString()
     }
 
-    suspend fun sendMessage(doctorId: String, message: Message) {
+    suspend fun sendMessage(message: Message) {
         try {
             val batch = firestore.batch()
-            val chatId = generateChatId(doctorId, getCurrentUserId())
-
 
             val msgRef = firestore.collection("chats")
-                .document(chatId)
+                .document(message.chatId)
                 .collection("messages")
                 .document(message.messageId)
 
             val docMsgRef = firestore.collection("doctors")
-                .document(doctorId)
+                .document(message.doctorId)
                 .collection("conversations")
-                .document(getCurrentUserId())
+                .document(message.patientId)
 
             val patMsgRef = firestore.collection("users")
-                .document(getCurrentUserId())
+                .document(message.patientId)
                 .collection("conversations")
-                .document(doctorId)
+                .document(message.doctorId)
 
 
             batch.set(msgRef, message)
 
             val patientData = mapOf(
-                "doctorId" to doctorId,
+                "doctorId" to message.doctorId,
                 "lastMessage" to message.content,
                 "timestamp" to message.timestamp
             )
             val doctorData = mapOf(
-                "patientId" to getCurrentUserId(),
+                "patientId" to message.patientId,
                 "lastMessage" to message.content,
                 "timestamp" to message.timestamp
             )
@@ -70,11 +67,9 @@ class ChatRemoteDataSource @Inject constructor(
     }
 
     fun listenToMessages(
-        doctorId: String,
-        patientId: String,
+        chatId: String,
         onMessagesChanged: (List<Message>) -> Unit
     ): ListenerRegistration {
-        val chatId = generateChatId(doctorId, getCurrentUserId())
 
         return firestore.collection("chats")
             .document(chatId)
@@ -95,9 +90,6 @@ class ChatRemoteDataSource @Inject constructor(
             }
     }
 
-    fun generateChatId(userId1: String, userId2: String): String {
-        return listOf(userId1, userId2).sorted().joinToString("_")
-    }
 }
 
 /*
@@ -107,5 +99,3 @@ class ChatRemoteDataSource @Inject constructor(
     Cache user profiles (doctor/patient)	For faster chat list UI
     Add pagination for messages	Load 20 messages at a time for performance
  */
-
-

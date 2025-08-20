@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -31,8 +33,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -47,48 +50,29 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.Message
-import java.util.UUID
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
     navController: NavController,
+    chatViewModel: ChatViewModel = viewModel(),
+    doctorId: String,
 ) {
     var messageInput by remember { mutableStateOf("") }
-    val messages = remember {
-        mutableStateListOf(
-            Message(UUID.randomUUID().toString(), "Hey there!", false),
-            Message(UUID.randomUUID().toString(), "Hi! How are you?", true),
-            Message(
-                UUID.randomUUID().toString(),
-                "I'm doing great, thanks for asking! Just chilling.",
-                false
-            ),
-            Message(UUID.randomUUID().toString(), "Nice! What's up?", true),
-            Message(
-                UUID.randomUUID().toString(),
-                "Not much, just coding a chat app using Jetpack Compose. It's pretty cool!",
-                false
-            ),
-            Message(UUID.randomUUID().toString(), "That sounds awesome! Is it difficult?", true),
-            Message(
-                UUID.randomUUID().toString(),
-                "It has its moments, but overall it's quite intuitive. The declarative UI really speeds things up.",
-                false
-            ),
-            Message(UUID.randomUUID().toString(), "Cool, cool. Maybe I should learn it too.", true),
-            Message(UUID.randomUUID().toString(), "Definitely! You'd pick it up fast.", false),
-            Message(
-                UUID.randomUUID().toString(),
-                "Okay, I'll check it out. Thanks for the info!",
-                true
-            )
-        )
+    val messages by chatViewModel.messages.collectAsState()
+
+
+    LaunchedEffect(Unit) {
+        chatViewModel.listenToMessages(doctorId)
     }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -124,7 +108,7 @@ fun ChatScreen(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = {navController.popBackStack()}) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -132,7 +116,7 @@ fun ChatScreen(
                     }
                 },
 
-            )
+                )
         },
         content = { paddingValues ->
             Column(
@@ -149,7 +133,10 @@ fun ChatScreen(
                     reverseLayout = true // To make new messages appear at the bottom
                 ) {
                     items(messages.reversed()) { message -> // Displaying reversed for chronological order
-                        MessageBubble(message = message)
+                        MessageBubble(
+                            message = message,
+                            isSentByMe = message.patientId == chatViewModel.patientId
+                        )
                     }
                 }
 
@@ -159,13 +146,11 @@ fun ChatScreen(
                     onMessageChange = { messageInput = it },
                     onSendMessage = {
                         if (messageInput.isNotBlank()) {
-                            messages.add(
-                                Message(
-                                    UUID.randomUUID().toString(),
-                                    messageInput,
-                                    true
-                                )
+
+                            chatViewModel.sendMessage(
+                                doctorId = doctorId, messageContent = messageInput
                             )
+
                             messageInput = ""
                         }
                     }
@@ -176,27 +161,81 @@ fun ChatScreen(
 }
 
 @Composable
-fun MessageBubble(message: Message) {
+fun MessageBubble(
+    message: Message,
+    isSentByMe: Boolean
+) {
+    val bubbleColor = if (isSentByMe) {
+        colorResource(id = R.color.colorPrimary)
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
+
+    val textColor = if (isSentByMe) {
+        Color.White
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
+    val instant = Instant.ofEpochMilli(message.timestamp)
+    val formatter = DateTimeFormatter.ofPattern("h:mm a")
+        .withZone(ZoneId.systemDefault())
+    val formattedTime = formatter.format(instant)
+
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = if (message.isSentByMe) Arrangement.End else Arrangement.Start
+            .padding(horizontal = 12.dp, vertical = 4.dp),
+        horizontalArrangement = if (isSentByMe) Arrangement.End else Arrangement.Start
     ) {
-        Card(
-            shape = RoundedCornerShape(8.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = if (message.isSentByMe) colorResource(R.color.colorPrimary) else MaterialTheme.colorScheme.surfaceVariant
-//                containerColor = if (message.isSentByMe) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
-            )
+        Column(
+            modifier = Modifier.widthIn(max = 280.dp),
+            horizontalAlignment = if (isSentByMe) Alignment.End else Alignment.Start
         ) {
-            Text(
-                text = message.text,
-                color = if (message.isSentByMe) colorResource(R.color.white) else MaterialTheme.colorScheme.onSurfaceVariant,
-//                color = if (message.isSentByMe) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(8.dp),
-                fontSize = 16.sp
-            )
+            Card(
+                shape = RoundedCornerShape(
+                    topStart = 16.dp,
+                    topEnd = 16.dp,
+                    bottomEnd = if (isSentByMe) 4.dp else 16.dp, // Smaller corner for the tail effect
+                    bottomStart = if (isSentByMe) 16.dp else 4.dp
+                ),
+                colors = CardDefaults.cardColors(containerColor = bubbleColor),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Text(
+                    text = message.content,
+                    color = textColor,
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                    fontSize = 16.sp,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+
+                ) {
+                Text(
+                    text = formattedTime,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
+
+// ⚠️ KEEP: Might be used later for showing read receipts
+// ⚠️ DO NOT DELETE unless confirmed unnecessary
+
+//                if (isSentByMe) {
+//                    Spacer(modifier = Modifier.width(4.dp))
+//                    Icon(
+//                        imageVector = Icons.Default.DoneAll, // Double checkmark for 'read'
+//                        contentDescription = "Read",
+//                        tint = MaterialTheme.colorScheme.primary, // A distinct color for 'read' status
+//                        modifier = Modifier.size(16.dp)
+//                    )
+//                }
+            }
         }
     }
 }
@@ -242,5 +281,5 @@ fun MessageInput(
 @Preview(showBackground = true)
 @Composable
 fun PreviewChatScreen() {
-    ChatScreen(navController = rememberNavController())
+//    ChatScreen(navController = rememberNavController())
 }

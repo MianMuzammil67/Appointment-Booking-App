@@ -21,6 +21,7 @@ import com.example.appointmentbookingapp.presentation.ui.auth.SignInScreen
 import com.example.appointmentbookingapp.presentation.ui.auth.SignupScreen
 import com.example.appointmentbookingapp.presentation.ui.chat.ChatListScreen
 import com.example.appointmentbookingapp.presentation.ui.chat.ChatScreen
+import com.example.appointmentbookingapp.presentation.ui.chat.ChatViewModel
 import com.example.appointmentbookingapp.presentation.ui.doctorDetail.DocDetailScreen
 import com.example.appointmentbookingapp.presentation.ui.favorite.FavoriteScreen
 import com.example.appointmentbookingapp.presentation.ui.favorite.viewModel.FavoriteViewModel
@@ -30,6 +31,7 @@ import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDo
 import com.example.appointmentbookingapp.presentation.ui.navigation.BottomNavigationBar
 import com.example.appointmentbookingapp.presentation.ui.profile.ProfileScreen
 import com.example.appointmentbookingapp.presentation.ui.profile.ProfileViewModel
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.DoctorChatSharedViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -42,6 +44,8 @@ fun MainApp() {
     val favoriteViewModel: FavoriteViewModel = hiltViewModel()
     val profileViewModel: ProfileViewModel = hiltViewModel()
     val appointmentViewModel: AppointmentViewModel = hiltViewModel()
+    val chatViewModel: ChatViewModel = hiltViewModel()
+    val doctorChatSharedViewModel: DoctorChatSharedViewModel = hiltViewModel()
 
 
     val currentUser = FirebaseAuth.getInstance().currentUser
@@ -51,7 +55,7 @@ fun MainApp() {
     val currentRoute = currentBackStackEntry?.destination?.route
 
     val bottomBarScreens =
-        listOf("HomeScreen", "ChatListScreen", "MyAppointmentsScreen",  "ProfileScreen")
+        listOf("HomeScreen", "ChatListScreen", "MyAppointmentsScreen", "ProfileScreen")
     val showBottomBar = currentRoute in bottomBarScreens
     val bottomPadding = if (showBottomBar) 80.dp else 0.dp
 
@@ -79,7 +83,12 @@ fun MainApp() {
                 )
             }
             composable("DoctorDetail") {
-                DocDetailScreen(navController, sharedDoctorViewModel, favoriteViewModel)
+                DocDetailScreen(
+                    navController,
+                    sharedDoctorViewModel,
+                    favoriteViewModel,
+                    doctorChatSharedViewModel
+                )
             }
             composable("BookAppointment") {
                 BookAppointmentScreen(navController, sharedDoctorViewModel)
@@ -103,7 +112,7 @@ fun MainApp() {
                 ChatListScreen(navController)
             }
             composable("ChatScreen") {
-                ChatScreen(navController)
+                ChatScreen(navController, chatViewModel, doctorChatSharedViewModel.doctorId)
             }
         }
     }

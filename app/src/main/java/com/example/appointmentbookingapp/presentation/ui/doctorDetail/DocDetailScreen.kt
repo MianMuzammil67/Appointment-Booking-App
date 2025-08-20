@@ -2,6 +2,7 @@ package com.example.appointmentbookingapp.presentation.ui.doctorDetail
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,6 +59,7 @@ import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.presentation.ui.favorite.viewModel.FavoriteViewModel
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.DoctorChatSharedViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,9 +67,10 @@ import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDo
 fun DocDetailScreen(
     navController: NavHostController,
     sharedDoctorViewModel: SharedDoctorViewModel = viewModel(),
-    favoriteViewModel: FavoriteViewModel = hiltViewModel()
-
+    favoriteViewModel: FavoriteViewModel = hiltViewModel(),
+    doctorChatSharedViewModel: DoctorChatSharedViewModel = hiltViewModel(),
 ) {
+
     val currentDoctor by sharedDoctorViewModel.selectedDoctor.collectAsState()
 // This code returns the hash code of the object, which helps in comparing two objects.
 
@@ -126,7 +129,11 @@ fun DocDetailScreen(
                         .clip(CircleShape)
                         .background(color = colorResource(R.color.colorPrimary))
                         .padding(16.dp)
-                        .size(32.dp),
+                        .size(32.dp)
+                        .clickable {
+                            doctorChatSharedViewModel.updateDoctorId(currentDoctor.id)
+                            navController.navigate("ChatScreen")
+                        },
                     contentAlignment = Alignment.Center,
                 ) {
                     Image(
@@ -220,7 +227,7 @@ fun TopCardSection(currentDoctor: DoctorItem) {
                 text = currentDoctor.docCategory,
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.Black,
-                )
+            )
 
             Spacer(Modifier.height(8.dp))
 
@@ -337,7 +344,7 @@ fun AboutMeSection(currentDoctor: DoctorItem) {
             text = currentDoctor.aboutDoctor,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground,
-            )
+        )
     }
 }
 
