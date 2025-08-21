@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.appointmentbookingapp.domain.model.DoctorItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 
@@ -14,9 +15,10 @@ import jakarta.inject.Inject
 @HiltViewModel
 class DoctorChatSharedViewModel @Inject constructor(): ViewModel() {
 
-    var doctorId by mutableStateOf("")
+    var currentDoctor by mutableStateOf(DoctorItem())
 
-    fun updateDoctorId(id: String) {
-        doctorId = id
+    fun updateCurrentDoctor(doctor: DoctorItem) {
+        currentDoctor = doctor
     }
+
 }

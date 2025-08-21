@@ -1,6 +1,5 @@
 package com.example.appointmentbookingapp.presentation.ui.chat
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,7 +50,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.R
+import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.domain.model.Message
 import java.time.Instant
 import java.time.ZoneId
@@ -63,14 +63,14 @@ import java.time.format.DateTimeFormatter
 fun ChatScreen(
     navController: NavController,
     chatViewModel: ChatViewModel = viewModel(),
-    doctorId: String,
+    currentDoctor: DoctorItem
 ) {
     var messageInput by remember { mutableStateOf("") }
     val messages by chatViewModel.messages.collectAsState()
 
 
     LaunchedEffect(Unit) {
-        chatViewModel.listenToMessages(doctorId)
+        chatViewModel.listenToMessages(currentDoctor.id)
     }
 
     Scaffold(
@@ -80,8 +80,8 @@ fun ChatScreen(
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.im_doctor),
+                       AsyncImage(
+                            model = currentDoctor.imageUrl,
                             contentDescription = "Profile Picture",
                             modifier = Modifier
                                 .size(40.dp)
@@ -93,7 +93,7 @@ fun ChatScreen(
 
                         Column {
                             Text(
-                                text = "John Doe",
+                                text = currentDoctor.name,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 maxLines = 1,
@@ -148,7 +148,7 @@ fun ChatScreen(
                         if (messageInput.isNotBlank()) {
 
                             chatViewModel.sendMessage(
-                                doctorId = doctorId, messageContent = messageInput
+                                doctorId = currentDoctor.id, messageContent = messageInput
                             )
 
                             messageInput = ""

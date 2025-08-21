@@ -112,7 +112,7 @@ fun MainApp() {
                 ChatListScreen(navController)
             }
             composable("ChatScreen") {
-                ChatScreen(navController, chatViewModel, doctorChatSharedViewModel.doctorId)
+                ChatScreen(navController, chatViewModel, doctorChatSharedViewModel.currentDoctor)
             }
         }
     }

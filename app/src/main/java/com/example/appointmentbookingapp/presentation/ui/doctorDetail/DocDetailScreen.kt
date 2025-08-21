@@ -131,7 +131,7 @@ fun DocDetailScreen(
                         .padding(16.dp)
                         .size(32.dp)
                         .clickable {
-                            doctorChatSharedViewModel.updateDoctorId(currentDoctor.id)
+                            doctorChatSharedViewModel.updateCurrentDoctor(currentDoctor)
                             navController.navigate("ChatScreen")
                         },
                     contentAlignment = Alignment.Center,
@@ -389,7 +389,7 @@ fun SpokenLanguageSection(currentDoctor: DoctorItem) {
 
 @Preview
 @Composable
-fun DocScreenPreview(modifier: Modifier = Modifier) {
+fun DocScreenPreview() {
     DocDetailScreen(navController = rememberNavController())
 }
 
