@@ -1,6 +1,7 @@
 package com.example.appointmentbookingapp.data.remorte
 
 import android.util.Log
+import com.example.appointmentbookingapp.domain.model.ConversationItem
 import com.example.appointmentbookingapp.domain.model.Message
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -12,7 +13,6 @@ import javax.inject.Inject
 class ChatRemoteDataSource @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firestore: FirebaseFirestore
-
 ) {
     private val logTag: String = "ChatRemoteDataSource"
 
@@ -90,6 +90,24 @@ class ChatRemoteDataSource @Inject constructor(
             }
     }
 
+    suspend fun getConversations(): List<ConversationItem> {
+        return try {
+            val conversations = firestore.collection("users")
+                .document(getCurrentUserId())
+                .collection("conversations")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .get().await()
+
+            Log.d(logTag, conversations.toString())
+
+            conversations.documents.mapNotNull {
+                it.toObject(ConversationItem::class.java)
+            }
+        } catch (e: Exception) {
+            Log.d(logTag, "getConversations: ${e.message}")
+            emptyList()
+        }
+    }
 }
 
 /*

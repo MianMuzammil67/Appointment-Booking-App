@@ -1,6 +1,8 @@
 package com.example.appointmentbookingapp.domain.repository
 
+import com.example.appointmentbookingapp.domain.model.ChatListItem
 import com.example.appointmentbookingapp.domain.model.Message
+import com.example.appointmentbookingapp.util.Resource
 import com.google.firebase.firestore.ListenerRegistration
 
 interface ChatRepository {
@@ -13,4 +15,6 @@ interface ChatRepository {
         chatId: String,
         onMessagesChanged: (List<Message>) -> Unit
     ): ListenerRegistration
+
+    suspend fun getChatList():  Resource<List<ChatListItem>>
 }

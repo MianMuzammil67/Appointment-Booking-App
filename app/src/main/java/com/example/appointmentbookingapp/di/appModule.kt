@@ -54,9 +54,13 @@ object AppModule {
     fun provideAppointmentRepository(remote: AppointmentRemoteDataSource): AppointmentRepository {
         return AppointmentRepositoryImpl(remote)
     }
+
     @Singleton
     @Provides
-    fun provideChatRepository(remote: ChatRemoteDataSource) : ChatRepository {
-        return ChatRepositoryImpl(remote)
+    fun provideChatRepository(
+        chatRemoteDataSource: ChatRemoteDataSource,
+        appointmentRemoteDataSource: AppointmentRemoteDataSource
+    ): ChatRepository {
+        return ChatRepositoryImpl(chatRemoteDataSource, appointmentRemoteDataSource)
     }
 }

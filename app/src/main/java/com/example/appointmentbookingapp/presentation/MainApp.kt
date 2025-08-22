@@ -20,6 +20,7 @@ import com.example.appointmentbookingapp.presentation.ui.appointment.MyAppointme
 import com.example.appointmentbookingapp.presentation.ui.auth.SignInScreen
 import com.example.appointmentbookingapp.presentation.ui.auth.SignupScreen
 import com.example.appointmentbookingapp.presentation.ui.chat.ChatListScreen
+import com.example.appointmentbookingapp.presentation.ui.chat.ChatListViewModel
 import com.example.appointmentbookingapp.presentation.ui.chat.ChatScreen
 import com.example.appointmentbookingapp.presentation.ui.chat.ChatViewModel
 import com.example.appointmentbookingapp.presentation.ui.doctorDetail.DocDetailScreen
@@ -46,6 +47,7 @@ fun MainApp() {
     val appointmentViewModel: AppointmentViewModel = hiltViewModel()
     val chatViewModel: ChatViewModel = hiltViewModel()
     val doctorChatSharedViewModel: DoctorChatSharedViewModel = hiltViewModel()
+    val chatListViewModel: ChatListViewModel = hiltViewModel()
 
 
     val currentUser = FirebaseAuth.getInstance().currentUser
@@ -109,7 +111,7 @@ fun MainApp() {
                 MyAppointments(navController, appointmentViewModel)
             }
             composable("ChatListScreen") {
-                ChatListScreen(navController)
+                ChatListScreen(navController, chatListViewModel, doctorChatSharedViewModel)
             }
             composable("ChatScreen") {
                 ChatScreen(navController, chatViewModel, doctorChatSharedViewModel.currentDoctor)

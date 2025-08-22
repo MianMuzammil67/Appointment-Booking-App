@@ -1,6 +1,5 @@
 package com.example.appointmentbookingapp.presentation.ui.chat
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,15 +19,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Badge
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,63 +43,33 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.ChatListItem
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.DoctorChatSharedViewModel
 import com.example.appointmentbookingapp.ui.theme.mediumGray
-import com.example.appointmentbookingapp.util.getRandomColor
+import com.example.appointmentbookingapp.util.Resource
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatListScreen(
     navController: NavController,
-//    chatListItem: List<ChatListItem>,
-//    onChatClick: (ChatListItem) -> Unit,
+    chatListViewModel: ChatListViewModel = hiltViewModel(),
+    doctorChatSharedViewModel: DoctorChatSharedViewModel = hiltViewModel()
 ) {
-    val chatListItem = listOf(
-        ChatListItem(
-            id = "1",
-            doctorName = "Alice Johnson",
-            lastMessage = "Hey, how are you doing?",
-            timestamp = "10:30 AM",
-            unreadCount = 2,
-            imageUrl = null
-        ),
-        ChatListItem(
-            id = "2",
-            doctorName = "Bob Smith",
-            lastMessage = "I'll send you the details tomorrow.",
-            timestamp = "Yesterday",
-            unreadCount = 0,
-            imageUrl = null
-        ),
-        ChatListItem(
-            id = "3",
-            doctorName = "Team Project",
-            lastMessage = "Don't forget the meeting at 3 PM.",
-            timestamp = "09:15 AM",
-            unreadCount = 5,
-            imageUrl = null
-        ),
-        ChatListItem(
-            id = "4",
-            doctorName = "Charlie Brown",
-            lastMessage = "Sounds good!",
-            timestamp = "Wed",
-            unreadCount = 0,
-            imageUrl = null
-        ),
-        ChatListItem(
-            id = "5",
-            doctorName = "Marketing Updates",
-            lastMessage = "New campaign launched!",
-            timestamp = "Mon",
-            unreadCount = 1,
-            imageUrl = null
-        )
-    )
+    LaunchedEffect(Unit) {
+        chatListViewModel.getChatList()
+    }
+
+    val chatListResource by chatListViewModel.chatList.collectAsState()
+
+    val isLoading = chatListResource is Resource.Loading
+    val chatList = (chatListResource as? Resource.Success)?.data
+    val errorMessage = (chatListResource as? Resource.Error)?.message
 
     Scaffold(
         topBar = {
@@ -110,27 +83,60 @@ fun ChatListScreen(
             )
         },
     ) { paddingValues ->
-        if (chatListItem.isEmpty()) {
-            EmptyChatListMessage(Modifier.padding(paddingValues))
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                items(chatListItem, key = { it.id }) { conversation ->
-                    ChatListItem(
-                        conversation = conversation,
-                        onChatClick = { navController.navigate("ChatScreen") })
-                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+
+        when {
+            isLoading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            errorMessage != null -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Error: $errorMessage", color = Color.Red)
+                }
+            }
+
+            chatList.isNullOrEmpty() -> {
+                EmptyChatListMessage(Modifier.padding(paddingValues))
+            }
+
+            else -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    items(chatList, key = { it.id }) { conversation ->
+                        ConversationCard(
+                            conversation = conversation,
+                            onChatClick = {
+                                doctorChatSharedViewModel.updateCurrentDoctor(conversation.doctor)
+                                navController.navigate("ChatScreen")
+                            }
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                    }
                 }
             }
         }
     }
+
 }
 
 @Composable
-fun ChatListItem(conversation: ChatListItem, onChatClick: (ChatListItem) -> Unit) {
+fun ConversationCard(conversation: ChatListItem, onChatClick: (ChatListItem) -> Unit) {
+    val currentDoctor = conversation.doctor
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -139,33 +145,15 @@ fun ChatListItem(conversation: ChatListItem, onChatClick: (ChatListItem) -> Unit
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Avatar
-        if (conversation.imageUrl != null) {
-            Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                contentDescription = "Contact avatar",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFE0E0E0))
-            )
-        } else {
-            // Default avatar with initial
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(CircleShape)
-                    .background(getRandomColor()),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = conversation.doctorName.first().toString(),
-                    color = Color.White,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
+        AsyncImage(
+            model = currentDoctor.imageUrl,
+            contentDescription = "Contact avatar",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(56.dp)
+                .clip(CircleShape)
+                .background(Color(0xFFE0E0E0))
+        )
 
         Spacer(modifier = Modifier.width(16.dp))
 
@@ -173,17 +161,16 @@ fun ChatListItem(conversation: ChatListItem, onChatClick: (ChatListItem) -> Unit
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = conversation.doctorName,
+                text = currentDoctor.name,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = conversation.lastMessage,
-                // Directly specifying style parameters
                 fontSize = 14.sp,
                 color = mediumGray,
                 maxLines = 1,
@@ -239,53 +226,8 @@ fun EmptyChatListMessage(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun ChatListScreenPreview() {
-//    val sampleConversations = listOf(
-//        ChatListItem(
-//            id = "1",
-//            doctorName = "Alice Johnson",
-//            lastMessage = "Hey, how are you doing?",
-//            timestamp = "10:30 AM",
-//            unreadCount = 2,
-//            imageUrl = null
-//        ),
-//        ChatListItem(
-//            id = "2",
-//            doctorName = "Bob Smith",
-//            lastMessage = "I'll send you the details tomorrow.",
-//            timestamp = "Yesterday",
-//            unreadCount = 0,
-//            imageUrl = null
-//        ),
-//        ChatListItem(
-//            id = "3",
-//            doctorName = "Team Project",
-//            lastMessage = "Don't forget the meeting at 3 PM.",
-//            timestamp = "09:15 AM",
-//            unreadCount = 5,
-//            imageUrl = null
-//        ),
-//        ChatListItem(
-//            id = "4",
-//            doctorName = "Charlie Brown",
-//            lastMessage = "Sounds good!",
-//            timestamp = "Wed",
-//            unreadCount = 0,
-//            imageUrl = null
-//        ),
-//        ChatListItem(
-//            id = "5",
-//            doctorName = "Marketing Updates",
-//            lastMessage = "New campaign launched!",
-//            timestamp = "Mon",
-//            unreadCount = 1,
-//            imageUrl = null
-//        )
-//    )
     ChatListScreen(
         navController = rememberNavController()
-//        chatListItem = sampleConversations,
-//        onChatClick = {},
-//        onNewChatClick = {}
     )
 }
 
@@ -294,8 +236,5 @@ fun ChatListScreenPreview() {
 fun EmptyChatListScreenPreview() {
     ChatListScreen(
         navController = rememberNavController()
-    //    chatListItem = emptyList(),
-//        onChatClick = {},
-//        onNewChatClick = {}
     )
 }
