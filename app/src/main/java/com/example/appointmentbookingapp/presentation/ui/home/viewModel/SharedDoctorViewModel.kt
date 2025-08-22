@@ -8,6 +8,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
+// ⚠️ IMPORTANT for Hilt:
+// Always add @Inject constructor() even if there are no parameters,
+// otherwise Hilt can't generate the ViewModel and the build will fail!
+
 @HiltViewModel
 class SharedDoctorViewModel @Inject constructor() : ViewModel() {
 
