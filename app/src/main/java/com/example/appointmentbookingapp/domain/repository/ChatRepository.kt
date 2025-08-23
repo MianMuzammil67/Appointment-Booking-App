@@ -17,4 +17,5 @@ interface ChatRepository {
     ): ListenerRegistration
 
     suspend fun getChatList():  Resource<List<ChatListItem>>
+    suspend fun deleteConversation(doctorId: String)
 }

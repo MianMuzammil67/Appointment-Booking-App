@@ -62,4 +62,8 @@ class ChatRepositoryImpl(
         }
     }
 
+    override suspend fun deleteConversation(doctorId: String) {
+    return chatRemoteDataSource.deleteConversation(doctorId)
+    }
+
 }
