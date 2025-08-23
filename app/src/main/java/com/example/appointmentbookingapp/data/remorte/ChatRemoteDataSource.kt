@@ -109,7 +109,81 @@ class ChatRemoteDataSource @Inject constructor(
             emptyList()
         }
     }
-}
+
+    suspend fun deleteMessage(message: Message): Resource<Unit> {
+        return try {
+            val batch = firestore.batch()
+
+            // Message document reference
+            val msgRef = firestore.collection("chats")
+                .document(message.chatId)
+                .collection("messages")
+                .document(message.messageId)
+
+            // Conversation metadata references
+            val docMsgRef = firestore.collection("doctors")
+                .document(message.doctorId)
+                .collection("conversations")
+                .document(message.patientId)
+
+            val patMsgRef = firestore.collection("users")
+                .document(message.patientId)
+                .collection("conversations")
+                .document(message.doctorId)
+
+            batch.delete(msgRef)
+            batch.commit().await()
+
+//             check if any messages are left in the chat
+            val messagesSnapshot = firestore.collection("chats")
+                .document(message.chatId)
+                .collection("messages")
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(1)
+                .get()
+                .await()
+
+            if (messagesSnapshot.isEmpty) {
+//                No messages left
+//                delete the conversation entries
+                val cleanupBatch = firestore.batch()
+                cleanupBatch.delete(docMsgRef)
+                cleanupBatch.delete(patMsgRef)
+                cleanupBatch.commit().await()
+                Log.d(logTag, "deleteMessage: Last message deleted, conversation entries removed")
+            } else {
+
+//                Give me the 1 most recent message in this chat, ordered by timestamp descending
+                val lastMsg = messagesSnapshot.documents.first().toObject(Message::class.java)
+                if (lastMsg != null) {
+                    val newPatientData = mapOf(
+                        "doctorId" to lastMsg.doctorId,
+                        "lastMessage" to lastMsg.content,
+                        "timestamp" to lastMsg.timestamp
+                    )
+                    val newDoctorData = mapOf(
+                        "patientId" to lastMsg.patientId,
+                        "lastMessage" to lastMsg.content,
+                        "timestamp" to lastMsg.timestamp
+                    )
+
+                    val updateBatch = firestore.batch()
+                    updateBatch.set(patMsgRef, newPatientData)
+                    updateBatch.set(docMsgRef, newDoctorData)
+                    updateBatch.commit().await()
+
+                    Log.d(logTag, "deleteMessage: lastMessage updated in conversation metadata")
+                }
+            }
+
+            Resource.Success(Unit)
+
+        } catch (e: Exception) {
+            Log.e(logTag, "deleteMessage: ${e.message}")
+            Resource.Error(e.localizedMessage ?: "Failed to delete message")
+        }
+    }
+
     suspend fun deleteConversation(doctorId: String) {
 
         try {

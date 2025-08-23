@@ -21,7 +21,6 @@ class ChatViewModel @Inject constructor(
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages: StateFlow<List<Message>> = _messages.asStateFlow()
 
-//    val patientId = chatRepository.getCurrentUserId()
     val patientId: String by lazy { chatRepository.getCurrentUserId() }
 
 
@@ -51,6 +50,10 @@ class ChatViewModel @Inject constructor(
         messageListener = chatRepository.listenToMessages(chatId) { newMessages ->
             _messages.value = newMessages
         }
+    }
+
+    fun deleteMessage(message: Message) = viewModelScope.launch {
+        chatRepository.deleteMessage(message)
     }
 
     override fun onCleared() {

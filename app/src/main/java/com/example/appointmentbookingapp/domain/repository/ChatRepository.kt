@@ -16,6 +16,9 @@ interface ChatRepository {
         onMessagesChanged: (List<Message>) -> Unit
     ): ListenerRegistration
 
-    suspend fun getChatList():  Resource<List<ChatListItem>>
+    suspend fun getChatList(): Resource<List<ChatListItem>>
+
+    suspend fun deleteMessage(message: Message): Resource<Unit>
+
     suspend fun deleteConversation(doctorId: String)
 }

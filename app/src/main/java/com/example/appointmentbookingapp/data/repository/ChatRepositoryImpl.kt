@@ -66,4 +66,7 @@ class ChatRepositoryImpl(
     return chatRemoteDataSource.deleteConversation(doctorId)
     }
 
+    override suspend fun deleteMessage(message: Message): Resource<Unit> {
+        return  chatRemoteDataSource.deleteMessage(message)
+    }
 }

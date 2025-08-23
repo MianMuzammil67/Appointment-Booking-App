@@ -1,6 +1,9 @@
 package com.example.appointmentbookingapp.presentation.ui.chat
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,6 +58,7 @@ import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.domain.model.Message
+import com.example.appointmentbookingapp.presentation.ui.components.DeleteItemDialog
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -68,6 +73,9 @@ fun ChatScreen(
     var messageInput by remember { mutableStateOf("") }
     val messages by chatViewModel.messages.collectAsState()
 
+    var selectedMsg by remember { mutableStateOf<Message?>(null) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(Unit) {
         chatViewModel.listenToMessages(currentDoctor.id)
@@ -80,30 +88,37 @@ fun ChatScreen(
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                       AsyncImage(
-                            model = currentDoctor.imageUrl,
-                            contentDescription = "Profile Picture",
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .border(2.dp, colorResource(R.color.colorPrimary), CircleShape)
-                        )
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Column {
+                        if (selectedMsg != null) {
                             Text(
-                                text = currentDoctor.name,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                text = "1 selected",
+                                fontWeight = FontWeight.Bold
                             )
-                            Text(
-                                text = "Online",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.Gray
+                        } else {
+                            AsyncImage(
+                                model = currentDoctor.imageUrl,
+                                contentDescription = "Profile Picture",
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .border(2.dp, colorResource(R.color.colorPrimary), CircleShape)
                             )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Column {
+                                Text(
+                                    text = currentDoctor.name,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(
+                                    text = "Online",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.Gray
+                                )
+                            }
                         }
                     }
                 },
@@ -115,10 +130,28 @@ fun ChatScreen(
                         )
                     }
                 },
+                actions = {
+                    if (selectedMsg != null) {
+                        IconButton(onClick = { showDeleteDialog = true }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        }
+                    }
+                }
 
-                )
+            )
         },
         content = { paddingValues ->
+            if (showDeleteDialog && selectedMsg != null) {
+                DeleteItemDialog(
+                    onDismiss = { showDeleteDialog = false },
+                    onConfirm = {
+                        chatViewModel.deleteMessage(selectedMsg!!)
+                        selectedMsg = null
+                        showDeleteDialog = false
+                    }
+                )
+            }
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -135,7 +168,11 @@ fun ChatScreen(
                     items(messages.reversed()) { message -> // Displaying reversed for chronological order
                         MessageBubble(
                             message = message,
-                            isSentByMe = message.patientId == chatViewModel.patientId
+                            isSentByMe = message.patientId == chatViewModel.patientId,
+                            onMessageLongClick = {
+                                selectedMsg = message
+                            },
+                            isSelected = selectedMsg?.messageId == message.messageId
                         )
                     }
                 }
@@ -146,11 +183,9 @@ fun ChatScreen(
                     onMessageChange = { messageInput = it },
                     onSendMessage = {
                         if (messageInput.isNotBlank()) {
-
                             chatViewModel.sendMessage(
                                 doctorId = currentDoctor.id, messageContent = messageInput
                             )
-
                             messageInput = ""
                         }
                     }
@@ -160,10 +195,13 @@ fun ChatScreen(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MessageBubble(
     message: Message,
-    isSentByMe: Boolean
+    isSentByMe: Boolean,
+    onMessageLongClick: (message: Message) -> Unit,
+    isSelected: Boolean
 ) {
     val bubbleColor = if (isSentByMe) {
         colorResource(id = R.color.colorPrimary)
@@ -176,6 +214,8 @@ fun MessageBubble(
     } else {
         MaterialTheme.colorScheme.onSurfaceVariant
     }
+    val backgroundColor =
+        if (isSelected) colorResource(R.color.colorPrimary).copy(0.5f) else Color.Transparent
 
     val instant = Instant.ofEpochMilli(message.timestamp)
     val formatter = DateTimeFormatter.ofPattern("h:mm a")
@@ -186,11 +226,18 @@ fun MessageBubble(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 4.dp),
+            .background(backgroundColor)
+            .padding(horizontal = 12.dp, vertical = 4.dp)
+            .combinedClickable(
+                onClick = {},
+                onLongClick = { onMessageLongClick(message) }
+            ),
+
         horizontalArrangement = if (isSentByMe) Arrangement.End else Arrangement.Start
     ) {
         Column(
-            modifier = Modifier.widthIn(max = 280.dp),
+            modifier = Modifier
+                .widthIn(max = 280.dp),
             horizontalAlignment = if (isSentByMe) Alignment.End else Alignment.Start
         ) {
             Card(
@@ -215,8 +262,7 @@ fun MessageBubble(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-
-                ) {
+            ) {
                 Text(
                     text = formattedTime,
                     fontSize = 12.sp,
