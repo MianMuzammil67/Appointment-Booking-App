@@ -20,4 +20,6 @@ class ProfileRepositoryImp @Inject constructor(
         return profileRemoteDataSource.getCurrentUserPhoto()
     }
 
+    override fun logOut() = profileRemoteDataSource.logOut()
+
 }

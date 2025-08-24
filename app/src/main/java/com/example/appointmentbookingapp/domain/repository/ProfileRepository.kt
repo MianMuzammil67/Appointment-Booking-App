@@ -4,4 +4,5 @@ interface ProfileRepository {
     fun getCurrentUserName(): String?
     fun getCurrentEmail(): String?
     fun getCurrentUserPhoto(): String?
+    fun logOut()
 }

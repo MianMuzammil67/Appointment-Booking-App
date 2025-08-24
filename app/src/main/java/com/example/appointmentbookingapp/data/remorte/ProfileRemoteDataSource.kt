@@ -21,6 +21,8 @@ class ProfileRemoteDataSource @Inject constructor(
         Log.d(logTag, "getCurrentUserPhoto called")
         return firebaseAuth.currentUser?.photoUrl.toString()
     }
-
+    fun logOut(){
+        firebaseAuth.signOut()
+    }
 
 }

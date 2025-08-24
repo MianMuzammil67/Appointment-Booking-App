@@ -40,5 +40,5 @@ class ProfileViewModel @Inject constructor(
         _photoUrl.value = profileRepository.getCurrentUserPhoto()
     }
 
-
+    fun logOut() = profileRepository.logOut()
 }
