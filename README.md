@@ -1,10 +1,10 @@
+![Status](https://img.shields.io/badge/status-under--construction-orange)
+
 # 🩺 Doctor Appointment Booking App
 
-A modern Android application built with **Kotlin** using **Jetpack Compose** for the UI, **Hilt** for dependency injection, **Firebase** for backend services, and structured using **Clean Architecture** with **MVVM** and **Kotlin Flow**.
+A modern Android application for booking doctor appointments, built with **Kotlin**, **Jetpack Compose**, **Firebase**, and **Hilt**, following **Clean Architecture** with **MVVM** and **Kotlin Flow**.
 
 ---
-
-## 🚀 Features
 
 ## ✨ Features
 
@@ -15,7 +15,6 @@ A modern Android application built with **Kotlin** using **Jetpack Compose** for
 - 💬 **Chat Functionality** – Real-time messaging between doctor and patient *(Implemented)*
 - 📲 **Modern UI** – Fully responsive UI using Jetpack Compose
 - ⚙️ **Scalable Codebase** – Built with Clean Architecture principles
-
 
 ---
 
@@ -40,4 +39,6 @@ A modern Android application built with **Kotlin** using **Jetpack Compose** for
 - [ ] 📹 Video Calling (Telehealth Support)
 - [ ] 📆 Doctor Availability Calendar Integration
 - [ ] ⭐ Ratings & Reviews for Doctors
+
+---
 
