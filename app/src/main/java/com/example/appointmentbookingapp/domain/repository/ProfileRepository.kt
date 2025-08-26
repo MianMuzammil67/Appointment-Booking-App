@@ -1,8 +1,9 @@
 package com.example.appointmentbookingapp.domain.repository
 
 interface ProfileRepository {
+    fun getCurrentUserId(): String
     fun getCurrentUserName(): String?
     fun getCurrentEmail(): String?
-    fun getCurrentUserPhoto(): String?
+    suspend fun getCurrentUserPhoto(): String?
     fun logOut()
 }

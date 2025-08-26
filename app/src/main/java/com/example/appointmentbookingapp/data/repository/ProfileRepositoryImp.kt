@@ -7,6 +7,9 @@ import javax.inject.Inject
 class ProfileRepositoryImp @Inject constructor(
     private val profileRemoteDataSource: ProfileRemoteDataSource
 ): ProfileRepository {
+    override fun getCurrentUserId(): String {
+        return profileRemoteDataSource.getCurrentUserId()
+    }
 
     override fun getCurrentUserName(): String? {
         return profileRemoteDataSource.getCurrentUserName()
@@ -16,7 +19,7 @@ class ProfileRepositoryImp @Inject constructor(
         return profileRemoteDataSource.getCurrentEmail()
     }
 
-    override fun getCurrentUserPhoto(): String {
+    override suspend fun getCurrentUserPhoto(): String? {
         return profileRemoteDataSource.getCurrentUserPhoto()
     }
 
