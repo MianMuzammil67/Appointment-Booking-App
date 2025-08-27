@@ -6,6 +6,7 @@ import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import java.time.LocalDate
 import java.time.ZoneId
@@ -20,7 +21,7 @@ class AppointmentRemoteDataSource @Inject constructor(
     private val logTag: String = "AppointmentDataSource"
 
     fun getCurrentUserId(): String {
-        return firebaseAuth.currentUser?.uid.toString()
+        return firebaseAuth.currentUser?.uid ?: throw IllegalStateException("User not logged in")
     }
 
     suspend fun getFirebaseServerTime(): LocalDate {
@@ -33,9 +34,10 @@ class AppointmentRemoteDataSource @Inject constructor(
             ?: LocalDate.now(ZoneId.of("UTC"))
     }
 
-        suspend fun bookAppointment(appointment: Appointment) {
+    suspend fun bookAppointment(appointment: Appointment) {
         try {
             val batch = firestore.batch()
+
             /**
              * - Full data: appointments/{appointmentId}
              * - Only IDs: users/{userId}/appointments/{appointmentId}
@@ -69,7 +71,7 @@ class AppointmentRemoteDataSource @Inject constructor(
         }
     }
 
-    suspend fun cancelAppointment(appointment: Appointment){
+    suspend fun cancelAppointment(appointment: Appointment) {
         try {
             val batch = firestore.batch()
 
@@ -96,7 +98,6 @@ class AppointmentRemoteDataSource @Inject constructor(
             Log.d(logTag, "cancelAppointment: ${e.message}")
         }
     }
-
 
 
     suspend fun isTimeSlotAvailable(doctorId: String, date: LocalDate, time: String): Boolean {
@@ -136,28 +137,30 @@ class AppointmentRemoteDataSource @Inject constructor(
 
     }
 
-    suspend fun getMyAppointments(): List<Appointment?>{
+    suspend fun getMyAppointments(): List<Appointment?> {
         return try {
 
             val snapshot = firestore.collection("appointments")
-                .whereEqualTo("patientId", firebaseAuth.currentUser?.uid)
+                .whereEqualTo("patientId", getCurrentUserId())
+                .orderBy("appointmentDate", Query.Direction.DESCENDING)
                 .get().await()
 
             Log.d(logTag, snapshot.documents.toString())
             snapshot.documents.map { it.toObject(Appointment::class.java) }
-        }catch (e: Exception){
+        } catch (e: Exception) {
             Log.d(logTag, "getMyAppointments: ${e.message}")
             emptyList()
         }
     }
+
     suspend fun getDoctorById(doctorId: String): DoctorItem? {
         return try {
-           val snapshot= firestore.collection("doctors")
+            val snapshot = firestore.collection("doctors")
                 .document(doctorId)
                 .get().await()
 
             snapshot.toObject(DoctorItem::class.java)
-        }catch (e:Exception){
+        } catch (e: Exception) {
             null
         }
 
