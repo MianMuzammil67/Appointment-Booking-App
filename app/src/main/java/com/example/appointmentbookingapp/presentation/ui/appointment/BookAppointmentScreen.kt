@@ -303,7 +303,8 @@ fun AppointmentCalendar(
             ) {
                 Icon(
                     Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                    contentDescription = "Previous Month"
+                    contentDescription = "Previous Month",
+                    tint = Color.Black
                 )
             }
 
@@ -312,7 +313,8 @@ fun AppointmentCalendar(
                     currentMonth.month.name.lowercase().replaceFirstChar { it.uppercase() }
                 } ${currentMonth.year}",
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
             )
 
             IconButton(
@@ -320,7 +322,8 @@ fun AppointmentCalendar(
             ) {
                 Icon(
                     Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = "Next Month"
+                    contentDescription = "Next Month",
+                    tint = Color.Black
                 )
             }
         }
@@ -334,7 +337,8 @@ fun AppointmentCalendar(
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
+                    color = Color.Black
                 )
             }
         }
