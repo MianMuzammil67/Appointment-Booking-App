@@ -12,12 +12,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PrivacyTip
@@ -34,6 +37,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,16 +47,21 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.example.appointmentbookingapp.presentation.ui.components.LogOutDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    navController: NavController,
     profileViewModel: ProfileViewModel
 ) {
     val userName by profileViewModel.userName.collectAsState()
     val userEmail by profileViewModel.userEmail.collectAsState()
     val userProfile by profileViewModel.photoUrl.collectAsState()
+
+    var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -64,15 +75,16 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.background)
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Profile Picture
             Box(
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(100.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.secondaryContainer)
             ) {
@@ -84,7 +96,7 @@ fun ProfileScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // User Name
             Text(
@@ -102,7 +114,7 @@ fun ProfileScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Profile Details Card (Basic Info)
             Card(
@@ -128,9 +140,9 @@ fun ProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Action Buttons Card (Grouped for professionalism)
+            // Action Buttons Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -145,26 +157,34 @@ fun ProfileScreen(
                         text = "Edit Profile",
                         onClick = {}
                     )
-                    HorizontalDivider() // Subtle divider
-                    // Privacy Policy
+                    HorizontalDivider()
+
+                    ProfileActionItem(
+                        icon = Icons.Default.Favorite,
+                        text = "Favorites",
+                        onClick = {
+                            navController.navigate("FavoriteScreen")
+                        }
+                    )
+                    HorizontalDivider()
                     ProfileActionItem(
                         icon = Icons.Default.PrivacyTip,
                         text = "Privacy Policy",
                         onClick = {}
                     )
                     HorizontalDivider()
-                    // About Us
                     ProfileActionItem(
                         icon = Icons.Default.Info,
                         text = "About Us",
                         onClick = { }
                     )
                     HorizontalDivider()
-                    // Logout
                     ProfileActionItem(
                         icon = Icons.AutoMirrored.Filled.Logout,
                         text = "Logout",
-                        onClick = { profileViewModel.logOut() },
+                        onClick = {
+                            showDialog = true
+                        },
                         isDestructive = true // Indicates a destructive action
                     )
                 }
@@ -172,6 +192,19 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
         }
+        if (showDialog) {
+            LogOutDialog(
+                onDismiss = { showDialog = false },
+                onConfirm = {
+                    profileViewModel.logOut()
+                    navController.navigate("SignIn") {
+                        popUpTo(0) { inclusive = true }
+                    }
+                    showDialog = false
+                }
+            )
+        }
+
     }
 }
 

@@ -105,7 +105,7 @@ fun MainApp() {
                 FavoriteScreen(navController, sharedDoctorViewModel, favoriteViewModel)
             }
             composable("ProfileScreen") {
-                ProfileScreen(profileViewModel)
+                ProfileScreen(navController,profileViewModel)
             }
             composable("MyAppointmentsScreen") {
                 MyAppointments(navController, appointmentViewModel)
