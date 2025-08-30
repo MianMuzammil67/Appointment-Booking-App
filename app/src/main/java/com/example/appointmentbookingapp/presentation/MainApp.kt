@@ -33,6 +33,7 @@ import com.example.appointmentbookingapp.presentation.ui.navigation.BottomNaviga
 import com.example.appointmentbookingapp.presentation.ui.profile.ProfileScreen
 import com.example.appointmentbookingapp.presentation.ui.profile.ProfileViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.DoctorChatSharedViewModel
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.SharedCategoryViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -48,6 +49,7 @@ fun MainApp() {
     val chatViewModel: ChatViewModel = hiltViewModel()
     val doctorChatSharedViewModel: DoctorChatSharedViewModel = hiltViewModel()
     val chatListViewModel: ChatListViewModel = hiltViewModel()
+    val sharedCategoryViewModel: SharedCategoryViewModel = hiltViewModel()
 
 
     val currentUser = FirebaseAuth.getInstance().currentUser
@@ -81,7 +83,8 @@ fun MainApp() {
                     sharedDoctorViewModel,
                     homeViewModel,
                     favoriteViewModel,
-                    profileViewModel
+                    profileViewModel,
+                    sharedCategoryViewModel
                 )
             }
             composable("DoctorDetail") {
@@ -96,16 +99,22 @@ fun MainApp() {
                 BookAppointmentScreen(navController, sharedDoctorViewModel)
             }
             composable("AllDoctorCategories") {
-                AllDoctorCategories(navController, homeViewModel)
+                AllDoctorCategories(navController, homeViewModel, sharedCategoryViewModel)
             }
             composable("DoctorScreen") {
-                DoctorScreen(navController, homeViewModel, sharedDoctorViewModel, favoriteViewModel)
+                DoctorScreen(
+                    navController,
+                    homeViewModel,
+                    sharedDoctorViewModel,
+                    favoriteViewModel,
+                    sharedCategoryViewModel
+                )
             }
             composable("FavoriteScreen") {
                 FavoriteScreen(navController, sharedDoctorViewModel, favoriteViewModel)
             }
             composable("ProfileScreen") {
-                ProfileScreen(navController,profileViewModel)
+                ProfileScreen(navController, profileViewModel)
             }
             composable("MyAppointmentsScreen") {
                 MyAppointments(navController, appointmentViewModel)

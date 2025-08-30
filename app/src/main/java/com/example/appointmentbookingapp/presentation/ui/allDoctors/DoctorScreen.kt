@@ -32,6 +32,7 @@ import com.example.appointmentbookingapp.presentation.ui.components.DocCard
 import com.example.appointmentbookingapp.presentation.ui.favorite.viewModel.FavoriteViewModel
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.HomeViewModel
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.SharedCategoryViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,19 +41,26 @@ fun DoctorScreen(
     navController: NavHostController,
     homeViewModel: HomeViewModel = hiltViewModel(),
     sharedDoctorViewModel: SharedDoctorViewModel = viewModel(),
-    favoriteViewModel: FavoriteViewModel = hiltViewModel()
+    favoriteViewModel: FavoriteViewModel = hiltViewModel(),
+    sharedCategoryViewModel: SharedCategoryViewModel = viewModel()
 ) {
     val favoriteIds by favoriteViewModel.favoriteIds.collectAsState()
 
     val scope = rememberCoroutineScope()
     val allDoctors by homeViewModel.allDoctorState.collectAsState()
+    val selectedCategory by sharedCategoryViewModel.selectedCategory.collectAsState()
 
     Scaffold(
         Modifier
             .fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("All Doctors", fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        selectedCategory ?: "All Doctors",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -78,7 +86,12 @@ fun DoctorScreen(
             }
 
             is UiState.Success -> {
-                val categoryList = state.data
+
+                val categoryList = selectedCategory?.let { category ->
+                    state.data.filter { it.docCategory.equals(category, ignoreCase = true) }
+                } ?: state.data
+
+//                val categoryList = state.data
                 LazyColumn(
                     modifier = Modifier
                         .padding(contentPadding)

@@ -23,19 +23,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.presentation.ui.home.components.CategoryItem
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.HomeViewModel
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.SharedCategoryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AllDoctorCategories(
     navController: NavHostController,
-    viewModel: HomeViewModel = hiltViewModel()
+    viewModel: HomeViewModel = hiltViewModel(),
+    sharedCategoryViewModel: SharedCategoryViewModel = viewModel()
 ) {
-
     val allCategories by viewModel.allCategoriesState.collectAsState()
 
     Scaffold(
@@ -76,6 +78,7 @@ fun AllDoctorCategories(
                 ) {
                     items(categoryList.size) { index ->
                         CategoryItem(categoryList[index]) { itemName ->
+                            sharedCategoryViewModel.setSelectedCategory(itemName)
                             navController.navigate("DoctorScreen")
                         }
                     }

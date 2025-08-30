@@ -55,6 +55,7 @@ import com.example.appointmentbookingapp.presentation.ui.home.components.ImageSl
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.HomeViewModel
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
 import com.example.appointmentbookingapp.presentation.ui.profile.ProfileViewModel
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.SharedCategoryViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -63,7 +64,8 @@ fun HomeScreen(
     sharedDoctorViewModel: SharedDoctorViewModel,
     homeViewModel: HomeViewModel,
     favoriteViewModel: FavoriteViewModel,
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    sharedCategoryViewModel: SharedCategoryViewModel
 ) {
 
     val userName by profileViewModel.userName.collectAsState()
@@ -94,7 +96,7 @@ fun HomeScreen(
             BannerSection(bannerState)
             Spacer(modifier = Modifier.height(16.dp))
 
-            CategorySection(categoryState, navController)
+            CategorySection(categoryState, navController, sharedCategoryViewModel)
             Spacer(modifier = Modifier.height(16.dp))
 
             DoctorSection(
@@ -107,6 +109,7 @@ fun HomeScreen(
                     Log.d("HomeScreen", "HomeScreen: ${currentDoctor.id}")
                 },
                 onSeeAllClicked = {
+                    sharedCategoryViewModel.setSelectedCategory(null)
                     navController.navigate("DoctorScreen")
                 },
                 favoriteViewModel = favoriteViewModel,
@@ -184,7 +187,8 @@ fun BannerSection(state: UiState<List<BannerItem>>) {
 @Composable
 fun CategorySection(
     categoryState: UiState<List<DoctorCategory>>,
-    navController: NavHostController
+    navController: NavHostController,
+    sharedCategoryViewModel: SharedCategoryViewModel
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -221,6 +225,7 @@ fun CategorySection(
 
                 categoryState.data.forEach { category ->
                     CategoryItem(category = category) { itemName ->
+                        sharedCategoryViewModel.setSelectedCategory(itemName)
                         navController.navigate("DoctorScreen")
                     }
                 }
@@ -309,12 +314,14 @@ fun HomeScreenPreview() {
     val homeViewModel: HomeViewModel = hiltViewModel()
     val favoriteViewModel: FavoriteViewModel = hiltViewModel()
     val profileViewModel: ProfileViewModel = hiltViewModel()
+    val sharedCategoryViewModel: SharedCategoryViewModel = hiltViewModel()
 
     HomeScreen(
         navController = rememberNavController(),
         sharedDoctorViewModel = sharedDoctorViewModel,
         homeViewModel = homeViewModel,
         favoriteViewModel = favoriteViewModel,
-        profileViewModel = profileViewModel
+        profileViewModel = profileViewModel,
+        sharedCategoryViewModel = sharedCategoryViewModel
     )
 }
