@@ -1,0 +1,44 @@
+package com.example.appointmentbookingapp.presentation.ui.splash
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.appointmentbookingapp.domain.model.User
+import com.example.appointmentbookingapp.domain.repository.ProfileRepository
+import com.example.appointmentbookingapp.util.UserRole
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
+import kotlinx.coroutines.launch
+
+@HiltViewModel
+class SplashViewModel @Inject constructor(
+    private val profileRepository: ProfileRepository
+) : ViewModel() {
+
+    var startDestination by mutableStateOf<String>("SignIn")
+    var currentUserData: User? by mutableStateOf(null)
+
+    var isLoading by mutableStateOf(true)
+
+    init {
+        loadUser()
+    }
+    private fun loadUser() = viewModelScope.launch {
+        if (!profileRepository.isUserLoggedIn()) {
+            currentUserData = null
+            startDestination = "SignIn"
+        } else {
+            currentUserData = profileRepository.getCurrentUserData()
+            startDestination = when (currentUserData?.role) {
+                UserRole.PATIENT -> "HomeScreen"
+                UserRole.DOCTOR -> "DoctorHomeScreen"
+                else -> "SignIn"
+            }
+        }
+
+        isLoading = false
+    }
+
+}

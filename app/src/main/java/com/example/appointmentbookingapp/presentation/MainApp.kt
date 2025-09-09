@@ -24,6 +24,7 @@ import com.example.appointmentbookingapp.presentation.ui.chat.ChatListViewModel
 import com.example.appointmentbookingapp.presentation.ui.chat.ChatScreen
 import com.example.appointmentbookingapp.presentation.ui.chat.ChatViewModel
 import com.example.appointmentbookingapp.presentation.ui.doctorDetail.DocDetailScreen
+import com.example.appointmentbookingapp.presentation.ui.doctorHome.DoctorHomeScreen
 import com.example.appointmentbookingapp.presentation.ui.favorite.FavoriteScreen
 import com.example.appointmentbookingapp.presentation.ui.favorite.viewModel.FavoriteViewModel
 import com.example.appointmentbookingapp.presentation.ui.home.HomeScreen
@@ -34,11 +35,10 @@ import com.example.appointmentbookingapp.presentation.ui.profile.ProfileScreen
 import com.example.appointmentbookingapp.presentation.ui.profile.ProfileViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.DoctorChatSharedViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.SharedCategoryViewModel
-import com.google.firebase.auth.FirebaseAuth
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainApp() {
+fun MainApp(startDestination: String) {
     val navController = rememberNavController()
 
     val sharedDoctorViewModel: SharedDoctorViewModel = hiltViewModel()
@@ -50,10 +50,6 @@ fun MainApp() {
     val doctorChatSharedViewModel: DoctorChatSharedViewModel = hiltViewModel()
     val chatListViewModel: ChatListViewModel = hiltViewModel()
     val sharedCategoryViewModel: SharedCategoryViewModel = hiltViewModel()
-
-
-    val currentUser = FirebaseAuth.getInstance().currentUser
-    val start = if (currentUser != null) "HomeScreen" else "SignIn"
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route
@@ -72,7 +68,7 @@ fun MainApp() {
     ) {
         NavHost(
             navController = navController,
-            startDestination = start,
+            startDestination = startDestination,
             modifier = Modifier.padding(bottom = bottomPadding)
         ) {
             composable("SignUp") { SignupScreen(navController) }
@@ -125,6 +121,10 @@ fun MainApp() {
             composable("ChatScreen") {
                 ChatScreen(navController, chatViewModel, doctorChatSharedViewModel.currentDoctor)
             }
+            composable ("DoctorHomeScreen"){
+                DoctorHomeScreen(navController)
+            }
+
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.appointmentbookingapp.data.remorte
 
 import android.util.Log
+import com.example.appointmentbookingapp.domain.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -11,8 +12,8 @@ class ProfileRemoteDataSource @Inject constructor(
     private val firestore: FirebaseFirestore
 ) {
     private val logTag = "ProfileRemoteDataSource"
-    fun getCurrentUserId(): String {
-        return firebaseAuth.currentUser?.uid ?: throw IllegalStateException("User not logged in")
+    fun getCurrentUserId(): String? {
+        return firebaseAuth.currentUser?.uid
     }
 
     fun getCurrentUserName(): String? {
@@ -25,9 +26,9 @@ class ProfileRemoteDataSource @Inject constructor(
         return firebaseAuth.currentUser?.email
     }
 
-
-    suspend fun getCurrentUserPhoto(): String {
-        val userId = getCurrentUserId()
+    suspend fun getCurrentUserData(): User? {
+        Log.d(logTag, "getCurrentUserData called")
+        val userId = getCurrentUserId() ?: return null
         Log.d(logTag, "Current user ID: $userId")
 
         try {
@@ -36,20 +37,20 @@ class ProfileRemoteDataSource @Inject constructor(
                 .get()
                 .await()
 
+            val user = snapshot.toObject(User::class.java)
+            Log.d(logTag, "userData: \"${user?.name}\"")
 
-            val profileUrl = snapshot.getString("profileUrl") ?: ""
-            Log.d(logTag, "profileUrl: \"$profileUrl\"")
-
-            return profileUrl
+            return user
         } catch (e: Exception) {
-            Log.d(logTag, "getCurrentUserPhoto error: ${e.message}")
+            Log.d(logTag, "getCurrentUserData error: ${e.message}")
         }
 
-        return ""
+        return null
 
+    }
 
-        //        return firebaseAuth.currentUser?.photoUrl.toString()
-
+    fun isUserLoggedIn(): Boolean {
+        return firebaseAuth.currentUser != null
     }
 
     fun logOut() {

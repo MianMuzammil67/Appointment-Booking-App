@@ -22,6 +22,7 @@ class AppointmentRemoteDataSource @Inject constructor(
 
     fun getCurrentUserId(): String {
         return firebaseAuth.currentUser?.uid ?: throw IllegalStateException("User not logged in")
+        return firebaseAuth.currentUser?.uid?:""
     }
 
     suspend fun getFirebaseServerTime(): LocalDate {

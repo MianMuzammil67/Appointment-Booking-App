@@ -3,6 +3,7 @@ package com.example.appointmentbookingapp.presentation.ui.auth
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.appointmentbookingapp.domain.model.User
+import com.example.appointmentbookingapp.util.UserRole
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
@@ -16,6 +17,7 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
 ) : ViewModel() {
 
     private val _signUp = MutableStateFlow<AuthState>(AuthState.Initial)
@@ -39,7 +41,7 @@ class AuthViewModel @Inject constructor(
             user?.updateProfile(profileUpdates)?.await()
 
             user.let {
-                val userData = User(name, email, password, profilePicture)
+                val userData = User(name, email, password, profilePicture, role = UserRole.PATIENT) //Patient as Role is temporary for testing
                 if (it != null) {
                     saveDataToFirestore(it.uid, userData)
                 }
@@ -59,6 +61,7 @@ class AuthViewModel @Inject constructor(
         try {
             firebaseAuth.signInWithEmailAndPassword(email, password).await()
             _signIn.value = AuthState.Success
+
         } catch (e: Exception) {
             _signIn.value = AuthState.Error
 
