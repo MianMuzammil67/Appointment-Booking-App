@@ -21,7 +21,6 @@ class AppointmentRemoteDataSource @Inject constructor(
     private val logTag: String = "AppointmentDataSource"
 
     fun getCurrentUserId(): String {
-        return firebaseAuth.currentUser?.uid ?: throw IllegalStateException("User not logged in")
         return firebaseAuth.currentUser?.uid?:""
     }
 
