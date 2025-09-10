@@ -31,8 +31,10 @@ import com.example.appointmentbookingapp.presentation.ui.home.HomeScreen
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.HomeViewModel
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
 import com.example.appointmentbookingapp.presentation.ui.navigation.BottomNavigationBar
+import com.example.appointmentbookingapp.presentation.ui.profile.CompleteProfileScreen
 import com.example.appointmentbookingapp.presentation.ui.profile.ProfileScreen
 import com.example.appointmentbookingapp.presentation.ui.profile.ProfileViewModel
+import com.example.appointmentbookingapp.presentation.ui.roleselection.RoleSelectionScreen
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.DoctorChatSharedViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.SharedCategoryViewModel
 
@@ -123,6 +125,12 @@ fun MainApp(startDestination: String) {
             }
             composable ("DoctorHomeScreen"){
                 DoctorHomeScreen(navController)
+            }
+            composable ("RoleSelectionScreen"){
+                RoleSelectionScreen()
+            }
+            composable("CompleteProfileScreen"){
+                CompleteProfileScreen()
             }
 
         }
