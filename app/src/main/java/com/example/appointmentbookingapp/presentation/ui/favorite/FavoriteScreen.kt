@@ -118,6 +118,8 @@ fun FavoriteScreen(
                     Text("Failed to load Favorite doctors", color = Color.Red)
                 }
 
+                else -> {}
+
             }
 
         }

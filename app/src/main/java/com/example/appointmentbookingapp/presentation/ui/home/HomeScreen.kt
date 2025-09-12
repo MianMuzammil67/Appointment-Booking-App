@@ -180,7 +180,12 @@ fun BannerSection(state: UiState<List<BannerItem>>) {
             ImageSlider(imageUrls = imageUrls)
         }
 
-        is UiState.Error -> Text("Error: ${state.message}", color = Color.Red)
+        is UiState.Error -> {
+            Text("Error: ${state.message}", color = Color.Red)
+        }
+
+        else -> {}
+
     }
 }
 
@@ -303,6 +308,8 @@ fun DoctorSection(
         }
 
         is UiState.Error -> Text("Failed to load doctors", color = Color.Red)
+        else -> {}
+
     }
 }
 

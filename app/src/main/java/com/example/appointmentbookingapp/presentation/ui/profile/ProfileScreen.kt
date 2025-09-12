@@ -197,7 +197,7 @@ fun ProfileScreen(
                 onDismiss = { showDialog = false },
                 onConfirm = {
                     profileViewModel.logOut()
-                    navController.navigate("SignIn") {
+                    navController.navigate("RoleSelectionScreen") {
                         popUpTo(0) { inclusive = true }
                     }
                     showDialog = false

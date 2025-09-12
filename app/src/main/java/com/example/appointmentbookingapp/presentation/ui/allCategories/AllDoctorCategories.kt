@@ -3,7 +3,7 @@ package com.example.appointmentbookingapp.presentation.ui.allCategories
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridCells.Fixed
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -73,7 +73,7 @@ fun AllDoctorCategories(
             is UiState.Success -> {
                 val categoryList = state.data
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
+                    columns = Fixed(3),
                     modifier = Modifier.padding(contentPadding)
                 ) {
                     items(categoryList.size) { index ->
@@ -83,7 +83,8 @@ fun AllDoctorCategories(
                         }
                     }
                 }
-            }
+            }else -> {}
+
         }
     }
 

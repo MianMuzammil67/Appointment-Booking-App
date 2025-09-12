@@ -157,6 +157,8 @@ fun MyAppointments(
                     Text("Failed to load appointments", color = Color.Red)
                 }
 
+                else -> {}
+
             }
 
         }

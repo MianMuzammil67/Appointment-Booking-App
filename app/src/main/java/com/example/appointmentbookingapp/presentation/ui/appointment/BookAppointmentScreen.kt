@@ -211,7 +211,7 @@ fun BookAppointmentScreen(
                         firebaseToday = firebaseDate
                     )
                     Log.d("appointmentScreen", firebaseDate.toString())
-                }
+                }else -> {}
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -400,6 +400,6 @@ fun AppointmentCalendar(
 
 @Preview
 @Composable
-fun BookAppointmentPreview(modifier: Modifier = Modifier) {
+fun BookAppointmentPreview() {
     BookAppointmentScreen(navController = rememberNavController())
 }

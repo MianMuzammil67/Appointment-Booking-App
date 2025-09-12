@@ -111,7 +111,7 @@ fun DoctorScreen(
                             onToggleFavorite = { favoriteViewModel.toggleFavorite(doctor) })
                     }
                 }
-            }
+            }else -> {}
         }
     }
 }
