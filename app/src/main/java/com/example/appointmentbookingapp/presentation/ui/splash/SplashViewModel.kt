@@ -17,7 +17,7 @@ class SplashViewModel @Inject constructor(
     private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
-    var startDestination by mutableStateOf<String>("SignIn")
+    var startDestination by mutableStateOf("RoleSelectionScreen")
     var currentUserData: User? by mutableStateOf(null)
 
     var isLoading by mutableStateOf(true)
@@ -28,13 +28,13 @@ class SplashViewModel @Inject constructor(
     private fun loadUser() = viewModelScope.launch {
         if (!profileRepository.isUserLoggedIn()) {
             currentUserData = null
-            startDestination = "SignIn"
+            startDestination = "RoleSelectionScreen"
         } else {
             currentUserData = profileRepository.getCurrentUserData()
             startDestination = when (currentUserData?.role) {
                 UserRole.PATIENT -> "HomeScreen"
                 UserRole.DOCTOR -> "DoctorHomeScreen"
-                else -> "SignIn"
+                else -> "RoleSelectionScreen"
             }
         }
 

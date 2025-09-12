@@ -37,6 +37,7 @@ import com.example.appointmentbookingapp.presentation.ui.profile.ProfileViewMode
 import com.example.appointmentbookingapp.presentation.ui.roleselection.RoleSelectionScreen
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.DoctorChatSharedViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.SharedCategoryViewModel
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -52,6 +53,9 @@ fun MainApp(startDestination: String) {
     val doctorChatSharedViewModel: DoctorChatSharedViewModel = hiltViewModel()
     val chatListViewModel: ChatListViewModel = hiltViewModel()
     val sharedCategoryViewModel: SharedCategoryViewModel = hiltViewModel()
+    val roleSharedViewModel: UserRoleSharedViewModel = hiltViewModel()
+    val authViewModel: AuthViewModel = hiltViewModel()
+
 
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry?.destination?.route

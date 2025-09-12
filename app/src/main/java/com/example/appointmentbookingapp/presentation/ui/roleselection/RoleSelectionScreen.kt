@@ -25,10 +25,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
+import com.example.appointmentbookingapp.util.UserRole
 
 @Composable
-fun RoleSelectionScreen() {
+fun RoleSelectionScreen(
+    navController: NavController,
+    roleViewModel: UserRoleSharedViewModel = hiltViewModel()
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -54,20 +62,26 @@ fun RoleSelectionScreen() {
             Text(
                 text = "Select Role",
                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                color = Color.Black,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-
             Text(
                 text = "Choose your role to continue using the app and access features tailored to you.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.Gray,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
-            RoleButton("Doctor") {}
+            RoleButton("Doctor") {
+                roleViewModel.setUserRole(UserRole.DOCTOR)
+                navController.navigate("SignUp")
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            RoleButton("Patient") {}
+            RoleButton("Patient") {
+                roleViewModel.setUserRole(UserRole.PATIENT)
+                navController.navigate("SignUp")
+            }
         }
     }
 }
@@ -94,5 +108,5 @@ fun RoleButton(roleName: String, onClick: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewRoleSelectionScreen() {
-    RoleSelectionScreen()
+    RoleSelectionScreen(rememberNavController())
 }
