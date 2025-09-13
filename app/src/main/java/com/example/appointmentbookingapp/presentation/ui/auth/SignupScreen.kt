@@ -23,7 +23,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,37 +35,44 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
+import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.presentation.ui.auth.components.ImageWithBorder
 import com.example.appointmentbookingapp.presentation.ui.auth.components.TextInputField
 import com.example.appointmentbookingapp.presentation.ui.auth.components.WelcomeText
-import kotlinx.coroutines.launch
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
+import com.example.appointmentbookingapp.util.UserRole
 
 @Composable
-fun SignupScreen(navController: NavHostController) {
-    val viewModel: AuthViewModel = hiltViewModel()
-    val uiState = viewModel.signUpState.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
+fun SignupScreen(
+    navController: NavHostController,
+    viewModel: AuthViewModel = hiltViewModel(),
+    roleSharedViewModel: UserRoleSharedViewModel = hiltViewModel()
+) {
+    val userRole by roleSharedViewModel.userRole.collectAsState()
+    val signUpResponse by viewModel.signUpState.collectAsState()
 
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
+
+    val isLoading = signUpResponse is UiState.Loading
+    val successResponse = (signUpResponse as? UiState.Success)?.data
+    val errorMessage = (signUpResponse as? UiState.Error)?.message
 
     val context = LocalContext.current
-    LaunchedEffect(uiState.value) {
-        when (uiState.value) {
 
-            is AuthState.Success -> {
+    LaunchedEffect(successResponse, errorMessage) {
+        when {
+            successResponse != null -> {
                 Toast.makeText(context, "SignUp Successful", Toast.LENGTH_SHORT).show()
-//                navController.navigate("HomeScreen")
-                navController.navigate("HomeScreen") {
-                    popUpTo("SignUp") { inclusive = true }
-                }
+                navController.navigate(
+                    if (userRole == UserRole.DOCTOR) "DoctorHomeScreen"
+                    else "HomeScreen"
+                )
             }
-            is AuthState.Error -> {
-                Toast.makeText(context, "SignUp Filed", Toast.LENGTH_SHORT).show()
+            errorMessage != null -> {
+                Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
             }
-            else -> {}
         }
     }
 
@@ -119,28 +125,18 @@ fun SignupScreen(navController: NavHostController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            TextInputField(
-                tittle = " Phone NO",
-                label = "Enter Your Phone NO",
-                isPassword = false,
-                value = phone,
-                onValueChange = { phone = it }
-            )
 
             Spacer(modifier = Modifier.height(16.dp))
-//            ActionButton(
-//                onClick = {},
-//                buttonText = "Sign Up"
-//            )
-
-            if (uiState.value is AuthState.Loading) {
+            if (isLoading) {
                 CircularProgressIndicator()
             } else {
                 Button(
                     onClick = {
-                        coroutineScope.launch {
-                            viewModel.signUp(name, email, password, "")
-                        }
+                        viewModel.signUp(
+                            name, email, password, "",
+                            userRole,
+                            doctorExtras = null
+                        )
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -148,7 +144,7 @@ fun SignupScreen(navController: NavHostController) {
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorResource(id = R.color.colorPrimary)
                     ),
-                    enabled = email.isNotEmpty() && password.isNotEmpty() && (uiState.value == AuthState.Initial || uiState.value is AuthState.Error),
+                    enabled = email.isNotEmpty() && password.isNotEmpty(),
                     shape = RoundedCornerShape(10.dp)
                 ) {
                     Text(text = "Sign Up")
@@ -188,8 +184,6 @@ fun SignupScreen(navController: NavHostController) {
                     color = colorResource(id = R.color.colorPrimary),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.clickable {
-//                        navController.navigate("SignIn")
-
                         navController.navigate("SignIn") {
                             popUpTo("SignUp") { inclusive = true }
                         }

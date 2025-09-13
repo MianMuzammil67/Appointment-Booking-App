@@ -17,6 +17,7 @@ import com.example.appointmentbookingapp.presentation.ui.allDoctors.DoctorScreen
 import com.example.appointmentbookingapp.presentation.ui.appointment.AppointmentViewModel
 import com.example.appointmentbookingapp.presentation.ui.appointment.BookAppointmentScreen
 import com.example.appointmentbookingapp.presentation.ui.appointment.MyAppointments
+import com.example.appointmentbookingapp.presentation.ui.auth.AuthViewModel
 import com.example.appointmentbookingapp.presentation.ui.auth.SignInScreen
 import com.example.appointmentbookingapp.presentation.ui.auth.SignupScreen
 import com.example.appointmentbookingapp.presentation.ui.chat.ChatListScreen
@@ -79,6 +80,7 @@ fun MainApp(startDestination: String) {
         ) {
             composable("SignUp") { SignupScreen(navController) }
             composable("SignIn") { SignInScreen(navController) }
+            composable("SignUp") { SignupScreen(navController,authViewModel, roleSharedViewModel) }
             composable("HomeScreen") {
                 HomeScreen(
                     navController,
@@ -131,7 +133,7 @@ fun MainApp(startDestination: String) {
                 DoctorHomeScreen(navController)
             }
             composable ("RoleSelectionScreen"){
-                RoleSelectionScreen()
+                RoleSelectionScreen(navController, roleSharedViewModel)
             }
             composable("CompleteProfileScreen"){
                 CompleteProfileScreen()
