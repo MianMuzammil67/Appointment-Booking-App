@@ -78,9 +78,8 @@ fun MainApp(startDestination: String) {
             startDestination = startDestination,
             modifier = Modifier.padding(bottom = bottomPadding)
         ) {
-            composable("SignUp") { SignupScreen(navController) }
-            composable("SignIn") { SignInScreen(navController) }
             composable("SignUp") { SignupScreen(navController,authViewModel, roleSharedViewModel) }
+            composable("SignIn") { SignInScreen(navController,authViewModel) }
             composable("HomeScreen") {
                 HomeScreen(
                     navController,

@@ -3,6 +3,7 @@ package com.example.appointmentbookingapp.presentation.ui.auth
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,7 +24,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,42 +37,42 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
+import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.presentation.ui.auth.components.ImageWithBorder
 import com.example.appointmentbookingapp.presentation.ui.auth.components.TextInputField
 import com.example.appointmentbookingapp.presentation.ui.auth.components.WelcomeText
-import kotlinx.coroutines.launch
 
 @Composable
-fun SignInScreen(navController: NavHostController) {
+fun SignInScreen(
+    navController: NavHostController,
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
 
-    val viewModel: AuthViewModel = hiltViewModel()
-    val uiState = viewModel.signInState.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
+    val uiState by authViewModel.signInState.collectAsState()
 
-    var email by remember {
-        mutableStateOf("")
-    }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    val isLoading = uiState is UiState.Loading
+    val isSuccess = (uiState as? UiState.Success)?.data
+    val isError = (uiState as? UiState.Error)?.message
+
     val context = LocalContext.current
-    LaunchedEffect(uiState.value) {
-        when (uiState.value) {
-            is AuthState.Success -> {
-                Toast.makeText(context, "SignIn Successful", Toast.LENGTH_SHORT).show()
-//                navController.navigate("HomeScreen")
+    LaunchedEffect(isSuccess, isError) {
+        when {
+            isSuccess != null -> {
+                Toast.makeText(context, "Sign In Successful", Toast.LENGTH_SHORT).show()
                 navController.navigate("HomeScreen") {
                     popUpTo("SignIn") { inclusive = true }
                 }
             }
 
-            is AuthState.Error -> {
-                Toast.makeText(context, "SignIn Filed", Toast.LENGTH_SHORT).show()
+            isError != null -> {
+                Toast.makeText(context, isError, Toast.LENGTH_SHORT).show()
             }
-
-            else -> {}
         }
-    }
 
+    }
 
     Column(
         modifier = Modifier
@@ -121,14 +121,12 @@ fun SignInScreen(navController: NavHostController) {
             }
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (uiState.value is AuthState.Loading) {
+            if (isLoading) {
                 CircularProgressIndicator()
             } else {
                 Button(
                     onClick = {
-                        coroutineScope.launch {
-                            viewModel.signIn(email, password)
-                        }
+                        authViewModel.signIn(email, password)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -136,7 +134,8 @@ fun SignInScreen(navController: NavHostController) {
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorResource(id = R.color.colorPrimary)
                     ),
-                    enabled = email.isNotEmpty() && password.isNotEmpty() && (uiState.value == AuthState.Initial || uiState.value is AuthState.Error),
+                    enabled = email.isNotEmpty() && password.isNotEmpty(),
+//                    enabled = email.isNotEmpty() && password.isNotEmpty() && (uiState.value == AuthState.Initial || uiState.value is AuthState.Error),
 
                     shape = RoundedCornerShape(10.dp)
                 ) {
@@ -176,8 +175,10 @@ fun SignInScreen(navController: NavHostController) {
                     text = "Sign Up",
                     color = colorResource(id = R.color.colorPrimary),
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.clickable {
-//                        navController.navigate("SignUp")
+                    modifier = Modifier.clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
                         navController.navigate("SignUp") {
                             popUpTo("SignIn") { inclusive = true }
                         }

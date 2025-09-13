@@ -21,7 +21,7 @@ class AuthViewModel @Inject constructor(
     private val _signUp = MutableStateFlow<UiState<Unit>>(UiState.Initial)
     val signUpState = _signUp.asStateFlow()
 
-    private val _signIn = MutableStateFlow<UiState<Unit>>(UiState.Loading)
+    private val _signIn = MutableStateFlow<UiState<Unit>>(UiState.Initial)
     val signInState = _signIn.asStateFlow()
 
 
@@ -73,11 +73,4 @@ class AuthViewModel @Inject constructor(
 
     }
 
-}
-
-sealed class AuthState {
-    data object Initial : AuthState()
-    data object Loading : AuthState()
-    data object Success : AuthState()
-    data object Error : AuthState()
 }
