@@ -1,16 +1,19 @@
 package com.example.appointmentbookingapp.di
 
 import com.example.appointmentbookingapp.data.remorte.AppointmentRemoteDataSource
+import com.example.appointmentbookingapp.data.remorte.AuthRemoteDataSource
 import com.example.appointmentbookingapp.data.remorte.ChatRemoteDataSource
 import com.example.appointmentbookingapp.data.remorte.FavoritesRemoteDataSource
 import com.example.appointmentbookingapp.data.remorte.HomeRemoteDataSource
 import com.example.appointmentbookingapp.data.remorte.ProfileRemoteDataSource
 import com.example.appointmentbookingapp.data.repository.AppointmentRepositoryImpl
+import com.example.appointmentbookingapp.data.repository.AuthRepositoryImpl
 import com.example.appointmentbookingapp.data.repository.ChatRepositoryImpl
 import com.example.appointmentbookingapp.data.repository.FavoriteRepositoryImpl
 import com.example.appointmentbookingapp.data.repository.HomeRepositoryImpl
 import com.example.appointmentbookingapp.data.repository.ProfileRepositoryImp
 import com.example.appointmentbookingapp.domain.repository.AppointmentRepository
+import com.example.appointmentbookingapp.domain.repository.AuthRepository
 import com.example.appointmentbookingapp.domain.repository.ChatRepository
 import com.example.appointmentbookingapp.domain.repository.FavoriteRepository
 import com.example.appointmentbookingapp.domain.repository.HomeRepository
@@ -71,6 +74,12 @@ object AppModule {
     @Singleton
     fun provideProfileRepository(profileRemoteDataSource: ProfileRemoteDataSource): ProfileRepository {
         return ProfileRepositoryImp(profileRemoteDataSource)
+    }
+
+    @Singleton
+    @Provides
+    fun provideAuthRepository(authRemoteDataSource: AuthRemoteDataSource): AuthRepository {
+        return AuthRepositoryImpl(authRemoteDataSource)
     }
 
 }

@@ -13,4 +13,7 @@ data class DoctorItem(
     val languagesSpoken: List<String>? = emptyList(),
     val gender: String? = "",
     val reviewsCount: Int? = 0,
-    )
+    val role: String = "doctor",
+    val email: String = "",
+    val password: String = "",
+)

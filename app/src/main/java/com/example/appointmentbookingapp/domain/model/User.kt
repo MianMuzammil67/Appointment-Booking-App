@@ -5,5 +5,5 @@ data class User(
     val email: String = "",
     val password: String = "",
     val profileUrl: String = "",
-    val role: String = "patient" // //Patient as Role is temporary for testing
+    val role: String = "patient"
 )

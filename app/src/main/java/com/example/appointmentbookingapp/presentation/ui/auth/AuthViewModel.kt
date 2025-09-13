@@ -1,83 +1,74 @@
 package com.example.appointmentbookingapp.presentation.ui.auth
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.appointmentbookingapp.domain.model.DoctorExtras
 import com.example.appointmentbookingapp.domain.model.User
-import com.example.appointmentbookingapp.util.UserRole
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserProfileChangeRequest
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.appointmentbookingapp.domain.repository.AuthRepository
+import com.example.appointmentbookingapp.presentation.state.UiState
+import com.example.appointmentbookingapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val firestore: FirebaseFirestore,
-    private val firebaseAuth: FirebaseAuth,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _signUp = MutableStateFlow<AuthState>(AuthState.Initial)
+    private val _signUp = MutableStateFlow<UiState<Unit>>(UiState.Initial)
     val signUpState = _signUp.asStateFlow()
 
-    private val _signIn = MutableStateFlow<AuthState>(AuthState.Initial)
+    private val _signIn = MutableStateFlow<UiState<Unit>>(UiState.Loading)
     val signInState = _signIn.asStateFlow()
 
-    suspend fun signUp(name: String, email: String, password: String, profilePicture: String) {
-        _signUp.value = AuthState.Loading
-        try {
-            val authResult = firebaseAuth
-                .createUserWithEmailAndPassword(email, password)
-                .await()
-            val user = authResult.user
 
-            val profileUpdates = UserProfileChangeRequest.Builder()
-                .setDisplayName(name)
-                .build()
+    fun signUp(
+        name: String,
+        email: String,
+        password: String,
+        profilePicture: String,
+        role: String,
+        doctorExtras: DoctorExtras?
+    ) = viewModelScope.launch {
+        val userData = User(
+            name = name,
+            email = email,
+            password = password,
+            profileUrl = profilePicture,
+            role = role
+        )
 
-            user?.updateProfile(profileUpdates)?.await()
-
-            user.let {
-                val userData = User(name, email, password, profilePicture, role = UserRole.PATIENT) //Patient as Role is temporary for testing
-                if (it != null) {
-                    saveDataToFirestore(it.uid, userData)
-                }
+        _signUp.value = UiState.Loading
+        when (val result = authRepository.signUp(userData, role, doctorExtras)) {
+            is Resource.Success -> {
+                _signUp.value = UiState.Success(Unit)
             }
 
-            _signUp.value = AuthState.Success
+            is Resource.Error -> {
+                _signUp.value = UiState.Error(result.message)
+            }
 
-        } catch (e: Exception) {
-            _signUp.value = AuthState.Error
-//            _signUp.value = AuthState.Error(e.message ?: "Unknown error")
+            else -> {}
         }
 
     }
 
-    suspend fun signIn(email: String, password: String) {
-        _signIn.value = AuthState.Loading
-        try {
-            firebaseAuth.signInWithEmailAndPassword(email, password).await()
-            _signIn.value = AuthState.Success
+    fun signIn(email: String, password: String) = viewModelScope.launch {
+        _signIn.value = UiState.Loading
 
-        } catch (e: Exception) {
-            _signIn.value = AuthState.Error
+        when (val result = authRepository.signIn(email, password)) {
+            is Resource.Success -> {
+                _signIn.value = UiState.Success(result.data)
+            }
 
-//            _signIn.value = AuthState.Error(e.message ?: "Unknown error")
+            is Resource.Error -> {
+                _signIn.value = UiState.Error(result.message)
+            }
 
-        }
-    }
-
-    private suspend fun saveDataToFirestore(userId: String, user: User) {
-        try {
-            firestore.collection("users")
-                .document(userId)
-                .set(user)
-                .await()
-            Log.d("AuthViewModel", "User data successfully saved.")
-        } catch (e: Exception) {
-            e.message?.let { Log.d("AuthViewModel", it) }
+            else -> {}
         }
 
     }
@@ -89,6 +80,4 @@ sealed class AuthState {
     data object Loading : AuthState()
     data object Success : AuthState()
     data object Error : AuthState()
-//    data class Success<T>(val data: T) : AuthState()
-//    data class Error(val message: String) : AuthState()
 }
