@@ -1,6 +1,7 @@
 package com.example.appointmentbookingapp.presentation.ui.profile
 
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -69,8 +70,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.R
+import com.example.appointmentbookingapp.domain.model.DoctorExtras
+import com.example.appointmentbookingapp.presentation.ui.auth.AuthViewModel
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
+import com.example.appointmentbookingapp.util.UserRole
 
 val docCategories = listOf(
     "Cardiologist",
@@ -86,7 +92,13 @@ val genders = listOf("Male", "Female", "Other")
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun JobApplicationForm() {
+fun CompleteProfileScreen(
+    viewModel: AuthViewModel = hiltViewModel(),
+    roleSharedViewModel: UserRoleSharedViewModel = hiltViewModel()
+) {
+//    val userRole by roleSharedViewModel.userRole.collectAsState()
+
+val userRole = UserRole.DOCTOR /////////// Temporary for Testing only
 
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -108,9 +120,11 @@ fun JobApplicationForm() {
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
             selectedUri = uri
+            Log.d("CompleteProfile",uri.toString())
         }
     )
 
+    roleSharedViewModel.setUserRole(UserRole.DOCTOR)
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
@@ -197,7 +211,25 @@ fun JobApplicationForm() {
                     when (currentPage) {
                         0 -> currentPage++
                         1 -> currentPage++
-                        2 -> {}
+                        2 -> {
+                            // handling of submit button here
+
+                            val doctorExtras = DoctorExtras(
+                                aboutDoctor = aboutDoctor,
+                                docCategory = docCategory,
+                                experienceYears = experienceYears.toInt(),
+                                consultationFee = consultationFee,
+                                languagesSpoken = languagesSpoken,
+                                gender = gender
+                            )
+                            val uriString = selectedUri?.toString()?:""
+
+                            viewModel.signUp(
+                                name, email, password, uriString, userRole,
+                                doctorExtras = doctorExtras
+                            )
+//                            val restoredUri = uriString?.let { Uri.parse(it) }
+                        }
                     }
                 },
                 modifier = Modifier
@@ -386,7 +418,7 @@ fun PersonalInformationScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth(),
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
+            trailingIcon = {
                 val image = if (passwordVisible)
                     Icons.Default.Visibility
                 else Icons.Default.VisibilityOff
@@ -708,6 +740,6 @@ fun ReviewItem(label: String, value: String) {
 @Preview(showBackground = true)
 @Composable
 fun JobApplicationFormPreview() {
-    JobApplicationForm()
+    CompleteProfileScreen()
 
 }

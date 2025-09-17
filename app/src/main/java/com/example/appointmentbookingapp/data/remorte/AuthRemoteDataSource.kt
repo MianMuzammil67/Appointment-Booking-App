@@ -27,9 +27,7 @@ class AuthRemoteDataSource @Inject constructor(
             val authResult = firebaseAuth
                 .createUserWithEmailAndPassword(currUser.email, currUser.password)
                 .await()
-
             val user = authResult.user
-
             val profileUpdates = UserProfileChangeRequest.Builder()
                 .setDisplayName(currUser.name)
                 .build()
@@ -41,26 +39,22 @@ class AuthRemoteDataSource @Inject constructor(
                     UserRole.PATIENT -> {
                         savePatientToFirestore(it.uid, currUser.copy(role = UserRole.PATIENT))
                     }
-
                     UserRole.DOCTOR -> {
                         if (doctorExtras == null) {
                             throw IllegalArgumentException("Doctor data is missing for role=doctor")
                         }
-
                         val doctorItem = DoctorItem(
                             id = it.uid,
                             name = currUser.name,
                             email = currUser.email,
                             password = currUser.password,
-                            imageUrl = doctorExtras.profileUrl,
-                            rating = doctorExtras.rating,
+                            imageUrl = currUser.profileUrl, // yet to resolve problem of not saving photo on firebase
                             docCategory = doctorExtras.docCategory,
                             experienceYears = doctorExtras.experienceYears,
                             consultationFee = doctorExtras.consultationFee,
                             languagesSpoken = doctorExtras.languagesSpoken,
                             gender = doctorExtras.gender,
                             aboutDoctor = doctorExtras.aboutDoctor,
-                            reviewsCount = doctorExtras.reviewsCount,
                             role = UserRole.DOCTOR
                         )
 
