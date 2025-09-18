@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,50 +38,55 @@ fun RoleSelectionScreen(
     navController: NavController,
     roleViewModel: UserRoleSharedViewModel = hiltViewModel()
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.role_image),
-            contentDescription = "Doctor Image",
-            contentScale = ContentScale.Crop,
+    Scaffold (
+        modifier = Modifier.fillMaxSize()
+    ){ innerPadding->
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .background(
-                    color = Color.White,
-                    shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
-                )
-                .padding(horizontal = 24.dp, vertical = 32.dp)
+                .padding(innerPadding)
+                .fillMaxSize()
         ) {
-            Text(
-                text = "Select Role",
-                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                color = Color.Black,
-                modifier = Modifier.padding(bottom = 8.dp)
+            Image(
+                painter = painterResource(id = R.drawable.role_image),
+                contentDescription = "Doctor Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
             )
-            Text(
-                text = "Choose your role to continue using the app and access features tailored to you.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray,
-                modifier = Modifier.padding(bottom = 32.dp)
-            )
-            RoleButton("Doctor") {
-                roleViewModel.setUserRole(UserRole.DOCTOR)
-                navController.navigate("SignUp")
-            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        color = Color.White,
+                        shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
+                    )
+                    .padding(horizontal = 24.dp, vertical = 32.dp)
+            ) {
+                Text(
+                    text = "Select Role",
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                    color = Color.Black,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "Choose your role to continue using the app and access features tailored to you.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray,
+                    modifier = Modifier.padding(bottom = 32.dp)
+                )
+                RoleButton("Doctor") {
+                    roleViewModel.setUserRole(UserRole.DOCTOR)
+                    navController.navigate("CompleteProfileScreen")
+                }
 
-            RoleButton("Patient") {
-                roleViewModel.setUserRole(UserRole.PATIENT)
-                navController.navigate("SignUp")
+                Spacer(modifier = Modifier.height(16.dp))
+
+                RoleButton("Patient") {
+                    roleViewModel.setUserRole(UserRole.PATIENT)
+                    navController.navigate("SignUp")
+                }
             }
         }
     }
