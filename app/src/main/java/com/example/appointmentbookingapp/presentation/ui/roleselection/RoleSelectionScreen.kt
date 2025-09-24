@@ -79,6 +79,8 @@ fun RoleSelectionScreen(
                 RoleButton("Doctor") {
                     roleViewModel.setUserRole(UserRole.DOCTOR)
                     navController.navigate("CompleteProfileScreen")
+                    navController.navigate("SignIn")
+//                    navController.navigate("CompleteProfileScreen")
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))

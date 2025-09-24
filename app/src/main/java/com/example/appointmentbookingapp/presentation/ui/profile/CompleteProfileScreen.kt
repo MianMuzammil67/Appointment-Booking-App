@@ -71,6 +71,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.DoctorExtras
@@ -93,6 +95,7 @@ val genders = listOf("Male", "Female", "Other")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CompleteProfileScreen(
+    navController: NavController,
     viewModel: AuthViewModel = hiltViewModel(),
     roleSharedViewModel: UserRoleSharedViewModel = hiltViewModel()
 ) {
@@ -228,6 +231,7 @@ val userRole = UserRole.DOCTOR /////////// Temporary for Testing only
                                 name, email, password, uriString, userRole,
                                 doctorExtras = doctorExtras
                             )
+                            navController.navigate("DoctorHomeScreenn")
 //                            val restoredUri = uriString?.let { Uri.parse(it) }
                         }
                     }
@@ -740,6 +744,6 @@ fun ReviewItem(label: String, value: String) {
 @Preview(showBackground = true)
 @Composable
 fun JobApplicationFormPreview() {
-    CompleteProfileScreen()
+    CompleteProfileScreen(rememberNavController())
 
 }

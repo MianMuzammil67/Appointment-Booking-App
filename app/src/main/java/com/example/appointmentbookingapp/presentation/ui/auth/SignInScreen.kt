@@ -41,14 +41,18 @@ import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.presentation.ui.auth.components.ImageWithBorder
 import com.example.appointmentbookingapp.presentation.ui.auth.components.TextInputField
 import com.example.appointmentbookingapp.presentation.ui.auth.components.WelcomeText
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
+import com.example.appointmentbookingapp.util.UserRole
 
 @Composable
 fun SignInScreen(
     navController: NavHostController,
-    authViewModel: AuthViewModel = hiltViewModel()
+    authViewModel: AuthViewModel = hiltViewModel(),
+    roleSharedViewModel: UserRoleSharedViewModel = hiltViewModel()
 ) {
 
     val uiState by authViewModel.signInState.collectAsState()
+    val userRole by roleSharedViewModel.userRole.collectAsState()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -62,9 +66,16 @@ fun SignInScreen(
         when {
             isSuccess != null -> {
                 Toast.makeText(context, "Sign In Successful", Toast.LENGTH_SHORT).show()
-                navController.navigate("HomeScreen") {
-                    popUpTo("SignIn") { inclusive = true }
+                if (userRole == UserRole.DOCTOR) {
+                    navController.navigate("DoctorHomeScreenn") {
+                        popUpTo("SignIn") { inclusive = true }
+                    }
+                }else {
+                    navController.navigate("HomeScreen") {
+                        popUpTo("SignIn") { inclusive = true }
+                    }
                 }
+
             }
 
             isError != null -> {
@@ -179,8 +190,14 @@ fun SignInScreen(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
                     ) {
-                        navController.navigate("SignUp") {
-                            popUpTo("SignIn") { inclusive = true }
+                        if (roleSharedViewModel.userRole.value == UserRole.DOCTOR){
+                            navController.navigate("CompleteProfileScreen") {
+                                popUpTo("SignIn") { inclusive = true }
+                            }
+                        }else {
+                            navController.navigate("SignUp") {
+                                popUpTo("SignIn") { inclusive = true }
+                            }
                         }
                     }
                 )

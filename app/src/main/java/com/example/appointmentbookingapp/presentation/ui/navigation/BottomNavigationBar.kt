@@ -14,17 +14,36 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.appointmentbookingapp.util.UserRole
 
 
 @Composable
-fun BottomNavigationBar(navController: NavHostController) {
-    val items = listOf(
-        NavigationItem("Home", Icons.Filled.Home, "HomeScreen"),
-        NavigationItem("Conversations", Icons.AutoMirrored.Filled.Chat, "ChatListScreen"),
-        NavigationItem("Appointments", Icons.AutoMirrored.Filled.List, "MyAppointmentsScreen"),
-//        NavigationItem("Favorite", Icons.Filled.Favorite, "FavoriteScreen"),
-        NavigationItem("Profile", Icons.Filled.Person, "ProfileScreen")
-    )
+fun BottomNavigationBar(navController: NavHostController,userRole: String) {
+
+//    val items = listOf(
+//        NavigationItem("Home", Icons.Filled.Home, "HomeScreen"),
+//        NavigationItem("Conversations", Icons.AutoMirrored.Filled.Chat, "ChatListScreen"),
+//        NavigationItem("Appointments", Icons.AutoMirrored.Filled.List, "MyAppointmentsScreen"),
+////        NavigationItem("Favorite", Icons.Filled.Favorite, "FavoriteScreen"),
+//        NavigationItem("Profile", Icons.Filled.Person, "ProfileScreen")
+//    )
+
+    val items = if (userRole == UserRole.DOCTOR) {
+        listOf(
+            NavigationItem("Home", Icons.Filled.Home, "DoctorHomeScreenn"),
+            NavigationItem("Conversations", Icons.AutoMirrored.Filled.Chat, "ChatListScreen"),
+            NavigationItem("Appointments", Icons.AutoMirrored.Filled.List, "MyAppointmentsScreen"),
+            NavigationItem("Profile", Icons.Filled.Person, "ProfileScreen")
+        )
+    } else {
+        listOf(
+            NavigationItem("Home", Icons.Filled.Home, "HomeScreen"),
+            NavigationItem("Conversations", Icons.AutoMirrored.Filled.Chat, "ChatListScreen"),
+            NavigationItem("Appointments", Icons.AutoMirrored.Filled.List, "MyAppointmentsScreen"),
+            NavigationItem("Profile", Icons.Filled.Person, "ProfileScreen")
+        )
+    }
+
     NavigationBar {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route

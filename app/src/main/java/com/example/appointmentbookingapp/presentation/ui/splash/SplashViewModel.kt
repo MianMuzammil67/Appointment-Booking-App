@@ -1,5 +1,6 @@
 package com.example.appointmentbookingapp.presentation.ui.splash
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -31,6 +32,9 @@ class SplashViewModel @Inject constructor(
             startDestination = "RoleSelectionScreen"
         } else {
             currentUserData = profileRepository.getCurrentUserData()
+
+            Log.d("SplashViewModel", "Role: ${currentUserData?.role}")
+
             startDestination = when (currentUserData?.role) {
                 UserRole.PATIENT -> "HomeScreen"
                 UserRole.DOCTOR -> "DoctorHomeScreen"
