@@ -1,7 +1,6 @@
 package com.example.appointmentbookingapp.data.remorte
 
 import android.util.Log
-import com.example.appointmentbookingapp.domain.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -13,6 +12,7 @@ class ProfileRemoteDataSource @Inject constructor(
 ) {
     private val logTag = "ProfileRemoteDataSource"
     fun getCurrentUserId(): String? {
+        Log.d(logTag, "getCurrentUserId called : ${firebaseAuth.currentUser?.uid}" )
         return firebaseAuth.currentUser?.uid
     }
 
@@ -28,26 +28,42 @@ class ProfileRemoteDataSource @Inject constructor(
 
     suspend fun getCurrentUserData(): User? {
         Log.d(logTag, "getCurrentUserData called")
+    suspend fun getCurrentUserRole(): String? {
+        Log.d(logTag, "getCurrentUserRole called")
         val userId = getCurrentUserId() ?: return null
         Log.d(logTag, "Current user ID: $userId")
 
         try {
             val snapshot = firestore.collection("users")
+            // check users collection
+            val userSnapshot = firestore.collection("users")
                 .document(userId)
                 .get()
                 .await()
 
-            val user = snapshot.toObject(User::class.java)
-            Log.d(logTag, "userData: \"${user?.name}\"")
+            if (userSnapshot.exists()) {
+                val role = userSnapshot.getString("role")
+                Log.d(logTag, "Role from 'users': $role")
+                return role
+            }
 
-            return user
+            // check doctors collection
+            val doctorSnapshot = firestore.collection("doctors")
+                .document(userId)
+                .get()
+                .await()
+
+            if (doctorSnapshot.exists()) {
+                val role = doctorSnapshot.getString("role")
+                Log.d(logTag, "Role from 'doctors': $role")
+                return role
+            }
         } catch (e: Exception) {
-            Log.d(logTag, "getCurrentUserData error: ${e.message}")
+            Log.e(logTag, "getCurrentUserRole error: ${e.message}")
         }
-
         return null
-
     }
+
 
     fun isUserLoggedIn(): Boolean {
         return firebaseAuth.currentUser != null
