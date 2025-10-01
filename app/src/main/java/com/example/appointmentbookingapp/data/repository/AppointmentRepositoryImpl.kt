@@ -3,6 +3,7 @@ package com.example.appointmentbookingapp.data.repository
 import com.example.appointmentbookingapp.data.remorte.AppointmentRemoteDataSource
 import com.example.appointmentbookingapp.domain.model.Appointment
 import com.example.appointmentbookingapp.domain.model.DoctorItem
+import com.example.appointmentbookingapp.domain.model.User
 import com.example.appointmentbookingapp.domain.repository.AppointmentRepository
 import com.example.appointmentbookingapp.util.Resource
 import java.time.LocalDate
@@ -57,8 +58,14 @@ class AppointmentRepositoryImpl(
     override suspend fun getMyAppointments(): List<Appointment?> {
        return remote.getMyAppointments()
     }
+    override suspend fun getMyAppointmentsAsDoctor(): List<Appointment?> {
+       return remote.getMyAppointmentsAsDoctor()
+    }
 
-    override suspend fun getDoctorById(doctorId: String): DoctorItem? {
+    override suspend fun getPatientById(doctorId: String): User? {
+        return remote.getPatientById(doctorId)
+
+    }override suspend fun getDoctorById(doctorId: String): DoctorItem? {
         return remote.getDoctorById(doctorId)
     }
 }

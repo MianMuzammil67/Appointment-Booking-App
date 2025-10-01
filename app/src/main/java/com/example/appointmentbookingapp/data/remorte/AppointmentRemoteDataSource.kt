@@ -3,6 +3,7 @@ package com.example.appointmentbookingapp.data.remorte
 import android.util.Log
 import com.example.appointmentbookingapp.domain.model.Appointment
 import com.example.appointmentbookingapp.domain.model.DoctorItem
+import com.example.appointmentbookingapp.domain.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -153,6 +154,33 @@ class AppointmentRemoteDataSource @Inject constructor(
         }
     }
 
+    suspend fun getMyAppointmentsAsDoctor(): List<Appointment?> {
+        return try {
+            val snapshot = firestore.collection("appointments")
+                .whereEqualTo("doctorId", getCurrentUserId())
+                .orderBy("appointmentDate", Query.Direction.DESCENDING)
+                .get().await()
+            Log.d(logTag, "getMyAppointmentsAsDoctor: ${snapshot.documents}")
+
+            snapshot.documents.map { it.toObject(Appointment::class.java) }
+        } catch (e: Exception) {
+            Log.d(logTag, "getMyAppointmentsAsDoctor: ${e.message}")
+            emptyList()
+        }
+    }
+
+    suspend fun getPatientById(patientId: String): User? {
+        return try {
+            val snapshot = firestore.collection("users")
+                .document(patientId)
+                .get().await()
+
+            snapshot.toObject(User::class.java)
+        } catch (e: Exception) {
+            null
+        }
+
+    }
     suspend fun getDoctorById(doctorId: String): DoctorItem? {
         return try {
             val snapshot = firestore.collection("doctors")

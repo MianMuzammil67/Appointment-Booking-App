@@ -1,5 +1,6 @@
 package com.example.appointmentbookingapp.presentation.ui.appointment
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -34,29 +35,42 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.appointmentbookingapp.domain.model.AppointmentWithDoctor
+import com.example.appointmentbookingapp.domain.model.AppointmentWithPatient
 import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.presentation.ui.components.CancelBookingDialog
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.AppointmentSharedViewModel
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
+import com.example.appointmentbookingapp.util.UserRole
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyAppointments(
     navController: NavController,
-    appointmentViewModel: AppointmentViewModel
+    appointmentViewModel: AppointmentViewModel,
+    appointmentSharedViewModel: AppointmentSharedViewModel,
+    userRoleSharedViewModel: UserRoleSharedViewModel
 ) {
     val context = LocalContext.current
 
-    val myAppointmentsState by appointmentViewModel.myAppointments.collectAsState()
+    val appointmentsForPatientState by appointmentViewModel.appointmentsForPatient.collectAsState()
+    val appointmentsForDoctorState by appointmentViewModel.appointmentsForDoctor.collectAsState()
     val bookingCancelState by appointmentViewModel.bookingCancelState.collectAsState()
+    val userRole by userRoleSharedViewModel.userRole.collectAsState()
 
+    Log.d("MyAppointments", "userRole: $userRole")
     var appointmentToCancel by remember { mutableStateOf<AppointmentWithDoctor?>(null) }
 
     LaunchedEffect(bookingCancelState) {
         when (bookingCancelState) {
             is UiState.Loading -> {}
             is UiState.Success -> {
-                appointmentViewModel.getAppointments()
+                if (userRole == UserRole.PATIENT) {
+                    appointmentViewModel.getAppointments()
+                } else {
+                    appointmentViewModel.getAppointmentsForDoctor()
+                }
 
-                appointmentToCancel = null          // Dismiss the dialog
+                appointmentToCancel = null
                 Toast.makeText(context, "Booking canceled", Toast.LENGTH_SHORT).show()
             }
 
@@ -75,7 +89,12 @@ fun MyAppointments(
     }
 
     LaunchedEffect(Unit) {
-        appointmentViewModel.getAppointments()
+
+        if (userRole == UserRole.PATIENT) {
+            appointmentViewModel.getAppointments()
+        } else {
+            appointmentViewModel.getAppointmentsForDoctor()
+        }
     }
     appointmentToCancel?.let { appointmentItem ->
         CancelBookingDialog(
@@ -107,7 +126,11 @@ fun MyAppointments(
                 .padding(8.dp),
 
             ) {
-            when (myAppointmentsState) {
+
+            val uiState =
+                if (userRole == UserRole.PATIENT) appointmentsForPatientState else appointmentsForDoctorState
+
+            when (uiState) {
                 is UiState.Loading -> {
                     Box(
                         modifier = Modifier
@@ -123,6 +146,8 @@ fun MyAppointments(
                     val appointment =
                         (myAppointmentsState as UiState.Success<List<AppointmentWithDoctor?>>).data
                     if (appointment.isEmpty()) {
+                    val appointments = uiState.data
+                    if (appointments.isEmpty()) {
                         Text(
                             "No appointments found.",
                             modifier = Modifier.align(Alignment.Center),
@@ -135,7 +160,7 @@ fun MyAppointments(
                                 .padding(horizontal = 8.dp)
                         )
                         {
-                            items(appointment) { item ->
+                            items(appointments) { item ->
                                 Spacer(modifier = Modifier.height(8.dp))
                                 item?.let {
                                     AppointmentItem(
@@ -147,6 +172,37 @@ fun MyAppointments(
                                         },
                                         onRescheduleClick = {}
                                     )
+                                    when {
+                                        userRole == UserRole.PATIENT && it is AppointmentWithDoctor -> {
+                                            AppointmentItem(
+                                                appointment = it.appointment,
+                                                doctorItem = it.doctor,
+                                                onClick = {
+                                                    appointmentSharedViewModel.setAppointmentId(it.appointment.appointmentId)
+                                                    navController.navigate("WaitingRoomScreen")
+                                                },
+                                                onCancelClick = { appointmentToCancel = it },
+                                                onRescheduleClick = {},
+                                                user = null
+                                            )
+                                        }
+                                        userRole == UserRole.DOCTOR && it is AppointmentWithPatient -> {
+                                            AppointmentItem(
+                                                appointment = it.appointment,
+                                                doctorItem = null,
+                                                user = it.patient,
+                                                onClick = {
+                                                    appointmentSharedViewModel.setAppointmentId(it.appointment.appointmentId)
+                                                    navController.navigate("CallScreen")
+                                                },
+                                                onCancelClick = {},
+//                                                onCancelClick = { appointmentToCancel = it },
+                                                onRescheduleClick = {}
+                                            )
+                                        }
+                                    }
+
+
                                 }
                             }
                         }

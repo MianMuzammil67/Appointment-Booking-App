@@ -32,13 +32,15 @@ import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.Appointment
 import com.example.appointmentbookingapp.domain.model.DoctorItem
+import com.example.appointmentbookingapp.domain.model.User
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
 fun AppointmentItem(
     appointment: Appointment,
-    doctorItem: DoctorItem,
+    doctorItem: DoctorItem?,
+    user: User?,
     onClick: () -> Unit,
     onCancelClick:() -> Unit,
     onRescheduleClick:() -> Unit
@@ -85,7 +87,7 @@ fun AppointmentItem(
                     modifier = Modifier
                         .matchParentSize()
                         .align(Alignment.Center),
-                    model = doctorItem.imageUrl,
+                    model = doctorItem?.imageUrl ?: user?.profileUrl,
                     contentDescription = null,
                     contentScale = ContentScale.Crop
                 )
@@ -93,17 +95,16 @@ fun AppointmentItem(
             Spacer(modifier = Modifier.width(8.dp))
             Column {
                 Text(
-                    text = doctorItem.name,
+                    text = doctorItem?.name ?: user?.name?: "Unknown",
                     style = MaterialTheme.typography.titleMedium,
                     color = Color.Black
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text = doctorItem.docCategory,
+                    text = doctorItem?.docCategory ?:"",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.Black
                 )
-
             }
         }
         HorizontalDivider(thickness = 2.dp)

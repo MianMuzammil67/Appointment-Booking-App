@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appointmentbookingapp.domain.model.Appointment
 import com.example.appointmentbookingapp.domain.model.AppointmentWithDoctor
+import com.example.appointmentbookingapp.domain.model.AppointmentWithPatient
 import com.example.appointmentbookingapp.domain.repository.AppointmentRepository
 import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.util.Resource
@@ -43,9 +44,11 @@ class AppointmentViewModel @Inject constructor(
     private val _notAvailableSlots = MutableStateFlow<List<String?>>(emptyList())
     val notAvailableSlots: MutableStateFlow<List<String?>> = _notAvailableSlots
 
-    private val _myAppointments =
-        MutableStateFlow<UiState<List<AppointmentWithDoctor?>>>(UiState.Loading)
-    val myAppointments: StateFlow<UiState<List<AppointmentWithDoctor?>>> = _myAppointments
+    private val _appointmentsForPatient = MutableStateFlow<UiState<List<AppointmentWithDoctor?>>>(UiState.Loading)
+    val appointmentsForPatient: StateFlow<UiState<List<AppointmentWithDoctor?>>> = _appointmentsForPatient
+
+    private val _appointmentsForDoctor = MutableStateFlow<UiState<List<AppointmentWithPatient?>>>(UiState.Loading)
+    val appointmentsForDoctor: StateFlow<UiState<List<AppointmentWithPatient?>>> = _appointmentsForDoctor
 
     init {
         getFirebaseServerTime()
@@ -118,7 +121,8 @@ class AppointmentViewModel @Inject constructor(
     }
 
     fun getAppointments() = viewModelScope.launch {
-        _myAppointments.value = UiState.Loading
+        Log.d(logTag, "getAppointments is called")
+        _appointmentsForPatient.value = UiState.Loading
         try {
             val myAppointments = repository.getMyAppointments()
 
@@ -134,9 +138,37 @@ class AppointmentViewModel @Inject constructor(
                     doctor = doctorMap[it.doctorId]
                 )
             }
-            _myAppointments.value = UiState.Success(result)
+            Log.d(logTag, "getAppointmentsForDoctor: $result")
+            _appointmentsForPatient.value = UiState.Success(result)
         } catch (e: Exception) {
-            _myAppointments.value = UiState.Error(e.message ?: "Something went wrong")
+            _appointmentsForPatient.value = UiState.Error(e.message ?: "Something went wrong")
         }
     }
+
+    fun getAppointmentsForDoctor() = viewModelScope.launch {
+        Log.d(logTag, "getAppointmentsForDoctor is called")
+        _appointmentsForDoctor.value = UiState.Loading
+        try {
+            val myAppointments = repository.getMyAppointmentsAsDoctor()
+
+            val patientIds = myAppointments.map { it?.patientId }.distinct()
+
+            val patientMap = patientIds.associateWith { id ->
+                async { repository.getPatientById(id!!) }
+            }.mapValues { it.value.await() }
+
+            val result = myAppointments.map {
+                AppointmentWithPatient(
+                    appointment = it!!,
+                    patient = patientMap[it.patientId]
+                )
+            }
+            Log.d(logTag, "getAppointmentsForDoctor: $result")
+            _appointmentsForDoctor.value = UiState.Success(result)
+        } catch (e: Exception) {
+            Log.d(logTag, "getAppointmentsForDoctor: ${e.message}")
+            _appointmentsForDoctor.value = UiState.Error(e.message ?: "Something went wrong")
+        }
+    }
+
 }
