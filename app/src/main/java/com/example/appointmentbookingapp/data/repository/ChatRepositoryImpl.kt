@@ -3,10 +3,13 @@ package com.example.appointmentbookingapp.data.repository
 import com.example.appointmentbookingapp.data.remorte.AppointmentRemoteDataSource
 import com.example.appointmentbookingapp.data.remorte.ChatRemoteDataSource
 import com.example.appointmentbookingapp.domain.model.ChatListItem
+import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.domain.model.Message
+import com.example.appointmentbookingapp.domain.model.User
 import com.example.appointmentbookingapp.domain.repository.ChatRepository
 import com.example.appointmentbookingapp.util.DateUtils
 import com.example.appointmentbookingapp.util.Resource
+import com.example.appointmentbookingapp.util.UserRole
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -32,41 +35,53 @@ class ChatRepositoryImpl(
         return chatRemoteDataSource.listenToMessages(chatId, onMessagesChanged)
     }
 
-    override suspend fun getChatList(): Resource<List<ChatListItem>> {
+    override suspend fun getChatList(role: String): Resource<List<ChatListItem>> {
         try {
-            val conversations = chatRemoteDataSource.getConversations()
+            val conversations = chatRemoteDataSource.getConversations(role)
 
-            val chatList = coroutineScope {
+            val deferredChatItems = coroutineScope {
                 conversations.map { conversation ->
                     async {
-                        val doctor =
-                            appointmentRemoteDataSource.getDoctorById(conversation.doctorId)
-                        doctor?.let {
-                            ChatListItem(
-                                id = conversation.doctorId,
-                                doctor = doctor,
-                                lastMessage = conversation.lastMessage,
-                                timestamp = DateUtils.formatTimestamp(conversation.timestamp),
-                                unreadCount = 0,
-                            )
-                        }
+                        val otherUserId = if (role == UserRole.DOCTOR) {
+                            conversation.patientId
+                        } else {
+                            conversation.doctorId
+                        } ?: return@async null
+
+                        val otherUser = when (role) {
+                            UserRole.DOCTOR ->
+                                appointmentRemoteDataSource.getPatientById(otherUserId)
+
+                            else ->
+                                appointmentRemoteDataSource.getDoctorById(otherUserId)
+                        } ?: return@async null
+
+                        ChatListItem(
+                            id = otherUserId,
+                            doctor = if (role != UserRole.DOCTOR) otherUser as? DoctorItem else null,
+                            patient = if (role == UserRole.DOCTOR) otherUser as? User else null,
+                            lastMessage = conversation.lastMessage,
+                            timestamp = DateUtils.formatTimestamp(conversation.timestamp),
+                            unreadCount = 0,
+                        )
 
                     }
 
                 }
 
             }
-            return Resource.Success(chatList.awaitAll().filterNotNull())
-        }catch (e: Exception){
+            val chatList = deferredChatItems.awaitAll().filterNotNull()
+            return Resource.Success(chatList)
+        } catch (e: Exception) {
             return Resource.Error(e.message.toString())
         }
     }
 
-    override suspend fun deleteConversation(doctorId: String) {
-    return chatRemoteDataSource.deleteConversation(doctorId)
+    override suspend fun deleteConversation(otherUserId: String, role: String) {
+        return chatRemoteDataSource.deleteConversation(otherUserId, role)
     }
 
     override suspend fun deleteMessage(message: Message): Resource<Unit> {
-        return  chatRemoteDataSource.deleteMessage(message)
+        return chatRemoteDataSource.deleteMessage(message)
     }
 }

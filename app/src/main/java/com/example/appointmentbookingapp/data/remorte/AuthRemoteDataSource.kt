@@ -37,7 +37,7 @@ class AuthRemoteDataSource @Inject constructor(
             user?.let {
                 when (role.lowercase()) {
                     UserRole.PATIENT -> {
-                        savePatientToFirestore(it.uid, currUser.copy(role = UserRole.PATIENT))
+                        savePatientToFirestore(it.uid, currUser.copy(id = it.uid, role = UserRole.PATIENT))
                     }
                     UserRole.DOCTOR -> {
                         if (doctorExtras == null) {

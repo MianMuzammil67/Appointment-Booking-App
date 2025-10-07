@@ -57,6 +57,7 @@ import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.ChatListItem
 import com.example.appointmentbookingapp.presentation.ui.components.DeleteItemDialog
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.DoctorChatSharedViewModel
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
 import com.example.appointmentbookingapp.ui.theme.mediumGray
 import com.example.appointmentbookingapp.util.Resource
 
@@ -66,16 +67,19 @@ import com.example.appointmentbookingapp.util.Resource
 fun ChatListScreen(
     navController: NavController,
     chatListViewModel: ChatListViewModel = hiltViewModel(),
-    doctorChatSharedViewModel: DoctorChatSharedViewModel = hiltViewModel()
+    doctorChatSharedViewModel: DoctorChatSharedViewModel = hiltViewModel(),
+    roleSharedViewModel: UserRoleSharedViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        chatListViewModel.getChatList()
-    }
 
     var selectedItem by remember { mutableStateOf<ChatListItem?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     val chatListResource by chatListViewModel.chatList.collectAsState()
+    val userRole by roleSharedViewModel.userRole.collectAsState()
+
+    LaunchedEffect(Unit) {
+        chatListViewModel.getChatList(userRole)
+    }
 
     val isLoading = chatListResource is Resource.Loading
     val chatList = (chatListResource as? Resource.Success)?.data
@@ -111,7 +115,13 @@ fun ChatListScreen(
             DeleteItemDialog(
                 onDismiss = { showDeleteDialog = false },
                 onConfirm = {
-                    chatListViewModel.deleteConversation(selectedItem!!.doctor.id)
+//                    val otherUserId = when (userRole) {
+//                        UserRole.DOCTOR -> selectedItem!!.doctor?.id
+//                        UserRole.PATIENT ->selectedItem!!.patient?.id
+//                        else -> null
+//
+//                    }
+                    chatListViewModel.deleteConversation(selectedItem!!.id, userRole)
                     selectedItem = null
                     showDeleteDialog = false
                 }
@@ -159,7 +169,16 @@ fun ChatListScreen(
                                 if (selectedItem != null) {
                                     selectedItem = null
                                 } else {
-                                    doctorChatSharedViewModel.updateCurrentDoctor(conversation.doctor)
+//                                    doctorChatSharedViewModel.updateCurrentPatient(
+//                                        conversation.patient ?: return@ConversationCard
+//                                    )
+//                                    doctorChatSharedViewModel.updateCurrentDoctor(
+//                                        conversation.doctor ?:  return@ConversationCard
+//                                    )
+                                    val user = conversation.patient ?: conversation.doctor
+                                    ?: return@ConversationCard
+
+                                    doctorChatSharedViewModel.updateCurrentUser(user)
                                     navController.navigate("ChatScreen")
                                 }
                             },
@@ -187,6 +206,7 @@ fun ConversationCard(
         if (isSelected) colorResource(R.color.colorPrimary).copy(0.5f) else Color.Transparent
 
     val currentDoctor = conversation.doctor
+    val currentPatient = conversation.patient
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -202,7 +222,7 @@ fun ConversationCard(
     ) {
         // Avatar
         AsyncImage(
-            model = currentDoctor.imageUrl,
+            model = currentDoctor?.imageUrl ?: currentPatient?.profileUrl,
             contentDescription = "Contact avatar",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -217,7 +237,7 @@ fun ConversationCard(
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = currentDoctor.name,
+                text = currentDoctor?.name ?: currentPatient?.name ?: "Unknown",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,

@@ -23,6 +23,9 @@ import com.example.appointmentbookingapp.presentation.ui.appointment.MyAppointme
 import com.example.appointmentbookingapp.presentation.ui.auth.AuthViewModel
 import com.example.appointmentbookingapp.presentation.ui.auth.SignInScreen
 import com.example.appointmentbookingapp.presentation.ui.auth.SignupScreen
+import com.example.appointmentbookingapp.presentation.ui.call.CallScreen
+import com.example.appointmentbookingapp.presentation.ui.call.CallViewModel
+import com.example.appointmentbookingapp.presentation.ui.call.WaitingRoomScreen
 import com.example.appointmentbookingapp.presentation.ui.chat.ChatListScreen
 import com.example.appointmentbookingapp.presentation.ui.chat.ChatListViewModel
 import com.example.appointmentbookingapp.presentation.ui.chat.ChatScreen
@@ -40,6 +43,7 @@ import com.example.appointmentbookingapp.presentation.ui.profile.CompleteProfile
 import com.example.appointmentbookingapp.presentation.ui.profile.ProfileScreen
 import com.example.appointmentbookingapp.presentation.ui.profile.ProfileViewModel
 import com.example.appointmentbookingapp.presentation.ui.roleselection.RoleSelectionScreen
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.AppointmentSharedViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.DoctorChatSharedViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.SharedCategoryViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
@@ -62,6 +66,7 @@ fun MainApp(startDestination: String) {
     val roleSharedViewModel: UserRoleSharedViewModel = hiltViewModel()
     val authViewModel: AuthViewModel = hiltViewModel()
     val appointmentSharedViewModel: AppointmentSharedViewModel = hiltViewModel()
+    val callViewModel: CallViewModel = hiltViewModel()
 
 
 
@@ -78,14 +83,19 @@ fun MainApp(startDestination: String) {
         listOf("DoctorHomeScreenn", "ChatListScreen", "MyAppointmentsScreen", "ProfileScreen")
     } else {
         listOf("HomeScreen", "ChatListScreen", "MyAppointmentsScreen", "ProfileScreen")
+    }
+
+//    val bottomBarScreens =
+//        listOf("HomeScreen", "ChatListScreen", "MyAppointmentsScreen", "ProfileScreen")
+
     val showBottomBar = currentRoute in bottomBarScreens
     val bottomPadding = if (showBottomBar) 80.dp else 0.dp
 
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
-                BottomNavigationBar(navController = navController)
                 BottomNavigationBar(navController = navController, userRole = userRolee)
+//                BottomNavigationBar(navController = navController)
             }
         }) {
         NavHost(
@@ -135,13 +145,18 @@ fun MainApp(startDestination: String) {
                 ProfileScreen(navController, profileViewModel)
             }
             composable("MyAppointmentsScreen") {
-                MyAppointments(navController, appointmentViewModel)
+                MyAppointments(
+                    navController,
+                    appointmentViewModel,
+                    appointmentSharedViewModel,
+                    roleSharedViewModel
+                )
             }
             composable("ChatListScreen") {
-                ChatListScreen(navController, chatListViewModel, doctorChatSharedViewModel)
+                ChatListScreen(navController, chatListViewModel, doctorChatSharedViewModel, roleSharedViewModel)
             }
             composable("ChatScreen") {
-                ChatScreen(navController, chatViewModel, doctorChatSharedViewModel.currentDoctor)
+                ChatScreen(navController, chatViewModel, doctorChatSharedViewModel)
             }
             composable("DoctorHomeScreen") {
                 DoctorHomeScreen(navController)
@@ -149,14 +164,25 @@ fun MainApp(startDestination: String) {
             composable("RoleSelectionScreen") {
                 RoleSelectionScreen(navController, roleSharedViewModel)
             }
-            composable("CompleteProfileScreen"){
-                CompleteProfileScreen()
             composable("CompleteProfileScreen") {
                 CompleteProfileScreen(navController, authViewModel, roleSharedViewModel)
             }
             composable("DoctorHomeScreenn") {
                 DoctorHomeScreenn(navController)
             }
+            composable("CallScreen") {
+                CallScreen(
+//                    navController,
+                    callViewModel,appointmentSharedViewModel,
+                    roleSharedViewModel
+                )
+            }
+            composable("WaitingRoomScreen") {
+                WaitingRoomScreen(
+                    navController,
+                    callViewModel,
+                    appointmentSharedViewModel
+                )
             }
 
         }

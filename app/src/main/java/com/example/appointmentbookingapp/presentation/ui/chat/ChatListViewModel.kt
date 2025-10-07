@@ -22,25 +22,29 @@ class ChatListViewModel @Inject constructor(
 
     private var currentList: MutableList<ChatListItem> = mutableListOf()
 
-    fun getChatList() = viewModelScope.launch {
+    fun getChatList(role: String) = viewModelScope.launch {
         _chatList.value = Resource.Loading
 
-        when (val result = chatRepository.getChatList()) {
+        when (val result = chatRepository.getChatList(role)) {
             is Resource.Success -> {
                 currentList = result.data as MutableList<ChatListItem>
                 _chatList.value = Resource.Success(currentList)
             }
+
             is Resource.Error -> {
                 _chatList.value = Resource.Error(result.message)
             }
+
             else -> {}
         }
     }
 
-    fun deleteConversation(doctorId: String) = viewModelScope.launch {
-        chatRepository.deleteConversation(doctorId)
+    fun deleteConversation(otherUserId: String, role: String) = viewModelScope.launch {
+        chatRepository.deleteConversation(otherUserId, role)
 
-        currentList = currentList.filterNot { it.doctor.id == doctorId }.toMutableList()
+        currentList = currentList.filterNot {
+            it.doctor?.id == otherUserId
+        }.toMutableList()
 
         _chatList.value = Resource.Success(currentList)
 

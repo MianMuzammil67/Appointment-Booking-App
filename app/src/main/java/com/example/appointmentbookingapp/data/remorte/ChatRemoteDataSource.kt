@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.appointmentbookingapp.domain.model.ConversationItem
 import com.example.appointmentbookingapp.domain.model.Message
 import com.example.appointmentbookingapp.util.Resource
+import com.example.appointmentbookingapp.util.UserRole
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -91,21 +92,28 @@ class ChatRemoteDataSource @Inject constructor(
             }
     }
 
-    suspend fun getConversations(): List<ConversationItem> {
+    suspend fun getConversations(role: String): List<ConversationItem> {
         return try {
-            val conversations = firestore.collection("users")
+
+            val collection = when (role) {
+                UserRole.DOCTOR -> "doctors"
+                else -> "users"
+            }
+//            val conversations = firestore.collection("users")
+            val conversations = firestore.collection(collection)
                 .document(getCurrentUserId())
                 .collection("conversations")
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .get().await()
 
-            Log.d(logTag, conversations.toString())
+//            Log.d(logTag, conversations.toString())
+            Log.d(logTag, "Fetched conversations: ${conversations.size()} items")
 
             conversations.documents.mapNotNull {
                 it.toObject(ConversationItem::class.java)
             }
         } catch (e: Exception) {
-            Log.d(logTag, "getConversations: ${e.message}")
+            Log.d(logTag, "getConversations: $e")
             emptyList()
         }
     }
@@ -184,24 +192,30 @@ class ChatRemoteDataSource @Inject constructor(
         }
     }
 
-    suspend fun deleteConversation(doctorId: String) {
+    suspend fun deleteConversation(otherUserId: String, role: String) {
 
         try {
-            val msgRef = firestore.collection("users")
+
+            val collection = when (role) {
+                UserRole.DOCTOR -> "doctors"
+                else -> "users"
+            }
+
+            val msgRef = firestore.collection(collection)
                 .document(getCurrentUserId())
                 .collection("conversations")
-                .document(doctorId)
+                .document(otherUserId)
 
             msgRef.delete().await()
 
-        }catch (e: Exception){
-            Log.d(logTag,"deleteConversation:${e.message}")
+        } catch (e: Exception) {
+            Log.d(logTag, "deleteConversation:${e.message}")
         }
 
     }
 
 
-    }
+}
 
 /*
     Suggestions (for future improvements):
