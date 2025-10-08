@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.appointmentbookingapp.domain.model.Message
 import com.example.appointmentbookingapp.domain.repository.ChatRepository
 import com.example.appointmentbookingapp.util.ChatUtils.generateChatId
+import com.example.appointmentbookingapp.util.UserRole
 import com.google.firebase.firestore.ListenerRegistration
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -21,32 +22,34 @@ class ChatViewModel @Inject constructor(
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages: StateFlow<List<Message>> = _messages.asStateFlow()
 
-    val patientId: String by lazy { chatRepository.getCurrentUserId() }
+    val currentUserId: String by lazy { chatRepository.getCurrentUserId() }
 
+    fun sendMessage(receiverId: String, messageContent: String, currentUserRole: String) =
+        viewModelScope.launch {
+            val chatId = generateChatId(currentUserId, receiverId)
 
-    fun sendMessage(doctorId: String, messageContent: String) = viewModelScope.launch {
+            val message = Message(
+                messageId = UUID.randomUUID().toString(),
+                chatId = chatId,
+                senderId = currentUserId,
+                receiverId = receiverId,
+                patientId = if (currentUserRole == UserRole.PATIENT) currentUserId else receiverId,
+                doctorId = if (currentUserRole == UserRole.DOCTOR) currentUserId else receiverId,
+                content = messageContent,
+                timestamp = System.currentTimeMillis()
+            )
+            chatRepository.sendMessage(message)
 
-        val message = Message(
-            messageId = UUID.randomUUID().toString(),
-            chatId = generateChatId(patientId, doctorId),
-            patientId = patientId,
-            doctorId = doctorId,
-            content = messageContent,
-            timestamp = System.currentTimeMillis()
-        )
-        chatRepository.sendMessage(message)
-
-    }
+        }
 
     var messageListener: ListenerRegistration? = null
 
     fun listenToMessages(
-        doctorId: String,
+        otherUserId: String,
     ) {
-        val patientId = chatRepository.getCurrentUserId()
         messageListener?.remove()
-        val chatId = generateChatId(doctorId, patientId)
-
+        val chatId = generateChatId(otherUserId, currentUserId)
+//        val chatId = generateChatId(currentUserId, otherUserId)
         messageListener = chatRepository.listenToMessages(chatId) { newMessages ->
             _messages.value = newMessages
         }

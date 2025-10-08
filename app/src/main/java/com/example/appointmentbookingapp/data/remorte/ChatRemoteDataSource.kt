@@ -60,7 +60,7 @@ class ChatRemoteDataSource @Inject constructor(
 
             batch.commit().await()
 
-            Log.d(logTag, "sendMessage: Message sent!")
+            Log.d(logTag, "sendMessage: Message sent! ${message.content}")
 
         } catch (e: Exception) {
             Log.d(logTag, "sendMessage: ${e.message}")

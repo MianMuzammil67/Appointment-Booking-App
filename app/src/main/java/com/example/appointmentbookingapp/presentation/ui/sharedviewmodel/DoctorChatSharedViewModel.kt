@@ -15,6 +15,14 @@ import jakarta.inject.Inject
 @HiltViewModel
 class DoctorChatSharedViewModel @Inject constructor(): ViewModel() {
 
+    var currentUser by mutableStateOf<Any?>(null)
+        private set
+
+    fun updateCurrentUser(user: Any) {
+        currentUser = user
+    }
+
+
     var currentDoctor by mutableStateOf(DoctorItem())
 
     fun updateCurrentDoctor(doctor: DoctorItem) {

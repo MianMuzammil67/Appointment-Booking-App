@@ -1,5 +1,6 @@
 package com.example.appointmentbookingapp.presentation.ui.chat
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.VideoCall
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,13 +54,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.domain.model.Message
+import com.example.appointmentbookingapp.domain.model.User
 import com.example.appointmentbookingapp.presentation.ui.components.DeleteItemDialog
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.DoctorChatSharedViewModel
+import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -68,17 +74,43 @@ import java.time.format.DateTimeFormatter
 fun ChatScreen(
     navController: NavController,
     chatViewModel: ChatViewModel = viewModel(),
-    currentDoctor: DoctorItem
+    doctorChatSharedViewModel: DoctorChatSharedViewModel = hiltViewModel(),
+    userRoleSharedViewModel: UserRoleSharedViewModel = hiltViewModel()
 ) {
+    val otherUser = doctorChatSharedViewModel.currentUser
+
+    val userRole by userRoleSharedViewModel.userRole.collectAsState()
     var messageInput by remember { mutableStateOf("") }
     val messages by chatViewModel.messages.collectAsState()
 
     var selectedMsg by remember { mutableStateOf<Message?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
+    val name: String
+    val imageUrl: String
+    val userId: String
+
+    when (otherUser) {
+        is DoctorItem -> {
+            name = otherUser.name
+            imageUrl = otherUser.imageUrl
+            userId = otherUser.id
+        }
+
+        is User -> {
+            name = otherUser.name
+            imageUrl = otherUser.profileUrl
+            userId = otherUser.id
+        }
+
+        else -> {
+            navController.popBackStack()
+            return
+        }
+    }
 
     LaunchedEffect(Unit) {
-        chatViewModel.listenToMessages(currentDoctor.id)
+        chatViewModel.listenToMessages(userId)
     }
 
     Scaffold(
@@ -95,7 +127,7 @@ fun ChatScreen(
                             )
                         } else {
                             AsyncImage(
-                                model = currentDoctor.imageUrl,
+                                model = imageUrl,
                                 contentDescription = "Profile Picture",
                                 modifier = Modifier
                                     .size(40.dp)
@@ -107,7 +139,7 @@ fun ChatScreen(
 
                             Column {
                                 Text(
-                                    text = currentDoctor.name,
+                                    text = name,
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold,
                                     maxLines = 1,
@@ -134,6 +166,13 @@ fun ChatScreen(
                     if (selectedMsg != null) {
                         IconButton(onClick = { showDeleteDialog = true }) {
                             Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        }
+                    } else {
+                        IconButton(onClick = {
+                            navController.navigate("cal")
+
+                        }) {
+                            Icon(Icons.Default.VideoCall, contentDescription = "Delete")
                         }
                     }
                 }
@@ -168,12 +207,18 @@ fun ChatScreen(
                     items(messages.reversed()) { message -> // Displaying reversed for chronological order
                         MessageBubble(
                             message = message,
-                            isSentByMe = message.patientId == chatViewModel.patientId,
+                            isSentByMe = message.senderId == chatViewModel.currentUserId,
                             onMessageLongClick = {
                                 selectedMsg = message
                             },
                             isSelected = selectedMsg?.messageId == message.messageId
                         )
+                        Log.d(
+                            "MessageDebug", """ CurrentUserId: ${chatViewModel.currentUserId}
+                            CurrentUserRole: $userRole Message.patientId: ${message.patientId} 
+                             Message.doctorId: ${message.doctorId}""".trimIndent()
+                        )
+
                     }
                 }
 
@@ -184,7 +229,9 @@ fun ChatScreen(
                     onSendMessage = {
                         if (messageInput.isNotBlank()) {
                             chatViewModel.sendMessage(
-                                doctorId = currentDoctor.id, messageContent = messageInput
+                                receiverId = userId,
+                                messageContent = messageInput,
+                                currentUserRole = userRole
                             )
                             messageInput = ""
                         }
