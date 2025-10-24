@@ -172,7 +172,7 @@ fun MainApp(startDestination: String) {
             }
             composable("CallScreen") {
                 CallScreen(
-//                    navController,
+                    navController,
                     callViewModel,appointmentSharedViewModel,
                     roleSharedViewModel
                 )
