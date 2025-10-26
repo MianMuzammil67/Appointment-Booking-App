@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.appointmentbookingapp.domain.repository.CallRepository
-import com.example.appointmentbookingapp.domain.repository.ProfileRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,17 +14,11 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class CallViewModel @Inject constructor(
     private val callRepository: CallRepository,
-    private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
-    private val _callStarted = MutableStateFlow(false)
-    val callStarted: StateFlow<Boolean> = _callStarted.asStateFlow()
+    private val _callState = MutableStateFlow(CallState.NOT_STARTED)
+    val callState: StateFlow<CallState> = _callState.asStateFlow()
 
-    fun observeCall(appointmentId: String) {
-        callRepository.observeCallStarted(appointmentId) {
-            _callStarted.value = true
-        }
-    }
 
     fun updatePeerId(appointmentId: String, role: String, peerId: String) = viewModelScope.launch {
         callRepository.updatePeerId(appointmentId, role, peerId)
@@ -36,18 +29,20 @@ class CallViewModel @Inject constructor(
         callRepository.getPatientPeerId(appointmentId, onResult)
     }
 
-
-    fun notifyServerCallStarted(appointmentId: String) {
-        Log.d("CallViewModel", "startCall called with appointmentId: $appointmentId")
-        viewModelScope.launch {
-            callRepository.notifyServerCallStarted(appointmentId)
-        }
+    fun updateCallState(appointmentId: String, state: CallState) = viewModelScope.launch {
+        callRepository.updateCallState(appointmentId, state)
     }
 
-    fun notifyServerCallEnded(appointmentId: String) {
-        Log.d("CallViewModel", "endCallCall called with appointmentId: $appointmentId")
-        viewModelScope.launch {
-            callRepository.notifyServerCallEnded(appointmentId)
+    fun observeCallState(appointmentId: String) {
+        callRepository.observeCallState(appointmentId) {
+            _callState.value = it
         }
     }
+}
+
+enum class CallState {
+    NOT_STARTED,
+    WAITING,
+    STARTED,
+    ENDED
 }

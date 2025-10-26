@@ -26,11 +26,11 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,26 +59,26 @@ fun CallScreen(
     val currentAppointment by appointmentSharedViewModel.selectedAppointment.collectAsState()
     val userRole by userRoleSharedViewModel.userRole.collectAsState()
     val userId by appointmentViewModel.currentUserId.collectAsState()
+    val callState by callViewModel.callState.collectAsState()
+
     val webViewRef = remember { mutableStateOf<WebView?>(null) }
-    var isLoading by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
     var isMuted by remember { mutableStateOf(false) }
     var isSwapped by remember { mutableStateOf(false) }
 
     val appointmentId = currentAppointment?.appointmentId
-    val isDoctor = userRole == UserRole.DOCTOR
-
+    LaunchedEffect(appointmentId) {
+        appointmentId?.let {
+            callViewModel.observeCallState(it)
+        }
+    }
     if (appointmentId.isNullOrBlank() || userId.isNullOrBlank()) return
 
     Log.d(logTag, "UserId: $userId, Role: $userRole, AppointmentId: $appointmentId")
 
-    // Doctor starts the call status in Firebase
-//    LaunchedEffect(appointmentId, userRole) {
-//        if (isDoctor) {
-//            callViewModel.startCall(appointmentId)
-//        }
-//    }
-
+    when (callState) {
+        CallState.ENDED -> navController.navigateUp()
+        else -> {}
+    }
 
     Scaffold { padding ->
         Box(
@@ -103,14 +103,11 @@ fun CallScreen(
                             webViewClient = object : WebViewClient() {
 
                                 override fun onPageFinished(view: WebView?, url: String?) {
-//                                val doctorPeerId = "${userId}_${System.currentTimeMillis()}"
                                     val deviceId = UUID.randomUUID().toString()
                                     val doctorPeerId = "${userId}_$deviceId"
 
-                                    if (isDoctor) {
-                                        evaluateJavascript("init('$doctorPeerId')", null)
-                                        Log.d(logTag, "init called: $doctorPeerId")
-                                    }
+                                    evaluateJavascript("init('$doctorPeerId')", null)
+                                    Log.d(logTag, "init called: $doctorPeerId")
                                 }
                             }
 
@@ -119,25 +116,23 @@ fun CallScreen(
                                 @JavascriptInterface
                                 fun onPeerConnected(peerId: String) {
                                     Log.d(logTag, "Doctor Peer ID: $peerId")
-                                    if (isDoctor) {
-                                        callViewModel.notifyServerCallStarted(appointmentId)
+                                    callViewModel.updateCallState(appointmentId, CallState.STARTED)
 
-                                        if (appointmentId.isNotBlank()) {
-                                            callViewModel.updatePeerId(
-                                                appointmentId = appointmentId,
-                                                role = UserRole.DOCTOR,
-                                                peerId = peerId
+                                    if (appointmentId.isNotBlank()) {
+                                        callViewModel.updatePeerId(
+                                            appointmentId = appointmentId,
+                                            role = UserRole.DOCTOR,
+                                            peerId = peerId
+                                        )
+                                    }
+                                    // Once peer is connected, fetch patient peerId and start the call
+                                    callViewModel.getPatientPeerId(appointmentId) { patientPeerId ->
+                                        if (!patientPeerId.isNullOrBlank()) {
+                                            webViewRef.value?.evaluateJavascript(
+                                                "startCall('$patientPeerId')", null
                                             )
-                                        }
-                                        // Once peer is connected, fetch patient peerId and start the call
-                                        callViewModel.getPatientPeerId(appointmentId) { patientPeerId ->
-                                            if (!patientPeerId.isNullOrBlank()) {
-                                                webViewRef.value?.evaluateJavascript(
-                                                    "startCall('$patientPeerId')", null
-                                                )
-                                                Log.d(logTag, "startCall called: $patientPeerId")
+                                            Log.d(logTag, "startCall called: $patientPeerId")
 
-                                            }
                                         }
                                     }
                                 }
@@ -150,8 +145,6 @@ fun CallScreen(
                 modifier = Modifier.matchParentSize()
             )
 
-
-
             Row(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -160,7 +153,7 @@ fun CallScreen(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                //  Swap Video
+                //  Swap Video (left)
                 FloatingActionButton(
                     onClick = {
 //                        webViewRef.value?.evaluateJavascript("toggleVideo(${isSwapped})", null)
@@ -185,7 +178,7 @@ fun CallScreen(
                     onClick = {
                         webViewRef.value?.evaluateJavascript("endCall()", null)
                         navController.navigateUp()
-                        callViewModel.notifyServerCallEnded(appointmentId)
+                        callViewModel.updateCallState(appointmentId, CallState.ENDED)
                     },
                     containerColor = Color.Red,
                     modifier = Modifier.size(80.dp)

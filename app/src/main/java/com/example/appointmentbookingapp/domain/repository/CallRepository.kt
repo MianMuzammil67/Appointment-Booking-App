@@ -1,9 +1,15 @@
 package com.example.appointmentbookingapp.domain.repository
+
+import com.example.appointmentbookingapp.presentation.ui.call.CallState
+import com.google.firebase.firestore.ListenerRegistration
+
 interface CallRepository {
 
-    suspend fun notifyServerCallStarted(appointmentId: String)
-    suspend fun notifyServerCallEnded(appointmentId: String)
-    suspend fun updatePeerId (appointmentId: String, role: String, peerId: String)
-    fun observeCallStarted(appointmentId: String, onStarted: () -> Unit)
+    suspend fun updatePeerId(appointmentId: String, role: String, peerId: String)
     fun getPatientPeerId(appointmentId: String, onResult: (String?) -> Unit)
+    suspend fun updateCallState(appointmentId: String, state: CallState)
+    fun observeCallState(
+        appointmentId: String,
+        onStateChanged: (CallState) -> Unit
+    ): ListenerRegistration
 }

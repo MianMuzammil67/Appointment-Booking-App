@@ -64,9 +64,9 @@ fun WaitingRoomScreen(
     appointmentSharedViewModel: AppointmentSharedViewModel,
     appointmentViewModel: AppointmentViewModel = hiltViewModel()
 ) {
-//    val appointmentId by appointmentSharedViewModel.selectedAppointmentId.collectAsState()
     val appointment by appointmentSharedViewModel.selectedAppointment.collectAsState()
-    val callStarted by callViewModel.callStarted.collectAsState()
+    val callState by callViewModel.callState.collectAsState()
+
     val currentUser by appointmentViewModel.currentUserId.collectAsState()
     val webViewRef = remember { mutableStateOf<WebView?>(null) }
     val logTag = "WaitingRoom"
@@ -81,16 +81,15 @@ fun WaitingRoomScreen(
     val appointmentId = appointment?.appointmentId
     LaunchedEffect(appointmentId) {
         appointmentId?.let {
-            callViewModel.observeCall(it)
+            callViewModel.observeCallState(it)
         }
     }
 
 
-    if (callStarted) {
-        isCallActive = true
-//        navController.navigate("CallScreen") {
-//            popUpTo("WaitingRoomScreen") { inclusive = true }
-//        }
+    when(callState){
+        CallState.STARTED -> isCallActive = true
+        CallState.ENDED -> navController.navigateUp()
+        else -> {}
     }
 
     Scaffold { paddingValues ->
@@ -134,11 +133,7 @@ fun WaitingRoomScreen(
                     }
                 }
             }
-        } else {
-            // Show the WebView (already initialized)
-//            webViewRef.value?.visibility = View.VISIBLE
         }
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -164,9 +159,8 @@ fun WaitingRoomScreen(
                                 override fun onPageFinished(view: WebView?, url: String?) {
                                     super.onPageFinished(view, url)
                                     if (!currentUser.isNullOrBlank()) {
-//                                    val patientPeerId = "${currentUser}_${System.currentTimeMillis()}"
 
-//                                  val deviceId = UUID.randomUUID().toString()
+//                                    val deviceId = UUID.randomUUID().toString()
 //                                    val patientPeerId = "${currentUser}_$deviceId"
 
                                         view?.evaluateJavascript("init('$patientPeerId');", null)
@@ -188,24 +182,11 @@ fun WaitingRoomScreen(
                                             peerId = patientPeerId
                                         )
                                     }
+                                    callViewModel.updateCallState(
+                                        appointmentId.toString(),
+                                        CallState.WAITING
+                                    )
                                 }
-
-                                @JavascriptInterface
-                                fun onCallEnded() {
-                                    Log.d("WaitingRoom", "Call ended")
-                                    navController.navigateUp()
-                                }
-
-//                                @JavascriptInterface
-//                                fun onCallStarted() {
-//                                    Log.d("WaitingRoom", "Call started — hiding waiting dialog")
-//
-//                                    // Switch to UI thread
-//                                    (context as Activity).runOnUiThread {
-//                                        isCallActive = true
-//                                    }
-//                                }
-
                             }, "Android")
                             loadUrl("file:///android_asset/call.html")
                             webViewRef.value = this
@@ -247,7 +228,8 @@ fun WaitingRoomScreen(
                 FloatingActionButton(
                     onClick = {
                         webViewRef.value?.evaluateJavascript("endCall()", null)
-//                        callViewModel.notifyServerCallEnded(appointmentId) //TODO
+
+                        callViewModel.updateCallState(appointmentId!!, CallState.ENDED)
                         navController.navigateUp()
                     },
                     containerColor = Color.Red,
@@ -283,30 +265,3 @@ fun WaitingRoomScreen(
         }
     }
 }
-
-
-//    //  Clean up WebView on lifecycle destroy
-//    val lifecycleOwner = LocalLifecycleOwner.current
-//    DisposableEffect(lifecycleOwner) {
-//        val observer = LifecycleEventObserver { _, event ->
-//            if (event == Lifecycle.Event.ON_DESTROY) {
-////                webViewRef.value?.destroy()
-//
-//                webViewRef.value?.evaluateJavascript("cleanupPeer();", null)
-//                webViewRef.value?.destroy()
-//            }
-//        }
-//        lifecycleOwner.lifecycle.addObserver(observer)
-//        onDispose {
-//            lifecycleOwner.lifecycle.removeObserver(observer)
-//        }
-//    }
-//}
-
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun WaitingScreenPreview(){
-//    WaitingRoomScreen(rememberNavController())
-//}
