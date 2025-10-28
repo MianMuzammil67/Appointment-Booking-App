@@ -8,6 +8,9 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -77,6 +81,8 @@ fun WaitingRoomScreen(
     val deviceId = remember { UUID.randomUUID().toString() }
     val patientPeerId = "${"pat"}_${currentUser}_$deviceId"
     var isCallActive by remember { mutableStateOf(false) }
+    var hasPermissions by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     val appointmentId = appointment?.appointmentId
     LaunchedEffect(appointmentId) {
@@ -85,11 +91,36 @@ fun WaitingRoomScreen(
         }
     }
 
-
-    when(callState){
+    when (callState) {
         CallState.STARTED -> isCallActive = true
         CallState.ENDED -> navController.navigateUp()
         else -> {}
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = { permissions ->
+            hasPermissions = permissions[android.Manifest.permission.CAMERA] == true &&
+                    permissions[android.Manifest.permission.RECORD_AUDIO] == true
+            if (!hasPermissions) {
+                Toast.makeText(context, "Camera & Microphone are required", Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
+    LaunchedEffect(Unit) {
+        permissionLauncher.launch(
+            arrayOf(
+                android.Manifest.permission.CAMERA,
+                android.Manifest.permission.RECORD_AUDIO
+            )
+        )
+    }
+
+    if (!hasPermissions) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Requesting camera and microphone permissions...")
+        }
+        return
     }
 
     Scaffold { paddingValues ->

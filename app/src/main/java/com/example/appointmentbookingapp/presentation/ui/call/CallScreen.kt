@@ -8,6 +8,9 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -25,6 +28,7 @@ import androidx.compose.material.icons.filled.MicOff
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -35,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -65,6 +70,9 @@ fun CallScreen(
     var isMuted by remember { mutableStateOf(false) }
     var isSwapped by remember { mutableStateOf(false) }
 
+    var hasPermission by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
     val appointmentId = currentAppointment?.appointmentId
     LaunchedEffect(appointmentId) {
         appointmentId?.let {
@@ -78,6 +86,32 @@ fun CallScreen(
     when (callState) {
         CallState.ENDED -> navController.navigateUp()
         else -> {}
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions(),
+        onResult = {permissions->
+            hasPermission = permissions[android.Manifest.permission.CAMERA] == true &&
+                    permissions[android.Manifest.permission.RECORD_AUDIO] == true
+            if (!hasPermission){
+                Toast.makeText(context, "Camera & Microphone are required", Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
+
+    LaunchedEffect(Unit) {
+        permissionLauncher.launch(
+            arrayOf(
+                android.Manifest.permission.CAMERA,
+                android.Manifest.permission.RECORD_AUDIO
+            )
+        )
+    }
+    if (!hasPermission) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Requesting camera and microphone permissions...")
+        }
+        return
     }
 
     Scaffold { padding ->
