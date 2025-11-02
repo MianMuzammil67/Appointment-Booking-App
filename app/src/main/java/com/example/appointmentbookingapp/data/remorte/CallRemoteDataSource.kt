@@ -48,6 +48,18 @@ class CallRemoteDataSource @Inject constructor(
                     "callState" to state.name,
                     "lastUpdated" to FieldValue.serverTimestamp()
                 )
+            ).await()
+    }
+
+    suspend fun updateCallStatus(appointmentId: String, status: String) {
+        Log.d(logTag, "updateCallState: $appointmentId -> $status")
+
+        firestore.collection("appointments")
+            .document(appointmentId)
+            .update(
+                mapOf(
+                    "status" to status,
+                )
             )
             .await()
     }

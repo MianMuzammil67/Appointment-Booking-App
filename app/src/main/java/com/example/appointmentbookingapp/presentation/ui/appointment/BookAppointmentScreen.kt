@@ -58,6 +58,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.Appointment
+import com.example.appointmentbookingapp.domain.util.AppointmentStatusString
 import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.presentation.ui.components.BookingSuccessDialog
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
@@ -85,7 +86,6 @@ fun BookAppointmentScreen(
     val isSuccess = bookingState is UiState.Success
 
     var showSuccessDialog by remember { mutableStateOf(false) }
-//    var selectedDate by remember { mutableStateOf(firebaseDateState ) }
     var selectedDate by remember { mutableStateOf<LocalDate?>(LocalDate.now()) }
 
     var selectedTime by remember { mutableStateOf<String?>(null) }
@@ -141,7 +141,7 @@ fun BookAppointmentScreen(
                         patientId = currentUser ?: "currentUser is null",
                         appointmentDate = utcDate,
                         timeSlot = selectedTime ?: "selectedTime is null",
-                        status = "Pending",
+                        status = AppointmentStatusString.PENDING,
                         doctorId = currentDoctor.id
                     )
                     viewModel.bookAppointment(appointment)
@@ -162,7 +162,7 @@ fun BookAppointmentScreen(
                     disabledContainerColor = Color.Gray
                 )
             ) {
-                if(isLoading){
+                if (isLoading) {
                     CircularProgressIndicator(
                         color = Color.White,
                         modifier = Modifier
@@ -171,7 +171,7 @@ fun BookAppointmentScreen(
                         strokeWidth = 2.dp
                     )
                     Text("Booking...", color = Color.White)
-                }else
+                } else
                     Text("Confirm", color = Color.White)
             }
         }
@@ -211,7 +211,9 @@ fun BookAppointmentScreen(
                         firebaseToday = firebaseDate
                     )
                     Log.d("appointmentScreen", firebaseDate.toString())
-                }else -> {}
+                }
+
+                else -> {}
             }
 
             Spacer(modifier = Modifier.height(24.dp))

@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.appointmentbookingapp.domain.util.AppointmentStatusString
 import com.example.appointmentbookingapp.presentation.ui.appointment.AppointmentViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.AppointmentSharedViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
@@ -213,6 +214,7 @@ fun CallScreen(
                         webViewRef.value?.evaluateJavascript("endCall()", null)
                         navController.navigateUp()
                         callViewModel.updateCallState(appointmentId, CallState.ENDED)
+                        callViewModel.updateCallStatus(appointmentId, AppointmentStatusString.COMPLETED)
                     },
                     containerColor = Color.Red,
                     modifier = Modifier.size(80.dp)

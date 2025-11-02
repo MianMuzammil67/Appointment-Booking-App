@@ -27,6 +27,9 @@ class CallRepositoryImpl(
     override suspend fun updateCallState(appointmentId: String, state: CallState) {
         callRemoteDataSource.updateCallState(appointmentId, state)
     }
+    override suspend fun updateCallStatus(appointmentId: String, status: String) {
+        callRemoteDataSource.updateCallStatus(appointmentId, status)
+    }
 
     override fun observeCallState(
         appointmentId: String,

@@ -32,6 +32,9 @@ class CallViewModel @Inject constructor(
     fun updateCallState(appointmentId: String, state: CallState) = viewModelScope.launch {
         callRepository.updateCallState(appointmentId, state)
     }
+    fun updateCallStatus(appointmentId: String, status: String) = viewModelScope.launch {
+        callRepository.updateCallStatus(appointmentId, status)
+    }
 
     fun observeCallState(appointmentId: String) {
         callRepository.observeCallState(appointmentId) {
