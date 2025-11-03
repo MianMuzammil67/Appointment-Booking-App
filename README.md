@@ -80,8 +80,8 @@ A modern Android application for booking doctor appointments, built with **Kotli
     <td><img src="https://github.com/user-attachments/assets/def66ae6-b3fa-4793-a2d4-a2e2d038b107" alt="Screenshot 12" width="200"/></td>
   </tr>
 <tr>
-    <td><img src="https://github.com/user-attachments/assets/13bfbd33-31d1-4330-9f45-bd9e7f541ebc" alt="Video Call" width="200"/></td>
-    <td><img src="https://github.com/user-attachments/assets/2a2291f1-3ef3-4488-a6ca-c0ee6a56e017" alt="Whiteboard/Workspace" width="200"/></td>
+      <td><img src="https://github.com/user-attachments/assets/2a2291f1-3ef3-4488-a6ca-c0ee6a56e017" alt="Whiteboard/Workspace" width="200"/></td>
+      <td><img src="https://github.com/user-attachments/assets/13bfbd33-31d1-4330-9f45-bd9e7f541ebc" alt="Video Call" width="200"/></td>
 </tr>
 
 </table>
