@@ -99,9 +99,8 @@ fun CompleteProfileScreen(
     viewModel: AuthViewModel = hiltViewModel(),
     roleSharedViewModel: UserRoleSharedViewModel = hiltViewModel()
 ) {
-//    val userRole by roleSharedViewModel.userRole.collectAsState()
 
-val userRole = UserRole.DOCTOR /////////// Temporary for Testing only
+    val userRole = UserRole.DOCTOR
 
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -123,7 +122,7 @@ val userRole = UserRole.DOCTOR /////////// Temporary for Testing only
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
             selectedUri = uri
-            Log.d("CompleteProfile",uri.toString())
+            Log.d("CompleteProfile", uri.toString())
         }
     )
 
@@ -225,7 +224,7 @@ val userRole = UserRole.DOCTOR /////////// Temporary for Testing only
                                 languagesSpoken = languagesSpoken,
                                 gender = gender
                             )
-                            val uriString = selectedUri?.toString()?:""
+                            val uriString = selectedUri?.toString() ?: ""
 
                             viewModel.signUp(
                                 name, email, password, uriString, userRole,
@@ -264,7 +263,7 @@ val userRole = UserRole.DOCTOR /////////// Temporary for Testing only
     }
 }
 
-// Custom step indicator composable
+// step indicator
 @Composable
 fun StepIndicator(text: String, isActive: Boolean) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -545,7 +544,7 @@ fun AdditionalInformationScreen(
             singleLine = true
         )
 
-        // Languages Spoken with multi-select chips
+        // Languages Spoken
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -715,7 +714,7 @@ fun ReviewSection(title: String, content: @Composable () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White, RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp))
             .padding(16.dp)
     ) {
         Row(
@@ -723,8 +722,12 @@ fun ReviewSection(title: String, content: @Composable () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(title, fontWeight = FontWeight.Bold, color = Color.Black)
-            Icon(Icons.Default.Edit, contentDescription = "Edit", tint = Color.Black)
+            Text(title, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+            Icon(
+                Icons.Default.Edit,
+                contentDescription = "Edit",
+                tint = MaterialTheme.colorScheme.onSurface
+            )
         }
         Spacer(Modifier.height(16.dp))
         content()
@@ -736,8 +739,8 @@ fun ReviewItem(label: String, value: String) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text(label, color = Color.Gray, fontSize = 14.sp)
-        Text(value, color = Color.Black, fontWeight = FontWeight.Bold)
+        Text(label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
+        Text(value, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
     }
 }
 

@@ -38,9 +38,9 @@ fun RoleSelectionScreen(
     navController: NavController,
     roleViewModel: UserRoleSharedViewModel = hiltViewModel()
 ) {
-    Scaffold (
+    Scaffold(
         modifier = Modifier.fillMaxSize()
-    ){ innerPadding->
+    ) { innerPadding ->
         Box(
             modifier = Modifier
                 .padding(innerPadding)
@@ -59,7 +59,7 @@ fun RoleSelectionScreen(
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
                     .background(
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.background,
                         shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp)
                     )
                     .padding(horizontal = 24.dp, vertical = 32.dp)
@@ -67,18 +67,17 @@ fun RoleSelectionScreen(
                 Text(
                     text = "Select Role",
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(
                     text = "Choose your role to continue using the app and access features tailored to you.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 32.dp)
                 )
                 RoleButton("Doctor") {
                     roleViewModel.setUserRole(UserRole.DOCTOR)
-                    navController.navigate("CompleteProfileScreen")
                     navController.navigate("SignIn")
 //                    navController.navigate("CompleteProfileScreen")
                 }

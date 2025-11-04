@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -58,7 +59,6 @@ fun SignupScreen(
     val isLoading = signUpResponse is UiState.Loading
     val successResponse = (signUpResponse as? UiState.Success)?.data
     val errorMessage = (signUpResponse as? UiState.Error)?.message
-
     val context = LocalContext.current
 
     LaunchedEffect(successResponse, errorMessage) {
@@ -66,41 +66,41 @@ fun SignupScreen(
             successResponse != null -> {
                 Toast.makeText(context, "SignUp Successful", Toast.LENGTH_SHORT).show()
                 navController.navigate(
-                    if (userRole == UserRole.DOCTOR) "DoctorHomeScreen"
-                    else "HomeScreen"
+                    if (userRole == UserRole.DOCTOR) "DoctorHomeScreen" else "HomeScreen"
                 )
             }
+
             errorMessage != null -> {
                 Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-
     Column(
         modifier = Modifier
-            .background(Color.White)
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(50.dp))
 
-        WelcomeText(text = "Create New Account")
+        WelcomeText(
+            text = "Create New Account",
+        )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(50.dp))
 
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
-
         ) {
             TextInputField(
                 tittle = "Full Name",
                 label = "Enter Your Name",
                 isPassword = false,
                 value = name,
-                onValueChange = { name = it }
+                onValueChange = { name = it },
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -110,32 +110,29 @@ fun SignupScreen(
                 label = "Enter Your Email",
                 isPassword = false,
                 value = email,
-                onValueChange = { email = it }
+                onValueChange = { email = it },
             )
-            Spacer(modifier = Modifier.height(16.dp))
 
+            Spacer(modifier = Modifier.height(16.dp))
 
             TextInputField(
                 tittle = "Password",
                 label = "Enter Your Password",
                 isPassword = true,
                 value = password,
-                onValueChange = { password = it }
+                onValueChange = { password = it },
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-
-            Spacer(modifier = Modifier.height(16.dp))
             if (isLoading) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = colorResource(id = R.color.colorPrimary))
             } else {
                 Button(
                     onClick = {
                         viewModel.signUp(
                             name, email, password, "",
-                            userRole,
-                            doctorExtras = null
+                            userRole, doctorExtras = null
                         )
                     },
                     modifier = Modifier
@@ -147,38 +144,35 @@ fun SignupScreen(
                     enabled = email.isNotEmpty() && password.isNotEmpty(),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text(text = "Sign Up")
+                    Text(text = "Sign Up", color = Color.White)
                 }
-
             }
-
 
             Text(
                 "OR",
-                color = colorResource(id = R.color.gray),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(vertical = 16.dp)
             )
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-
-                ) {
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 ImageWithBorder(R.drawable.google)
                 ImageWithBorder(R.drawable.facebook)
             }
+
             Spacer(modifier = Modifier.height(32.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.Center
-            ) {
+            Row(horizontalArrangement = Arrangement.Center) {
                 Text(
                     text = "Already have account?",
-                    color = colorResource(id = R.color.gray),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.titleSmall
                 )
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Sign In",
                     color = colorResource(id = R.color.colorPrimary),
@@ -189,10 +183,8 @@ fun SignupScreen(
                         }
                     }
                 )
-
             }
         }
-
     }
 }
 

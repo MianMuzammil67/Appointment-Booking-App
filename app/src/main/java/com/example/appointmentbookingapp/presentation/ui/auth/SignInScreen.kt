@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -30,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,7 +50,6 @@ fun SignInScreen(
     authViewModel: AuthViewModel = hiltViewModel(),
     roleSharedViewModel: UserRoleSharedViewModel = hiltViewModel()
 ) {
-
     val uiState by authViewModel.signInState.collectAsState()
     val userRole by roleSharedViewModel.userRole.collectAsState()
 
@@ -62,46 +61,40 @@ fun SignInScreen(
     val isError = (uiState as? UiState.Error)?.message
 
     val context = LocalContext.current
+
     LaunchedEffect(isSuccess, isError) {
         when {
             isSuccess != null -> {
                 Toast.makeText(context, "Sign In Successful", Toast.LENGTH_SHORT).show()
-                if (userRole == UserRole.DOCTOR) {
-                    navController.navigate("DoctorHomeScreenn") {
-                        popUpTo("SignIn") { inclusive = true }
-                    }
-                }else {
-                    navController.navigate("HomeScreen") {
-                        popUpTo("SignIn") { inclusive = true }
-                    }
+                val destination =
+                    if (userRole == UserRole.DOCTOR) "DoctorHomeScreen" else "HomeScreen"
+                navController.navigate(destination) {
+                    popUpTo("SignIn") { inclusive = true }
                 }
-
             }
 
             isError != null -> {
                 Toast.makeText(context, isError, Toast.LENGTH_SHORT).show()
             }
         }
-
     }
 
     Column(
         modifier = Modifier
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.surface)
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(70.dp))
 
         WelcomeText(text = "Welcome")
 
-        Spacer(modifier = Modifier.height(50.dp))
+        Spacer(modifier = Modifier.height(70.dp))
 
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
-
         ) {
             TextInputField(
                 tittle = "Email",
@@ -110,7 +103,9 @@ fun SignInScreen(
                 isPassword = false,
                 onValueChange = { email = it }
             )
+
             Spacer(modifier = Modifier.height(32.dp))
+
             TextInputField(
                 tittle = "Password",
                 label = "Enter Your Password",
@@ -118,70 +113,69 @@ fun SignInScreen(
                 isPassword = true,
                 onValueChange = { password = it }
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.End,
 
-                ) {
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.End
+            ) {
                 Text(
                     "Forget Password?",
-                    fontWeight = FontWeight.Bold
+                    color = colorResource(id = R.color.colorPrimary)
                 )
             }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             if (isLoading) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(
+                    color = colorResource(id = R.color.colorPrimary)
+                )
             } else {
                 Button(
-                    onClick = {
-                        authViewModel.signIn(email, password)
-                    },
+                    onClick = { authViewModel.signIn(email, password) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 24.dp, bottom = 24.dp),
+                        .padding(vertical = 24.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = colorResource(id = R.color.colorPrimary)
                     ),
                     enabled = email.isNotEmpty() && password.isNotEmpty(),
-//                    enabled = email.isNotEmpty() && password.isNotEmpty() && (uiState.value == AuthState.Initial || uiState.value is AuthState.Error),
-
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text(text = "Sign In")
+                    Text(
+                        text = "Sign In",
+                        color = Color.White
+                    )
                 }
-
             }
 
             Text(
                 "OR",
-                color = colorResource(id = R.color.gray),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(12.dp)
             )
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
-
-                ) {
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 ImageWithBorder(R.drawable.google)
                 ImageWithBorder(R.drawable.facebook)
             }
+
             Spacer(modifier = Modifier.height(32.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.Center
-            ) {
+            Row(horizontalArrangement = Arrangement.Center) {
                 Text(
                     text = "Don’t have an account yet?",
-                    color = colorResource(id = R.color.gray),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.titleSmall
                 )
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Sign Up",
                     color = colorResource(id = R.color.colorPrimary),
@@ -190,21 +184,19 @@ fun SignInScreen(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
                     ) {
-                        if (roleSharedViewModel.userRole.value == UserRole.DOCTOR){
-                            navController.navigate("CompleteProfileScreen") {
-                                popUpTo("SignIn") { inclusive = true }
+                        val destination =
+                            if (roleSharedViewModel.userRole.value == UserRole.DOCTOR) {
+                                "CompleteProfileScreen"
+                            } else {
+                                "SignUp"
                             }
-                        }else {
-                            navController.navigate("SignUp") {
-                                popUpTo("SignIn") { inclusive = true }
-                            }
+                        navController.navigate(destination) {
+                            popUpTo("SignIn") { inclusive = true }
                         }
                     }
                 )
-
             }
         }
-
     }
 }
 
