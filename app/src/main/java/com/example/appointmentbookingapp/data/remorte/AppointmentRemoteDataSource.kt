@@ -80,7 +80,7 @@ class AppointmentRemoteDataSource @Inject constructor(
                 .document(appointment.appointmentId)
 
             val userRef = firestore.collection("users")
-                .document(getCurrentUserId())
+                .document(appointment.patientId)
                 .collection("appointments")
                 .document(appointment.appointmentId)
 
@@ -112,7 +112,7 @@ class AppointmentRemoteDataSource @Inject constructor(
                 .whereEqualTo("time", time)
                 .get()
                 .await()
-            Log.d(logTag, "isTimeSlotAvailable: ${snapshot.toString()}")
+            Log.d(logTag, "isTimeSlotAvailable: $snapshot")
             snapshot.isEmpty // true if slot is free, false if taken
 
         } catch (e: Exception) {
@@ -177,6 +177,7 @@ class AppointmentRemoteDataSource @Inject constructor(
 
             snapshot.toObject(User::class.java)
         } catch (e: Exception) {
+            Log.d(logTag, "getPatientById: ${e.message}")
             null
         }
 
@@ -189,6 +190,7 @@ class AppointmentRemoteDataSource @Inject constructor(
 
             snapshot.toObject(DoctorItem::class.java)
         } catch (e: Exception) {
+            Log.d(logTag, "getDoctorById: ${e.message}")
             null
         }
 

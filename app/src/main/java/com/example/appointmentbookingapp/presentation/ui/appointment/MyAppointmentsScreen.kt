@@ -67,8 +67,7 @@ fun MyAppointments(
     val scope = rememberCoroutineScope()
 
     Log.d("MyAppointments", "userRole: $userRole")
-//    var appointmentToCancel by remember { mutableStateOf<AppointmentWithDoctor?>(null) }
-    var appointmentToCancel by remember { mutableStateOf<Any?>(null) }
+    var appointmentToCancel by remember { mutableStateOf<Appointment?>(null) }
     val tabItem = listOf("Upcoming", "Completed", "Cancelled")
 
     LaunchedEffect(bookingCancelState) {
@@ -111,7 +110,7 @@ fun MyAppointments(
         CancelBookingDialog(
             onDismiss = { appointmentToCancel = null },
             onCancelBooking = {
-                appointmentViewModel.cancelAppointment(appointmentItem as Appointment)
+                appointmentViewModel.cancelAppointment(appointmentItem)
                 appointmentToCancel = null
             }
         )
@@ -214,7 +213,7 @@ fun MyAppointments(
 fun AppointmentList(
     uiState: UiState<List<Any?>>,
     userRole: String,
-    onCancel: (Any) -> Unit,
+    onCancel: (Appointment) -> Unit,
     onItemClick: (Any) -> Unit
 ) {
     when (uiState) {
@@ -251,7 +250,7 @@ fun AppointmentList(
                                         appointment = it.appointment,
                                         doctorItem = it.doctor,
                                         onClick = { onItemClick(it) },
-                                        onCancelClick = { onCancel(it) },
+                                        onCancelClick = { onCancel(it.appointment) },
                                         onRescheduleClick = {},
                                         user = null
                                     )
@@ -263,7 +262,7 @@ fun AppointmentList(
                                         doctorItem = null,
                                         user = it.patient,
                                         onClick = { onItemClick(it) },
-                                        onCancelClick = { onCancel(it) },
+                                        onCancelClick = { onCancel(it.appointment) },
                                         onRescheduleClick = {}
                                     )
                                 }
