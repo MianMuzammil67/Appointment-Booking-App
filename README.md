@@ -2,6 +2,7 @@
 ![Kotlin](https://img.shields.io/badge/Kotlin-95%25-blue)
 ![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-UI-green)
 ![Firebase](https://img.shields.io/badge/Firebase-Backend-orange)
+![Status](https://img.shields.io/badge/status-core--features--complete-brightgreen)
 
 
 # 🩺 Doctor Appointment Booking App
