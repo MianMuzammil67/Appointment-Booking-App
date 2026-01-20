@@ -96,3 +96,8 @@ A modern Android application for booking doctor appointments, built with **Kotli
 - [ ] ⭐ Ratings & Reviews for Doctors
 - [x] 🎥 Video Calling (Telehealth Support using PeerJS)  
 - [ ] 💳 Payment Gateway Integration (for paid consultations)
+
+---
+## 📄 License
+This project is licensed under the MIT License.
+
