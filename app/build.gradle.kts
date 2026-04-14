@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
     implementation(libs.identity.jvm)
+    implementation(libs.androidx.compose.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -89,7 +90,8 @@ dependencies {
 
     implementation(libs.androidx.material.icons.extended)
 
-        implementation(libs.androidx.core.splashscreen)
+    implementation("androidx.datastore:datastore-preferences:1.1.7")
+    implementation(libs.androidx.core.splashscreen)
 
 
 }

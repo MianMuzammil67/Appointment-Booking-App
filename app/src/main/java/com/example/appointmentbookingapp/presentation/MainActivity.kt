@@ -32,9 +32,13 @@ class MainActivity : ComponentActivity() {
                         "MainActivity",
                         "Loading: ${splashViewModel.isLoading}, Destination: ${splashViewModel.startDestination}"
                     )
+//                MainApp(startDestination = "DoctorHomeScreenn")
                     MainApp(startDestination = startDestination)
+//                    JobApplicationForm()
                 }
             }
         }
     }
 }
+
+//https://www.behance.net/gallery/177790681/Doctor-Appointment-App-Doctor-Hospital-Finder-App

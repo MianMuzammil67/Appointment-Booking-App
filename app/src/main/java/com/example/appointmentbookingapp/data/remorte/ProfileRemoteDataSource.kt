@@ -1,6 +1,9 @@
 package com.example.appointmentbookingapp.data.remorte
 
 import android.util.Log
+import com.example.appointmentbookingapp.domain.model.DoctorItem
+import com.example.appointmentbookingapp.domain.model.User
+import com.example.appointmentbookingapp.util.UserRole
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
@@ -26,15 +29,66 @@ class ProfileRemoteDataSource @Inject constructor(
         return firebaseAuth.currentUser?.email
     }
 
-    suspend fun getCurrentUserData(): User? {
+    suspend fun getCurrentUserData(role :String) {
         Log.d(logTag, "getCurrentUserData called")
+        val userId = getCurrentUserId()
+        Log.d(logTag, "Current user ID: $userId")
+        try {
+            if (role == UserRole.PATIENT) {
+                val snapshot = firestore.collection("users")
+                    .document(userId!!)
+                    .get()
+                    .await()
+
+                val user = snapshot.toObject(User::class.java)
+                Log.d(logTag, "userData: \"${user?.name}\"")
+            }else{
+                val snapshot = firestore.collection("doctors")
+                    .document(userId!!)
+                    .get()
+                    .await()
+                val user = snapshot.toObject(DoctorItem::class.java)
+                Log.d(logTag, "userData: \"${user?.name}\"")
+            }
+        } catch (e: Exception) {
+            Log.d(logTag, "getCurrentUserData error: ${e.message}")
+        }
+    }
+
+
+
+
+
+//    suspend fun getCurrentUserData(): User? {
+//        Log.d(logTag, "getCurrentUserData called")
+//        val userId = getCurrentUserId() ?: return null
+//        Log.d(logTag, "Current user ID: $userId")
+//
+//        try {
+//            val snapshot = firestore.collection("users")
+//                .document(userId)
+//                .get()
+//                .await()
+//
+//            val user = snapshot.toObject(User::class.java)
+//            Log.d(logTag, "userData: \"${user?.name}\"")
+//
+//            return user
+//        } catch (e: Exception) {
+//            Log.d(logTag, "getCurrentUserData error: ${e.message}")
+//        }
+//
+//        return null
+//
+//    }
+
+
     suspend fun getCurrentUserRole(): String? {
         Log.d(logTag, "getCurrentUserRole called")
         val userId = getCurrentUserId() ?: return null
         Log.d(logTag, "Current user ID: $userId")
 
         try {
-            val snapshot = firestore.collection("users")
             // check users collection
             val userSnapshot = firestore.collection("users")
                 .document(userId)

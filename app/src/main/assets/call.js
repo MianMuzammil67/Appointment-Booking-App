@@ -208,4 +208,5 @@ function endCall() {
         currentCall = null;
     }
     stopLocalStream();
+    remoteVideo.srcObject = null;
 }

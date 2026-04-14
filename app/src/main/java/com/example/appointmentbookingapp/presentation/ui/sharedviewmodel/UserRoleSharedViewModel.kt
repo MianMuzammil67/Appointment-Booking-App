@@ -34,7 +34,8 @@ class UserRoleSharedViewModel @Inject constructor(
         } else {
             throw IllegalArgumentException("Invalid user role: $role")
         }
+//        profileRepository.setUserRoleManually(role)
     }
-
-
 }
+
+

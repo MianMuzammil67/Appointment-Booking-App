@@ -38,7 +38,9 @@ class ProfileRepositoryImp @Inject constructor(
     }
 
     override suspend fun getCurrentUserData(): User? {
-        return profileRemoteDataSource.getCurrentUserData()
+//        return profileRemoteDataSource.getCurrentUserData()
+        return null
+    }
     override suspend fun getCurrentUserRole(): String? {
         return profileRemoteDataSource.getCurrentUserRole()
     }
