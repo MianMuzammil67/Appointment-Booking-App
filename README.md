@@ -17,6 +17,13 @@ A modern Android application for booking doctor appointments, built with **Kotli
 - 🔑 **Role-Based Authentication** – Supports two user roles:
   - 🧑‍⚕️ **Doctor** – Manage appointments, respond to patient messages, and conduct video consultations.
   - 👩‍⚕️ **Patient** – Browse doctors, book appointments, view history, and chat/video call doctors.
+- 🧠 **AI Medical Assistant (Firebase AI Logic)**  
+  - Provides **safe, controlled medical guidance** using AI  
+  - Helps users understand symptoms at a basic level  
+  - Encourages doctor consultation when needed  
+  - Rejects unrelated queries automatically  
+  - Designed for **educational purposes only (not diagnosis)** 
+    
 - 🧑‍⚕️ **Doctor Directory** – Browse doctors by specialization
 - 📅 **Appointment Booking** – Schedule, view, and manage appointments
 - 🕒 **Appointment History** – View past & upcoming appointments
@@ -83,6 +90,11 @@ A modern Android application for booking doctor appointments, built with **Kotli
 <tr>
       <td><img src="https://github.com/user-attachments/assets/2a2291f1-3ef3-4488-a6ca-c0ee6a56e017" alt="Whiteboard/Workspace" width="200"/></td>
       <td><img src="https://github.com/user-attachments/assets/13bfbd33-31d1-4330-9f45-bd9e7f541ebc" alt="Video Call" width="200"/></td>
+
+  <td><img src="https://github.com/user-attachments/assets/7609325a-46e6-48ec-a8c6-40507ed70327" alt="Ai consult" width="200"/></td>
+
+ <td><img src="https://github.com/user-attachments/assets/1efe3f34-b7f6-4a86-b2f2-6afa4162674f" alt="Ai consult" width="200"/></td>
+
 </tr>
 
 </table>
@@ -96,6 +108,7 @@ A modern Android application for booking doctor appointments, built with **Kotli
 - [ ] ⭐ Ratings & Reviews for Doctors
 - [x] 🎥 Video Calling (Telehealth Support using PeerJS)  
 - [ ] 💳 Payment Gateway Integration (for paid consultations)
+- [x] 🧠 AI Medical Assistant (Firebase AI Logic)
 
 ---
 ## 📄 License
