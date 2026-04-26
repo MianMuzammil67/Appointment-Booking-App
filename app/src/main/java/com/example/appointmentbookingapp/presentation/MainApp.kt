@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.appointmentbookingapp.presentation.ui.aiLogic.AiLogicViewModel
 import com.example.appointmentbookingapp.presentation.ui.allCategories.AllDoctorCategories
 import com.example.appointmentbookingapp.presentation.ui.allDoctors.DoctorScreen
 import com.example.appointmentbookingapp.presentation.ui.appointment.AppointmentViewModel
@@ -67,6 +68,7 @@ fun MainApp(startDestination: String) {
     val authViewModel: AuthViewModel = hiltViewModel()
     val appointmentSharedViewModel: AppointmentSharedViewModel = hiltViewModel()
     val callViewModel: CallViewModel = hiltViewModel()
+    val aiLogicViewModel: AiLogicViewModel = hiltViewModel()
 
 
 
@@ -153,7 +155,7 @@ fun MainApp(startDestination: String) {
                 )
             }
             composable("ChatListScreen") {
-                ChatListScreen(navController, chatListViewModel, doctorChatSharedViewModel, roleSharedViewModel)
+                ChatListScreen(navController, chatListViewModel, doctorChatSharedViewModel, roleSharedViewModel,aiLogicViewModel)
             }
             composable("ChatScreen") {
                 ChatScreen(navController, chatViewModel, doctorChatSharedViewModel)

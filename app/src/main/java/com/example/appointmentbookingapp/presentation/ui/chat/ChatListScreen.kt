@@ -1,5 +1,6 @@
 package com.example.appointmentbookingapp.presentation.ui.chat
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -17,12 +18,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Badge
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -55,6 +58,7 @@ import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.ChatListItem
+import com.example.appointmentbookingapp.presentation.ui.aiLogic.AiLogicViewModel
 import com.example.appointmentbookingapp.presentation.ui.components.DeleteItemDialog
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.DoctorChatSharedViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
@@ -68,7 +72,8 @@ fun ChatListScreen(
     navController: NavController,
     chatListViewModel: ChatListViewModel = hiltViewModel(),
     doctorChatSharedViewModel: DoctorChatSharedViewModel = hiltViewModel(),
-    roleSharedViewModel: UserRoleSharedViewModel = hiltViewModel()
+    roleSharedViewModel: UserRoleSharedViewModel = hiltViewModel(),
+    aiLogicViewModel: AiLogicViewModel = hiltViewModel(),
 ) {
 
     var selectedItem by remember { mutableStateOf<ChatListItem?>(null) }
@@ -105,10 +110,31 @@ fun ChatListScreen(
                             Icon(Icons.Default.Delete, contentDescription = "Delete")
                         }
                     }
-
                 }
             )
         },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate("ChatScreen")
+                },
+                containerColor = colorResource(R.color.colorPrimary),
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .size(56.dp)
+
+                ) {
+
+                Icon(
+                    painter = painterResource(R.drawable.ic_ai),
+                    contentDescription = "Consult with AI",
+                    modifier = Modifier.padding(8.dp),
+                    tint = Color.White
+
+                )
+            }
+        }
     ) { paddingValues ->
 
         if (showDeleteDialog && selectedItem != null) {
@@ -178,6 +204,7 @@ fun ChatListScreen(
                                     val user = conversation.patient ?: conversation.doctor
                                     ?: return@ConversationCard
 
+                                    Log.d("ChatListScreen", "ChatListScreen: current User $user ")
                                     doctorChatSharedViewModel.updateCurrentUser(user)
                                     navController.navigate("ChatScreen")
                                 }

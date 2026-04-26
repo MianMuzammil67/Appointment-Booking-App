@@ -21,12 +21,16 @@ class DoctorChatSharedViewModel @Inject constructor(): ViewModel() {
     fun updateCurrentUser(user: Any) {
         currentUser = user
     }
+    fun clearViewModel(){
+        currentUser = null
+    }
 
 
     var currentDoctor by mutableStateOf(DoctorItem())
 
     fun updateCurrentDoctor(doctor: DoctorItem) {
         currentDoctor = doctor
+        currentUser= doctor
     }
 
 }

@@ -21,6 +21,7 @@ ksp = "2.2.10-2.0.2"
 #ksp = "2.0.21-1.0.27"
 identityJvm = "202411.1"
 ui = "1.9.3"
+firebaseAi = "17.11.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -51,6 +52,7 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 identity-jvm = { group = "com.android.identity", name = "identity-jvm", version.ref = "identityJvm" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
+firebase-ai = { group = "com.google.firebase", name = "firebase-ai", version.ref = "firebaseAi" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

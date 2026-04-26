@@ -1,5 +1,6 @@
 package com.example.appointmentbookingapp.di
 
+import com.example.appointmentbookingapp.data.remorte.AiLogicDataSource
 import com.example.appointmentbookingapp.data.remorte.AppointmentRemoteDataSource
 import com.example.appointmentbookingapp.data.remorte.AuthRemoteDataSource
 import com.example.appointmentbookingapp.data.remorte.CallRemoteDataSource
@@ -7,6 +8,7 @@ import com.example.appointmentbookingapp.data.remorte.ChatRemoteDataSource
 import com.example.appointmentbookingapp.data.remorte.FavoritesRemoteDataSource
 import com.example.appointmentbookingapp.data.remorte.HomeRemoteDataSource
 import com.example.appointmentbookingapp.data.remorte.ProfileRemoteDataSource
+import com.example.appointmentbookingapp.data.repository.AiLogicRepositoryImpl
 import com.example.appointmentbookingapp.data.repository.AppointmentRepositoryImpl
 import com.example.appointmentbookingapp.data.repository.AuthRepositoryImpl
 import com.example.appointmentbookingapp.data.repository.CallRepositoryImpl
@@ -14,6 +16,7 @@ import com.example.appointmentbookingapp.data.repository.ChatRepositoryImpl
 import com.example.appointmentbookingapp.data.repository.FavoriteRepositoryImpl
 import com.example.appointmentbookingapp.data.repository.HomeRepositoryImpl
 import com.example.appointmentbookingapp.data.repository.ProfileRepositoryImp
+import com.example.appointmentbookingapp.domain.repository.AiLogicRepository
 import com.example.appointmentbookingapp.domain.repository.AppointmentRepository
 import com.example.appointmentbookingapp.domain.repository.AuthRepository
 import com.example.appointmentbookingapp.domain.repository.CallRepository
@@ -89,6 +92,13 @@ object AppModule {
     @Provides
     fun provideCallRepository(callRemoteDataSource: CallRemoteDataSource): CallRepository {
         return CallRepositoryImpl(callRemoteDataSource)
+
+    }
+
+    @Singleton
+    @Provides
+    fun provideAiRepository(aiLogicDataSource: AiLogicDataSource): AiLogicRepository {
+        return AiLogicRepositoryImpl(aiLogicDataSource)
 
     }
 

@@ -1,11 +1,17 @@
 package com.example.appointmentbookingapp.presentation.ui.chat
 
 import android.util.Log
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,9 +44,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -62,6 +70,7 @@ import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.domain.model.Message
 import com.example.appointmentbookingapp.domain.model.User
+import com.example.appointmentbookingapp.presentation.ui.aiLogic.AiLogicViewModel
 import com.example.appointmentbookingapp.presentation.ui.components.DeleteItemDialog
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.DoctorChatSharedViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
@@ -75,9 +84,11 @@ fun ChatScreen(
     navController: NavController,
     chatViewModel: ChatViewModel = viewModel(),
     doctorChatSharedViewModel: DoctorChatSharedViewModel = hiltViewModel(),
-    userRoleSharedViewModel: UserRoleSharedViewModel = hiltViewModel()
+    userRoleSharedViewModel: UserRoleSharedViewModel = hiltViewModel(),
+    aiLogicViewModel: AiLogicViewModel = hiltViewModel()
 ) {
     val otherUser = doctorChatSharedViewModel.currentUser
+    val aiMessages = remember { mutableStateListOf<Message>() }
 
     val userRole by userRoleSharedViewModel.userRole.collectAsState()
     var messageInput by remember { mutableStateOf("") }
@@ -85,6 +96,8 @@ fun ChatScreen(
 
     var selectedMsg by remember { mutableStateOf<Message?>(null) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    val aiResponse by aiLogicViewModel.result.collectAsState()
+    val isAiLoading by aiLogicViewModel.isLoading.collectAsState()
 
     val name: String
     val imageUrl: String
@@ -104,142 +117,243 @@ fun ChatScreen(
         }
 
         else -> {
-            navController.popBackStack()
-            return
+            name = "Consult with AI"
+            imageUrl =
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDk14dhpW6pbdUvNZnwzSZ6MJRgGRWtm2IAQ&s"
+            userId = ""
         }
     }
 
     LaunchedEffect(Unit) {
         chatViewModel.listenToMessages(userId)
     }
+    LaunchedEffect(aiResponse) {
+        aiResponse?.text?.let {
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (selectedMsg != null) {
-                            Text(
-                                text = "1 selected",
-                                fontWeight = FontWeight.Bold
-                            )
-                        } else {
-                            AsyncImage(
-                                model = imageUrl,
-                                contentDescription = "Profile Picture",
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .border(2.dp, colorResource(R.color.colorPrimary), CircleShape)
-                            )
+            aiMessages.add(
+                Message(
+                    messageId = System.currentTimeMillis().toString(),
+                    senderId = "AI",
+                    content = it,
+                    timestamp = System.currentTimeMillis(),
+                    doctorId = "",
+                    patientId = ""
+                )
+            )
+        }
+    }
 
-                            Spacer(modifier = Modifier.width(8.dp))
 
-                            Column {
-                                Text(
-                                    text = name,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                                Text(
-                                    text = "Online",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Color.Gray
-                                )
-                            }
-                        }
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+    DisposableEffect(Unit) {
+        onDispose {
+            doctorChatSharedViewModel.clearViewModel()
+            Log.d("ChatScreen", "ChatScreen destroyed")
+        }
+    }
+
+
+    Scaffold(topBar = {
+        TopAppBar(title = {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (selectedMsg != null) {
+                    Text(
+                        text = "1 selected", fontWeight = FontWeight.Bold
+                    )
+                } else {
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .border(2.dp, colorResource(R.color.colorPrimary), CircleShape)
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    Column {
+                        Text(
+                            text = name,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "Online",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Gray
                         )
                     }
-                },
-                actions = {
-                    if (selectedMsg != null) {
-                        IconButton(onClick = { showDeleteDialog = true }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete")
-                        }
-                    } else {
-                        IconButton(onClick = {
-                            navController.navigate("cal")
-
-                        }) {
-                            Icon(Icons.Default.VideoCall, contentDescription = "Delete")
-                        }
-                    }
                 }
-
-            )
-        },
-        content = { paddingValues ->
-            if (showDeleteDialog && selectedMsg != null) {
-                DeleteItemDialog(
-                    onDismiss = { showDeleteDialog = false },
-                    onConfirm = {
-                        chatViewModel.deleteMessage(selectedMsg!!)
-                        selectedMsg = null
-                        showDeleteDialog = false
-                    }
+            }
+        }, navigationIcon = {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back"
                 )
             }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                // Message List
-                LazyColumn(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                    reverseLayout = true // To make new messages appear at the bottom
-                ) {
-                    items(messages.reversed()) { message -> // Displaying reversed for chronological order
-                        MessageBubble(
-                            message = message,
-                            isSentByMe = message.senderId == chatViewModel.currentUserId,
-                            onMessageLongClick = {
-                                selectedMsg = message
-                            },
-                            isSelected = selectedMsg?.messageId == message.messageId
-                        )
-                        Log.d(
-                            "MessageDebug", """ CurrentUserId: ${chatViewModel.currentUserId}
-                            CurrentUserRole: $userRole Message.patientId: ${message.patientId} 
-                             Message.doctorId: ${message.doctorId}""".trimIndent()
-                        )
-
-                    }
+        }, actions = {
+            if (selectedMsg != null) {
+                IconButton(onClick = { showDeleteDialog = true }) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete")
                 }
+            } else {
+                IconButton(onClick = {
+                    navController.navigate("cal")
 
-                // Message Input
-                MessageInput(
-                    message = messageInput,
-                    onMessageChange = { messageInput = it },
-                    onSendMessage = {
-                        if (messageInput.isNotBlank()) {
-                            chatViewModel.sendMessage(
-                                receiverId = userId,
-                                messageContent = messageInput,
-                                currentUserRole = userRole
-                            )
-                            messageInput = ""
-                        }
-                    }
-                )
+                }) {
+                    Icon(Icons.Default.VideoCall, contentDescription = "Delete")
+                }
             }
         }
-    )
+
+        )
+    }, content = { paddingValues ->
+        if (showDeleteDialog && selectedMsg != null) {
+            DeleteItemDialog(onDismiss = { showDeleteDialog = false }, onConfirm = {
+                chatViewModel.deleteMessage(selectedMsg!!)
+                selectedMsg = null
+                showDeleteDialog = false
+            })
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            // Message List
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                reverseLayout = false
+            ) {
+                val allMessages = if (userId.isEmpty()) aiMessages else messages
+
+                items(allMessages) { message ->
+                    MessageBubble(
+                        message = message,
+                        isSentByMe = message.senderId == chatViewModel.currentUserId,
+                        onMessageLongClick = {
+                            selectedMsg = message
+                        },
+                        isSelected = selectedMsg?.messageId == message.messageId
+                    )
+                    Log.d(
+                        "MessageDebug", """ CurrentUserId: ${chatViewModel.currentUserId}
+                            CurrentUserRole: $userRole Message.patientId: ${message.patientId} 
+                             Message.doctorId: ${message.doctorId}""".trimIndent()
+                    )
+                }
+                if (userId.isEmpty() && isAiLoading) {
+                    item {
+                        MessageBubble(
+                            message = Message(
+                                messageId = "typing",
+                                senderId = "AI",
+                                content = "typing",
+                                timestamp = System.currentTimeMillis(),
+                                doctorId = "",
+                                patientId = ""
+                            ),
+                            isSentByMe = false,
+                            onMessageLongClick = {},
+                            isSelected = false, isTyping = true
+                        )
+                    }
+                }
+            }
+
+            // Message Input
+            MessageInput(
+                message = messageInput,
+                onMessageChange = { messageInput = it },
+                onSendMessage = {
+
+                    if (messageInput.isBlank()) return@MessageInput
+
+                    if (userId.isEmpty()) {
+                        aiMessages.add(
+                            Message(
+                                messageId = System.currentTimeMillis().toString(),
+                                senderId = chatViewModel.currentUserId,
+                                content = messageInput,
+                                timestamp = System.currentTimeMillis(),
+                                doctorId = "",
+                                patientId = "",
+
+                            )
+                        )
+                        val msg = buildDoctorAssistantPrompt(messageInput)
+                        aiLogicViewModel.getSuggestions(msg)
+
+                    } else {
+
+                        chatViewModel.sendMessage(
+                            receiverId = userId,
+                            messageContent = messageInput,
+                            currentUserRole = userRole
+                        )
+                    }
+                    messageInput = ""
+
+//                        if (messageInput.isNotBlank()) {
+//                            chatViewModel.sendMessage(
+//                                receiverId = userId,
+//                                messageContent = messageInput,
+//                                currentUserRole = userRole
+//                            )
+//                            messageInput = ""
+//                        }
+                }
+            )
+        }
+    })
+}
+
+@Composable
+fun TypingDots() {
+
+    val dotCount = 3
+    val delayUnit = 300
+
+    val infiniteTransition = rememberInfiniteTransition(label = "")
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        repeat(dotCount) { index ->
+
+            val scale by infiniteTransition.animateFloat(
+                initialValue = 0.3f,
+                targetValue = 1f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(
+                        durationMillis = 600,
+                        delayMillis = index * delayUnit
+                    ),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = ""
+            )
+
+            Spacer(modifier = Modifier.width(4.dp))
+
+            Box(
+                modifier = Modifier
+                    .size((6 * scale).dp)
+                    .clip(CircleShape)
+                    .background(Color.Gray)
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -248,7 +362,9 @@ fun MessageBubble(
     message: Message,
     isSentByMe: Boolean,
     onMessageLongClick: (message: Message) -> Unit,
-    isSelected: Boolean
+    isSelected: Boolean,
+    isTyping: Boolean = false
+
 ) {
     val bubbleColor = if (isSentByMe) {
         colorResource(id = R.color.colorPrimary)
@@ -265,8 +381,7 @@ fun MessageBubble(
         if (isSelected) colorResource(R.color.colorPrimary).copy(0.5f) else Color.Transparent
 
     val instant = Instant.ofEpochMilli(message.timestamp)
-    val formatter = DateTimeFormatter.ofPattern("h:mm a")
-        .withZone(ZoneId.systemDefault())
+    val formatter = DateTimeFormatter.ofPattern("h:mm a").withZone(ZoneId.systemDefault())
     val formattedTime = formatter.format(instant)
 
 
@@ -275,16 +390,12 @@ fun MessageBubble(
             .fillMaxWidth()
             .background(backgroundColor)
             .padding(horizontal = 12.dp, vertical = 4.dp)
-            .combinedClickable(
-                onClick = {},
-                onLongClick = { onMessageLongClick(message) }
-            ),
+            .combinedClickable(onClick = {}, onLongClick = { onMessageLongClick(message) }),
 
         horizontalArrangement = if (isSentByMe) Arrangement.End else Arrangement.Start
     ) {
         Column(
-            modifier = Modifier
-                .widthIn(max = 280.dp),
+            modifier = Modifier.widthIn(max = 280.dp),
             horizontalAlignment = if (isSentByMe) Alignment.End else Alignment.Start
         ) {
             Card(
@@ -297,12 +408,20 @@ fun MessageBubble(
                 colors = CardDefaults.cardColors(containerColor = bubbleColor),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                Text(
-                    text = message.content,
-                    color = textColor,
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
-                    fontSize = 16.sp,
-                )
+
+                if (isTyping) {
+                    Box(modifier = Modifier.padding(12.dp)) {
+                        TypingDots()
+                    }
+                } else {
+
+                    Text(
+                        text = message.content,
+                        color = textColor,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                        fontSize = 16.sp,
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -335,9 +454,7 @@ fun MessageBubble(
 
 @Composable
 fun MessageInput(
-    message: String,
-    onMessageChange: (String) -> Unit,
-    onSendMessage: () -> Unit
+    message: String, onMessageChange: (String) -> Unit, onSendMessage: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -370,6 +487,43 @@ fun MessageInput(
         }
     }
 }
+
+
+fun buildDoctorAssistantPrompt(
+    userText: String,
+    doctorSpecialty: String = "general medical guidance"
+): String {
+
+    return """
+        SYSTEM ROLE:
+        You are a professional AI medical assistant inside a doctor consultation app.
+
+        DOCTOR SPECIALIZATION:
+        $doctorSpecialty
+
+        STRICT RULES:
+        • Only answer questions related to $doctorSpecialty
+        • Provide educational medical guidance only
+        • Do NOT provide diagnosis
+        • Do NOT prescribe medication
+        • Do NOT replace a real doctor consultation
+        • If symptoms appear serious advise immediate consultation with a doctor
+        • If question is unrelated reply EXACTLY with:
+
+        "I can only help with $doctorSpecialty-related medical questions."
+
+        RESPONSE STYLE:
+        • Clear
+        • Short
+        • Supportive
+        • Safe
+        • Professional
+
+        USER QUESTION:
+        $userText
+    """.trimIndent()
+}
+
 
 @Preview(showBackground = true)
 @Composable
