@@ -47,6 +47,7 @@ import com.example.appointmentbookingapp.presentation.state.UiState
 import com.example.appointmentbookingapp.presentation.ui.components.CancelBookingDialog
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.AppointmentSharedViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
+import com.example.appointmentbookingapp.util.Routes
 import com.example.appointmentbookingapp.util.UserRole
 import kotlinx.coroutines.launch
 
@@ -193,10 +194,10 @@ fun MyAppointments(
 
                             if (userRole == UserRole.PATIENT && item is AppointmentWithDoctor && item.appointment.status == AppointmentStatusString.PENDING && item.appointment.status != AppointmentStatusString.CANCELLED) {
                                 appointmentSharedViewModel.setAppointment(item.appointment)
-                                navController.navigate("WaitingRoomScreen")
+                                navController.navigate(Routes.WAITING_ROOM)
                             } else if (userRole == UserRole.DOCTOR && item is AppointmentWithPatient && item.appointment.status != AppointmentStatusString.CANCELLED && item.appointment.status != AppointmentStatusString.COMPLETED) {
                                 appointmentSharedViewModel.setAppointment(item.appointment)
-                                navController.navigate("CallScreen")
+                                navController.navigate(Routes.CALL)
                             }
                         }
                     )

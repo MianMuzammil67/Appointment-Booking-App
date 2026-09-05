@@ -56,6 +56,7 @@ import com.example.appointmentbookingapp.presentation.ui.home.viewModel.HomeView
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
 import com.example.appointmentbookingapp.presentation.ui.profile.ProfileViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.SharedCategoryViewModel
+import com.example.appointmentbookingapp.util.Routes
 import kotlinx.coroutines.launch
 
 @Composable
@@ -105,12 +106,12 @@ fun HomeScreen(
                     scope.launch {
                         sharedDoctorViewModel.setSelectedDoctor(currentDoctor)
                     }
-                    navController.navigate("DoctorDetail")
+                    navController.navigate(Routes.DOCTOR_DETAIL)
                     Log.d("HomeScreen", "HomeScreen: ${currentDoctor.id}")
                 },
                 onSeeAllClicked = {
                     sharedCategoryViewModel.setSelectedCategory(null)
-                    navController.navigate("DoctorScreen")
+                    navController.navigate(Routes.DOCTOR_SCREEN)
                 },
                 favoriteViewModel = favoriteViewModel,
                 favoriteIds = favoriteIds
@@ -211,7 +212,7 @@ fun CategorySection(
             style = MaterialTheme.typography.titleSmall,
             color = colorResource(id = R.color.gray),
             modifier = Modifier.clickable {
-                navController.navigate("AllDoctorCategories")
+                navController.navigate(Routes.ALL_DOCTOR_CATEGORIES)
             }
         )
     }
@@ -231,7 +232,7 @@ fun CategorySection(
                 categoryState.data.forEach { category ->
                     CategoryItem(category = category) { itemName ->
                         sharedCategoryViewModel.setSelectedCategory(itemName)
-                        navController.navigate("DoctorScreen")
+                        navController.navigate(Routes.DOCTOR_SCREEN)
                     }
                 }
             }

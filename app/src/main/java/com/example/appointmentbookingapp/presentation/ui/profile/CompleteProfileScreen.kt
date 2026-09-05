@@ -78,6 +78,7 @@ import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.domain.model.DoctorExtras
 import com.example.appointmentbookingapp.presentation.ui.auth.AuthViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
+import com.example.appointmentbookingapp.util.Routes
 import com.example.appointmentbookingapp.util.UserRole
 
 val docCategories = listOf(
@@ -230,7 +231,7 @@ fun CompleteProfileScreen(
                                 name, email, password, uriString, userRole,
                                 doctorExtras = doctorExtras
                             )
-                            navController.navigate("DoctorHomeScreenn")
+                            navController.navigate(Routes.DOCTOR_HOME)
 //                            val restoredUri = uriString?.let { Uri.parse(it) }
                         }
                     }

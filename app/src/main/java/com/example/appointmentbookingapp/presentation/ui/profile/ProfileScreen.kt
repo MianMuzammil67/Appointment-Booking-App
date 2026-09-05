@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.appointmentbookingapp.presentation.ui.components.LogOutDialog
+import com.example.appointmentbookingapp.util.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -163,7 +164,7 @@ fun ProfileScreen(
                         icon = Icons.Default.Favorite,
                         text = "Favorites",
                         onClick = {
-                            navController.navigate("FavoriteScreen")
+                            navController.navigate(Routes.FAVORITE)
                         }
                     )
                     HorizontalDivider()
@@ -197,7 +198,7 @@ fun ProfileScreen(
                 onDismiss = { showDialog = false },
                 onConfirm = {
                     profileViewModel.logOut()
-                    navController.navigate("RoleSelectionScreen") {
+                    navController.navigate(Routes.ROLE_SELECTION) {
                         popUpTo(0) { inclusive = true }
                     }
                     showDialog = false

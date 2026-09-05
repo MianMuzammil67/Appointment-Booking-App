@@ -31,6 +31,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.appointmentbookingapp.R
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
+import com.example.appointmentbookingapp.util.Routes
 import com.example.appointmentbookingapp.util.UserRole
 
 @Composable
@@ -78,7 +79,7 @@ fun RoleSelectionScreen(
                 )
                 RoleButton("Doctor") {
                     roleViewModel.setUserRole(UserRole.DOCTOR)
-                    navController.navigate("SignIn")
+                    navController.navigate(Routes.SIGN_IN)
 //                    navController.navigate("CompleteProfileScreen")
                 }
 
@@ -86,7 +87,7 @@ fun RoleSelectionScreen(
 
                 RoleButton("Patient") {
                     roleViewModel.setUserRole(UserRole.PATIENT)
-                    navController.navigate("SignUp")
+                    navController.navigate(Routes.SIGN_UP)
                 }
             }
         }

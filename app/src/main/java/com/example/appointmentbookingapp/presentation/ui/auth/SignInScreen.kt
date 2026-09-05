@@ -42,6 +42,7 @@ import com.example.appointmentbookingapp.presentation.ui.auth.components.ImageWi
 import com.example.appointmentbookingapp.presentation.ui.auth.components.TextInputField
 import com.example.appointmentbookingapp.presentation.ui.auth.components.WelcomeText
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
+import com.example.appointmentbookingapp.util.Routes
 import com.example.appointmentbookingapp.util.UserRole
 
 @Composable
@@ -66,10 +67,9 @@ fun SignInScreen(
         when {
             isSuccess != null -> {
                 Toast.makeText(context, "Sign In Successful", Toast.LENGTH_SHORT).show()
-                val destination =
-                    if (userRole == UserRole.DOCTOR) "DoctorHomeScreen" else "HomeScreen"
+                val destination = if (userRole == UserRole.DOCTOR) Routes.DOCTOR_HOME_SCREEN else Routes.HOME
                 navController.navigate(destination) {
-                    popUpTo("SignIn") { inclusive = true }
+                    popUpTo(Routes.SIGN_IN) { inclusive = true }
                 }
             }
 
@@ -186,12 +186,12 @@ fun SignInScreen(
                     ) {
                         val destination =
                             if (roleSharedViewModel.userRole.value == UserRole.DOCTOR) {
-                                "CompleteProfileScreen"
+                                Routes.COMPLETE_PROFILE
                             } else {
-                                "SignUp"
+                                Routes.SIGN_UP
                             }
                         navController.navigate(destination) {
-                            popUpTo("SignIn") { inclusive = true }
+                            popUpTo(Routes.SIGN_IN) { inclusive = true }
                         }
                     }
                 )

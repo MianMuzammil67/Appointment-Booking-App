@@ -41,6 +41,7 @@ import com.example.appointmentbookingapp.presentation.ui.auth.components.ImageWi
 import com.example.appointmentbookingapp.presentation.ui.auth.components.TextInputField
 import com.example.appointmentbookingapp.presentation.ui.auth.components.WelcomeText
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
+import com.example.appointmentbookingapp.util.Routes
 import com.example.appointmentbookingapp.util.UserRole
 
 @Composable
@@ -66,7 +67,7 @@ fun SignupScreen(
             successResponse != null -> {
                 Toast.makeText(context, "SignUp Successful", Toast.LENGTH_SHORT).show()
                 navController.navigate(
-                    if (userRole == UserRole.DOCTOR) "DoctorHomeScreen" else "HomeScreen"
+                    if (userRole == UserRole.DOCTOR) Routes.DOCTOR_HOME else Routes.HOME
                 )
             }
 
@@ -178,8 +179,8 @@ fun SignupScreen(
                     color = colorResource(id = R.color.colorPrimary),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.clickable {
-                        navController.navigate("SignIn") {
-                            popUpTo("SignUp") { inclusive = true }
+                        navController.navigate(Routes.SIGN_IN) {
+                            popUpTo(Routes.SIGN_UP) { inclusive = true }
                         }
                     }
                 )

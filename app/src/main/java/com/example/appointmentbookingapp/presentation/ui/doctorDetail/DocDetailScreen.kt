@@ -60,6 +60,7 @@ import com.example.appointmentbookingapp.domain.model.DoctorItem
 import com.example.appointmentbookingapp.presentation.ui.favorite.viewModel.FavoriteViewModel
 import com.example.appointmentbookingapp.presentation.ui.home.viewModel.SharedDoctorViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.DoctorChatSharedViewModel
+import com.example.appointmentbookingapp.util.Routes
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -132,7 +133,7 @@ fun DocDetailScreen(
                         .size(32.dp)
                         .clickable {
                             doctorChatSharedViewModel.updateCurrentDoctor(currentDoctor)
-                            navController.navigate("ChatScreen")
+                            navController.navigate(Routes.CHAT)
                         },
                     contentAlignment = Alignment.Center,
                 ) {
@@ -143,7 +144,7 @@ fun DocDetailScreen(
                     )
                 }
                 Button(
-                    onClick = { navController.navigate("BookAppointment") },
+                    onClick = { navController.navigate(Routes.BOOK_APPOINTMENT) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),

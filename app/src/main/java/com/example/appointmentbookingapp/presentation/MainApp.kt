@@ -48,6 +48,7 @@ import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.Appoint
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.DoctorChatSharedViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.SharedCategoryViewModel
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
+import com.example.appointmentbookingapp.util.Routes
 import com.example.appointmentbookingapp.util.UserRole
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -82,9 +83,9 @@ fun MainApp(startDestination: String) {
     }
 
     val bottomBarScreens = if (userRolee == UserRole.DOCTOR) {
-        listOf("DoctorHomeScreenn", "ChatListScreen", "MyAppointmentsScreen", "ProfileScreen")
+        listOf(Routes.DOCTOR_HOME_SCREEN, Routes.CHAT_LIST, Routes.MY_APPOINTMENTS, Routes.PROFILE)
     } else {
-        listOf("HomeScreen", "ChatListScreen", "MyAppointmentsScreen", "ProfileScreen")
+        listOf(Routes.HOME, Routes.CHAT_LIST, Routes.MY_APPOINTMENTS, Routes.PROFILE)
     }
 
 //    val bottomBarScreens =
@@ -105,9 +106,10 @@ fun MainApp(startDestination: String) {
             startDestination = startDestination,
             modifier = Modifier.padding(bottom = bottomPadding)
         ) {
-            composable("SignUp") { SignupScreen(navController, authViewModel, roleSharedViewModel) }
-            composable("SignIn") { SignInScreen(navController, authViewModel, roleSharedViewModel) }
-            composable("HomeScreen") {
+            composable(Routes.SIGN_UP) { SignupScreen(navController, authViewModel, roleSharedViewModel) }
+            composable(Routes.SIGN_IN) { SignInScreen(navController, authViewModel, roleSharedViewModel) }
+
+            composable(Routes.HOME) {
                 HomeScreen(
                     navController,
                     sharedDoctorViewModel,
@@ -117,7 +119,7 @@ fun MainApp(startDestination: String) {
                     sharedCategoryViewModel
                 )
             }
-            composable("DoctorDetail") {
+            composable(Routes.DOCTOR_DETAIL) {
                 DocDetailScreen(
                     navController,
                     sharedDoctorViewModel,
@@ -125,13 +127,13 @@ fun MainApp(startDestination: String) {
                     doctorChatSharedViewModel
                 )
             }
-            composable("BookAppointment") {
+            composable(Routes.BOOK_APPOINTMENT) {
                 BookAppointmentScreen(navController, sharedDoctorViewModel)
             }
-            composable("AllDoctorCategories") {
+            composable(Routes.ALL_DOCTOR_CATEGORIES) {
                 AllDoctorCategories(navController, homeViewModel, sharedCategoryViewModel)
             }
-            composable("DoctorScreen") {
+            composable(Routes.DOCTOR_SCREEN) {
                 DoctorScreen(
                     navController,
                     homeViewModel,
@@ -140,13 +142,13 @@ fun MainApp(startDestination: String) {
                     sharedCategoryViewModel
                 )
             }
-            composable("FavoriteScreen") {
+            composable(Routes.FAVORITE) {
                 FavoriteScreen(navController, sharedDoctorViewModel, favoriteViewModel)
             }
-            composable("ProfileScreen") {
+            composable(Routes.PROFILE) {
                 ProfileScreen(navController, profileViewModel)
             }
-            composable("MyAppointmentsScreen") {
+            composable(Routes.MY_APPOINTMENTS) {
                 MyAppointments(
                     navController,
                     appointmentViewModel,
@@ -154,32 +156,32 @@ fun MainApp(startDestination: String) {
                     roleSharedViewModel
                 )
             }
-            composable("ChatListScreen") {
+            composable(Routes.CHAT_LIST) {
                 ChatListScreen(navController, chatListViewModel, doctorChatSharedViewModel, roleSharedViewModel,aiLogicViewModel)
             }
-            composable("ChatScreen") {
+            composable(Routes.CHAT) {
                 ChatScreen(navController, chatViewModel, doctorChatSharedViewModel)
             }
-            composable("DoctorHomeScreen") {
+            composable(Routes.DOCTOR_HOME) {
                 DoctorHomeScreen(navController)
             }
-            composable("RoleSelectionScreen") {
+            composable(Routes.ROLE_SELECTION) {
                 RoleSelectionScreen(navController, roleSharedViewModel)
             }
-            composable("CompleteProfileScreen") {
+            composable(Routes.COMPLETE_PROFILE) {
                 CompleteProfileScreen(navController, authViewModel, roleSharedViewModel)
             }
-            composable("DoctorHomeScreenn") {
+            composable(Routes.DOCTOR_HOME_SCREEN) {
                 DoctorHomeScreenn(navController)
             }
-            composable("CallScreen") {
+            composable(Routes.CALL) {
                 CallScreen(
                     navController,
                     callViewModel,appointmentSharedViewModel,
                     roleSharedViewModel
                 )
             }
-            composable("WaitingRoomScreen") {
+            composable(Routes.WAITING_ROOM) {
                 WaitingRoomScreen(
                     navController,
                     callViewModel,

@@ -64,6 +64,7 @@ import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.DoctorC
 import com.example.appointmentbookingapp.presentation.ui.sharedviewmodel.UserRoleSharedViewModel
 import com.example.appointmentbookingapp.ui.theme.mediumGray
 import com.example.appointmentbookingapp.util.Resource
+import com.example.appointmentbookingapp.util.Routes
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -116,7 +117,7 @@ fun ChatListScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController.navigate("ChatScreen")
+                    navController.navigate(Routes.CHAT)
                 },
                 containerColor = colorResource(R.color.colorPrimary),
                 shape = RoundedCornerShape(20.dp),
@@ -206,7 +207,7 @@ fun ChatListScreen(
 
                                     Log.d("ChatListScreen", "ChatListScreen: current User $user ")
                                     doctorChatSharedViewModel.updateCurrentUser(user)
-                                    navController.navigate("ChatScreen")
+                                    navController.navigate(Routes.CHAT)
                                 }
                             },
                             longClickOnChat = { selectedItem = it },
